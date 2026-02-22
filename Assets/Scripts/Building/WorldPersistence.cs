@@ -3,6 +3,7 @@ using Unity.Netcode;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using ByteWar.Core;
 
 namespace ByteWar.Building
 {
@@ -31,7 +32,7 @@ namespace ByteWar.Building
     /// instances to a JSON file on the host machine.
     /// Attach to the NetworkManager (or a persistent server-owned object).
     /// </summary>
-    public class WorldPersistence : NetworkBehaviour
+    public class WorldPersistence : NetworkBehaviour, IPersistable
     {
         [Header("Configuration")]
         [SerializeField] private string _saveFileName = "world_save.json";
@@ -48,6 +49,39 @@ namespace ByteWar.Building
 
         /// <summary>Raised after a successful save. Parameter = number of buildings saved.</summary>
         public event Action<int> OnWorldSaved;
+
+        // ── IPersistable ──────────────────────────────────────────────────────
+
+        /// <inheritdoc/>
+        public string Serialize()
+        {
+            var pieces = FindObjectsByType<BuildingPiece>(FindObjectsSortMode.None);
+            var data = new WorldSaveData { SavedAtUtc = DateTime.UtcNow.ToString("o") };
+            foreach (var piece in pieces)
+            {
+                if (piece == null || !piece.IsSpawned) continue;
+                Vector3 pos = piece.transform.position;
+                data.Buildings.Add(new BuildingSaveEntry
+                {
+                    PieceType = (int)piece.PieceType,
+                    PosX = pos.x,
+                    PosY = pos.y,
+                    PosZ = pos.z,
+                    RotY = piece.transform.eulerAngles.y,
+                    PlacedByClientId = piece.PlacedByClientId.Value,
+                });
+            }
+            return JsonUtility.ToJson(data, prettyPrint: true);
+        }
+
+        /// <inheritdoc/>
+        public void Deserialize(string data)
+        {
+            if (string.IsNullOrEmpty(data)) return;
+            var save = JsonUtility.FromJson<WorldSaveData>(data);
+            if (save?.Buildings == null) return;
+            Debug.Log($"[WorldPersistence] IPersistable.Deserialize: {save.Buildings.Count} entries.");
+        }
 
         // ── Public API ────────────────────────────────────────────────────────
 

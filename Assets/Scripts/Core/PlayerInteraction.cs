@@ -80,26 +80,38 @@ namespace ByteWar.Core
             }
 
             Ray ray = _mainCamera.ScreenPointToRay(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+            if (Physics.Raycast(ray, out RaycastHit hit, GameConstants.GetInteractionRange()))
             {
                 Debug.Log($"[{nameof(PlayerInteraction)}] Raycast hit: {hit.collider.gameObject.name}");
 
-                ResourceNode resourceNode = hit.collider.GetComponent<ResourceNode>();
-                if (resourceNode != null)
+                // Try IDamageable + ICombatTarget (enemy combat)
+                var combatTarget = hit.collider.GetComponent<ICombatTarget>();
+                var damageable = hit.collider.GetComponent<IDamageable>();
+                if (combatTarget != null && combatTarget.IsAlive)
                 {
-                    Debug.Log($"[{nameof(PlayerInteraction)}] Hit ResourceNode: {resourceNode.gameObject.name}. Attempting to gather.");
-                    if (_animator != null) _animator.SetTrigger("Gather");
-                    GatherResourceServerRpc(resourceNode.NetworkObjectId);
+                    Debug.Log($"[{nameof(PlayerInteraction)}] Hit combat target: {hit.collider.gameObject.name}. Attacking.");
+                    if (_animator != null) _animator.SetTrigger("Attack");
+                    var enemyAI = hit.collider.GetComponent<EnemyAI>();
+                    if (enemyAI != null)
+                    {
+                        EnemyTargetTracker.SetTarget(enemyAI);
+                        AttackEnemyServerRpc(enemyAI.NetworkObjectId);
+                    }
                     return;
                 }
 
-                EnemyAI enemyAI = hit.collider.GetComponent<EnemyAI>();
-                if (enemyAI != null)
+                // Try IInteractable (resource gathering, crafting stations, etc.)
+                var interactable = hit.collider.GetComponent<IInteractable>();
+                if (interactable != null && interactable.CanInteract(OwnerClientId))
                 {
-                    Debug.Log($"[{nameof(PlayerInteraction)}] Hit EnemyAI: {enemyAI.gameObject.name} (NetworkObjectId={enemyAI.NetworkObjectId}). Attacking.");
-                    if (_animator != null) _animator.SetTrigger("Attack");
-                    EnemyTargetTracker.SetTarget(enemyAI);
-                    AttackEnemyServerRpc(enemyAI.NetworkObjectId);
+                    Debug.Log($"[{nameof(PlayerInteraction)}] Hit interactable: {interactable.InteractionName}. Interacting.");
+                    if (_animator != null) _animator.SetTrigger("Gather");
+                    // ResourceNode still needs the old path for gatherer param
+                    var resourceNode = hit.collider.GetComponent<ResourceNode>();
+                    if (resourceNode != null)
+                    {
+                        GatherResourceServerRpc(resourceNode.NetworkObjectId);
+                    }
                     return;
                 }
             }
@@ -114,7 +126,7 @@ namespace ByteWar.Core
             if (UnityEngine.InputSystem.Mouse.current == null) return Vector3.zero;
 
             Ray ray = _mainCamera.ScreenPointToRay(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+            if (Physics.Raycast(ray, out RaycastHit hit, GameConstants.GetInteractionRange()))
             {
                 return hit.point;
             }
@@ -130,7 +142,7 @@ namespace ByteWar.Core
                 if (enemy != null)
                 {
                     Debug.Log($"[{nameof(PlayerInteraction)}] Server: ClientId {rpcParams.Receive.SenderClientId} melee-attacking '{enemy.gameObject.name}'.");
-                    enemy.TakeDamage(10f);
+                    enemy.TakeDamage(GameConstants.GetMeleeDamage());
                 }
             }
             else
@@ -148,9 +160,8 @@ namespace ByteWar.Core
                 if (resourceNode != null)
                 {
                     Debug.Log($"[{nameof(PlayerInteraction)}] Server processing gather request from ClientId: {rpcParams.Receive.SenderClientId} for {resourceNode.gameObject.name}.");
-                    // Assuming 10 damage per gather for now
                     InventoryComponent gatherer = GetComponent<InventoryComponent>();
-                    resourceNode.TakeDamage(10f, gatherer);
+                    resourceNode.TakeDamage(GameConstants.GetGatherDamage(), gatherer);
                 }
             }
             else

@@ -16,6 +16,17 @@ All notable changes to this project are documented here.
 - **Docs**: ROADMAP, AGENTS, testing instructions, and Mixamo README updated.
 - **Cleanup**: Stale build artifacts deleted.
 
+### Core Abstractions & Architecture (Phase 14.1)
+
+- **Interfaces**: Created 7 core interfaces (`IDamageable`, `IInteractable`, `IInventoryHolder`, `ICombatTarget`, `IPersistable`, `IGameState`, `IAbilityExecutor`) implemented across EnemyAI, ResourceNode, InventoryComponent, AbilitySystemComponent, BuildingPiece, WorldPersistence.
+- **Encapsulation**: Converted public fields to `[SerializeField]` private + read-only properties across InventoryComponent, AbilitySystemComponent, EquipmentComponent, ScriptableObjects, CraftingStation, SurvivalStats. Added `internal` setters with `InternalsVisibleTo` for test assemblies.
+- **PlayerInteraction**: Refactored to use `IDamageable`/`IInteractable` interfaces instead of concrete `GetComponent<>()` casts.
+- **Architectural Extraction**: Extracted `PlayerMovement`, `PlayerVisualSetup`, `BuildingPreview`, `BuildingSnap` from monolithic parent classes for single-responsibility.
+- **GameConstants**: ScriptableObject centralizing all magic numbers with static fallback accessors via `Resources.Load`.
+- **GameStateMachine**: Lightweight state machine for game flow hosted by `GameManager`.
+- **GameEventBus**: Type-safe event channels with auto-cleanup on scene unload. Migrated static events from EnemyAI and EnemyTargetTracker.
+- **PlayerRegistry**: Static registry replacing `FindGameObjectsWithTag("Player")` calls, integrated into EnemyAI targeting.
+
 ### Greybox World & Valheim-Like Building (Phase 14 - Enhanced)
 
 - **Greybox World**: SceneGenerator now produces a flat 200×200m greybox ground plane (primitives with colliders + materials) instead of a procedural Terrain. Includes raised platform, ramp, obstacle walls, and 20 scattered rock props.

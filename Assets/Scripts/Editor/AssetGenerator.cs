@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using ByteWar.Core;
 using ByteWar.Survival;
 using ByteWar.Building;
 using ByteWar.Abilities.Mage;
@@ -44,11 +45,11 @@ namespace ByteWar.Editor
             // Generate Recipe
             CraftingRecipe staffRecipe = CreateAsset<CraftingRecipe>($"{basePath}/StaffRecipe.asset");
             staffRecipe.RecipeName = "Basic Staff Recipe";
-            staffRecipe.Ingredients = new List<RecipeIngredient>
+            staffRecipe.SetIngredients(new List<RecipeIngredient>
             {
                 new RecipeIngredient { Item = wood, Amount = 5 },
                 new RecipeIngredient { Item = stone, Amount = 2 }
-            };
+            });
             staffRecipe.Result = basicStaff;
             staffRecipe.ResultAmount = 1;
 
@@ -78,20 +79,28 @@ namespace ByteWar.Editor
             BuildingRecipe foundationRecipe = CreateAsset<BuildingRecipe>($"{basePath}/FoundationRecipe.asset");
             foundationRecipe.RecipeName = "Foundation";
             foundationRecipe.PieceType = BuildingPieceType.Foundation;
-            foundationRecipe.Cost = new List<RecipeIngredient>
+            foundationRecipe.SetCost(new List<RecipeIngredient>
             {
                 new RecipeIngredient { Item = wood, Amount = 4 },
                 new RecipeIngredient { Item = stone, Amount = 2 }
-            };
+            });
 
             BuildingRecipe wallRecipe = CreateAsset<BuildingRecipe>($"{basePath}/WallRecipe.asset");
             wallRecipe.RecipeName = "Wall";
             wallRecipe.PieceType = BuildingPieceType.Wall;
-            wallRecipe.Cost = new List<RecipeIngredient>
+            wallRecipe.SetCost(new List<RecipeIngredient>
             {
                 new RecipeIngredient { Item = wood, Amount = 3 },
                 new RecipeIngredient { Item = stone, Amount = 1 }
-            };
+            });
+
+            // Generate GameConstants (placed in Resources/ for Resources.Load)
+            string resourcesPath = "Assets/Resources";
+            if (!AssetDatabase.IsValidFolder(resourcesPath))
+            {
+                AssetDatabase.CreateFolder("Assets", "Resources");
+            }
+            CreateAsset<GameConstants>($"{resourcesPath}/GameConstants.asset");
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

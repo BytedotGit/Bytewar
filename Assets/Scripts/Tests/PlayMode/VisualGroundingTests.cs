@@ -31,8 +31,10 @@ namespace ByteWar.Tests.PlayMode
             playerGo.AddComponent<ByteWar.Survival.InventoryComponent>();
             playerGo.AddComponent<ByteWar.Core.PlayerInputHandler>();
             playerGo.AddComponent<CharacterController>();
+            playerGo.AddComponent<PlayerMovement>();
 
-            var player = playerGo.AddComponent<NetworkPlayer>();
+            var visualSetup = playerGo.AddComponent<PlayerVisualSetup>();
+            playerGo.AddComponent<NetworkPlayer>();
 
             // VisualRoot hovering 0.1m above terrain.
             var visualRoot = new GameObject("VisualRoot");
@@ -54,7 +56,7 @@ namespace ByteWar.Tests.PlayMode
             Assert.That(beforeMinY, Is.GreaterThan(0.05f), "Precondition: cube should start hovering above terrain.");
 
             // Act
-            bool applied = player.TryApplyVisualGroundingNow(desiredDelta: -0.035f, maxOffset: 1.0f, out float appliedOffset, out string diag);
+            bool applied = visualSetup.TryApplyVisualGroundingNow(desiredDelta: -0.035f, maxOffset: 1.0f, out float appliedOffset, out string diag);
 
             // Assert
             Assert.IsTrue(applied, $"Expected grounding correction to apply. diag={diag}");

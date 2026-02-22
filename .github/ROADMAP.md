@@ -43,7 +43,7 @@ This roadmap outlines the steps required to reach a fully playable, multiplayer 
 - [x] **Tests**: `EnemyTargetTrackerTests` (EditMode), `MeleeAttackSmokeTests` (PlayMode), plus existing combat/resource smoke tests. Build: ✅ Exit 0. AutoTest: ✅ PASS. No exceptions.
 - [x] **Input Hardening**: Enforced `Active Input Handling = Both` (`activeInputHandler: 2`) via editor-load enforcer + build preprocessor; AutoTester now fails fast if `ENABLE_INPUT_SYSTEM` isn’t defined or devices/actions aren’t active.
 
-## Phase 13.1: Player Feel Hotfix (NEXT)
+## Phase 13.1: Player Feel Hotfix (COMPLETED)
 
 **Goal**: Lock down the core "feels like WoW" fundamentals so we don't regress into camera/grounding/input issues.
 
@@ -75,7 +75,21 @@ This roadmap outlines the steps required to reach a fully playable, multiplayer 
 - [x] **World Persistence**: `WorldPersistence` server-side JSON save/load at `Application.persistentDataPath/world_save.json`.
 - [x] **Tests**: `BuildingSystemTests` (EditMode) — grid snapping, snap points, rotation, stability, recipe cost, JSON round-trip. `BuildingPlacementSmokeTests` (PlayMode) — placement with/without resources, piece spawn. AutoTester validates BuildingController + WorldPersistence + grounding on greybox surfaces. Build: Exit 0. AutoTest: PASS (all 8 checks). No exceptions.
 
-## Phase 15: Visuals & Audio Polish
+## Phase 14.1: Core Abstractions & Architecture (COMPLETED)
+
+**Goal**: Establish interface-first design, encapsulation, and centralized infrastructure for maintainable, testable code.
+
+- [x] **Interfaces**: Created 7 core interfaces (`IDamageable`, `IInteractable`, `IInventoryHolder`, `ICombatTarget`, `IPersistable`, `IGameState`, `IAbilityExecutor`) and implemented on EnemyAI, ResourceNode, InventoryComponent, AbilitySystemComponent, BuildingPiece, WorldPersistence.
+- [x] **Encapsulation**: Converted public fields to `[SerializeField]` private + read-only properties across InventoryComponent, AbilitySystemComponent, EquipmentComponent, ScriptableObjects, CraftingStation, SurvivalStats. Added `internal` setters with `InternalsVisibleTo` for test assemblies.
+- [x] **PlayerInteraction Refactor**: Rewrote to use `IDamageable`/`IInteractable` interfaces instead of concrete `GetComponent<EnemyAI>()` and `GetComponent<ResourceNode>()` casts.
+- [x] **Architectural Extraction**: Extracted `PlayerMovement` (movement/gravity/jumping/abilities), `PlayerVisualSetup` (animator repair/visual grounding/visual mode detection), `BuildingPreview` (preview ghost management/tinting), `BuildingSnap` (grid snap/adjacency snap/support checks) from their parent classes.
+- [x] **GameConstants ScriptableObject**: Centralized magic numbers (move speed 6, turn speed 14, gravity -18, jump force 6, melee/gather damage 10, fireball fallback 25, interaction range 100, target frame rate 60) into a runtime-loadable `Resources/GameConstants` asset with static fallback accessors.
+- [x] **GameStateMachine**: Lightweight state machine (Initializing → MainMenu → Connecting → Loading → Playing → Paused → Disconnected) hosted by `GameManager` with `OnStateChanged` events.
+- [x] **GameEventBus**: Type-safe event channels (`GameEvent<T>`) with auto-cleanup on scene unload. 6 channels: EnemyDied, EnemyTargeted, ItemAdded, ItemRemoved, BuildingPlaced, GameStateChanged. Migrated EnemyAI and EnemyTargetTracker from static events.
+- [x] **PlayerRegistry**: Static registry replacing `FindGameObjectsWithTag("Player")`. Maintained by `NetworkPlayer.OnNetworkSpawn/Despawn`. Provides `GetNearest()` utility. Integrated into EnemyAI targeting.
+- [x] **Tests**: All 62 EditMode + 18 PlayMode tests pass. Build: Exit 0. AutoTest: 8/8 PASS. No exceptions.
+
+## Phase 15: Visuals & Audio Polish (NEXT)
 
 **Goal**: Upgrade the game from a prototype to a polished vertical slice.
 

@@ -38,6 +38,8 @@ namespace ByteWar.Editor
             playerObj.AddComponent<PlayerInputHandler>();
             playerObj.AddComponent<PlayerInteraction>();
             CharacterController cc = playerObj.AddComponent<CharacterController>();
+            playerObj.AddComponent<PlayerMovement>();
+            playerObj.AddComponent<PlayerVisualSetup>();
             playerObj.AddComponent<NetworkPlayer>();
             Animator animator = playerObj.AddComponent<Animator>();
             ClientNetworkAnimator netAnimator = playerObj.AddComponent<ClientNetworkAnimator>();

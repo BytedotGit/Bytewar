@@ -7,7 +7,12 @@ namespace ByteWar.Building
 {
     public class CraftingStation : NetworkBehaviour
     {
-        public List<CraftingRecipe> AvailableRecipes;
+        [SerializeField] private List<CraftingRecipe> _availableRecipes;
+
+        public IReadOnlyList<CraftingRecipe> AvailableRecipes => _availableRecipes;
+
+        /// <summary>Sets the recipe list directly. Internal for test construction.</summary>
+        internal void SetAvailableRecipes(List<CraftingRecipe> recipes) => _availableRecipes = recipes;
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void RequestCraftServerRpc(int recipeIndex, ulong clientId)

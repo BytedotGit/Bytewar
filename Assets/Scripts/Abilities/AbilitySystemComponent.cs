@@ -1,18 +1,25 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using ByteWar.Core;
 
 namespace ByteWar.Abilities
 {
     [RequireComponent(typeof(AttributeSet))]
-    public class AbilitySystemComponent : NetworkBehaviour
+    public class AbilitySystemComponent : NetworkBehaviour, IAbilityExecutor
     {
         public AttributeSet Attributes { get; private set; }
-        public List<Ability> LearnedAbilities = new List<Ability>();
-        public List<Talent> LearnedTalents = new List<Talent>();
 
-        public Dictionary<string, float> CooldownReductions = new Dictionary<string, float>();
-        public Dictionary<string, float> ManaCostReductions = new Dictionary<string, float>();
+        [SerializeField] private List<Ability> _learnedAbilities = new List<Ability>();
+        [SerializeField] private List<Talent> _learnedTalents = new List<Talent>();
+
+        /// <summary>Read-only view of learned abilities.</summary>
+        public IReadOnlyList<Ability> LearnedAbilities => _learnedAbilities;
+        /// <summary>Read-only view of learned talents.</summary>
+        public IReadOnlyList<Talent> LearnedTalents => _learnedTalents;
+
+        private Dictionary<string, float> _cooldownReductions = new Dictionary<string, float>();
+        private Dictionary<string, float> _manaCostReductions = new Dictionary<string, float>();
 
         private Dictionary<string, float> _cooldowns = new Dictionary<string, float>();
 
@@ -92,7 +99,7 @@ namespace ByteWar.Abilities
 
             // Local preflight: avoid animation/no-op when mana is obviously insufficient.
             float actualManaCost = ability.ManaCost;
-            if (ManaCostReductions.TryGetValue(ability.AbilityName, out float manaReduction))
+            if (_manaCostReductions.TryGetValue(ability.AbilityName, out float manaReduction))
             {
                 actualManaCost = Mathf.Max(0f, actualManaCost - manaReduction);
             }
@@ -118,10 +125,10 @@ namespace ByteWar.Abilities
         {
             EnsureAttributesAssigned("CastAbilityServerRpc");
 
-            Ability ability = LearnedAbilities[abilityIndex];
+            Ability ability = _learnedAbilities[abilityIndex];
 
             float actualManaCost = ability.ManaCost;
-            if (ManaCostReductions.TryGetValue(ability.AbilityName, out float manaReduction))
+            if (_manaCostReductions.TryGetValue(ability.AbilityName, out float manaReduction))
             {
                 actualManaCost = Mathf.Max(0, actualManaCost - manaReduction);
             }
@@ -131,7 +138,7 @@ namespace ByteWar.Abilities
                 ability.Execute(this, targetPosition);
 
                 float actualCooldown = ability.Cooldown;
-                if (CooldownReductions.TryGetValue(ability.AbilityName, out float cdReduction))
+                if (_cooldownReductions.TryGetValue(ability.AbilityName, out float cdReduction))
                 {
                     actualCooldown = Mathf.Max(0, actualCooldown - cdReduction);
                 }
@@ -148,11 +155,11 @@ namespace ByteWar.Abilities
         [ClientRpc]
         private void PlayAbilityEffectClientRpc(int abilityIndex, Vector3 targetPosition)
         {
-            Ability ability = LearnedAbilities[abilityIndex];
+            Ability ability = _learnedAbilities[abilityIndex];
 
             // Set cooldown on client for UI tracking
             float actualCooldown = ability.Cooldown;
-            if (CooldownReductions.TryGetValue(ability.AbilityName, out float cdReduction))
+            if (_cooldownReductions.TryGetValue(ability.AbilityName, out float cdReduction))
             {
                 actualCooldown = Mathf.Max(0, actualCooldown - cdReduction);
             }
@@ -176,12 +183,44 @@ namespace ByteWar.Abilities
             return _cooldowns.ContainsKey(abilityName) && _cooldowns[abilityName] > 0;
         }
 
+        // ── Mutation methods ──────────────────────────────────────────────────
+
+        /// <summary>Add an ability to the learned list. Use for setup/tests.</summary>
+        public void AddLearnedAbility(Ability ability)
+        {
+            _learnedAbilities.Add(ability);
+        }
+
+        /// <summary>Set a cooldown reduction for the named ability.</summary>
+        public void SetCooldownReduction(string abilityName, float reduction)
+        {
+            _cooldownReductions[abilityName] = reduction;
+        }
+
+        /// <summary>Get cooldown reduction for the named ability.</summary>
+        public float GetCooldownReduction(string abilityName)
+        {
+            return _cooldownReductions.TryGetValue(abilityName, out float val) ? val : 0f;
+        }
+
+        /// <summary>Set a mana cost reduction for the named ability.</summary>
+        public void SetManaCostReduction(string abilityName, float reduction)
+        {
+            _manaCostReductions[abilityName] = reduction;
+        }
+
+        /// <summary>Get mana cost reduction for the named ability.</summary>
+        public float GetManaCostReduction(string abilityName)
+        {
+            return _manaCostReductions.TryGetValue(abilityName, out float val) ? val : 0f;
+        }
+
         public void LearnTalent(Talent talent)
         {
             if (!IsServer) return;
-            if (!LearnedTalents.Contains(talent))
+            if (!_learnedTalents.Contains(talent))
             {
-                LearnedTalents.Add(talent);
+                _learnedTalents.Add(talent);
                 talent.ApplyTalent(this);
             }
         }

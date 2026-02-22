@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8409b6b6070badd46b9a69bd1f88b4f7, type: 3}
   m_Name: StaffRecipe
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Building.CraftingRecipe
-  RecipeName: Basic Staff Recipe
-  Ingredients:
+  _recipeName: Basic Staff Recipe
+  _ingredients:
   - Item: {fileID: 11400000, guid: f55c1bada33abee4a90ba78e9640ff03, type: 2}
     Amount: 5
   - Item: {fileID: 11400000, guid: e433122c592ead246b632ef795d7e2df, type: 2}
     Amount: 2
-  Result: {fileID: 11400000, guid: 7b9b20b4f07912849b279f0eeba1d8d7, type: 2}
-  ResultAmount: 1
+  _result: {fileID: 11400000, guid: 7b9b20b4f07912849b279f0eeba1d8d7, type: 2}
+  _resultAmount: 1

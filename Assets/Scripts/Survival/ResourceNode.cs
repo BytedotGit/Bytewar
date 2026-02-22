@@ -1,15 +1,43 @@
 using UnityEngine;
 using Unity.Netcode;
+using ByteWar.Core;
 
 namespace ByteWar.Survival
 {
-    public class ResourceNode : NetworkBehaviour
+    public class ResourceNode : NetworkBehaviour, IDamageable, IInteractable
     {
         [SerializeField] private float _maxHealth = 100f;
         [SerializeField] private Item _dropItem;
         [SerializeField] private int _dropAmount = 1;
 
         public NetworkVariable<float> Health = new NetworkVariable<float>(100f);
+
+        // ── IDamageable ───────────────────────────────────────────────────────────
+        /// <inheritdoc/>
+        public float CurrentHealth => Health.Value;
+        /// <inheritdoc/>
+        public bool IsAlive => Health.Value > 0f;
+
+        // ── IInteractable ─────────────────────────────────────────────────────────
+        /// <inheritdoc/>
+        public string InteractionName => gameObject.name;
+        /// <inheritdoc/>
+        public bool CanInteract(ulong clientId) => IsAlive;
+        /// <inheritdoc/>
+        public void Interact(ulong clientId)
+        {
+            if (!IsServer) return;
+            // Find the player's inventory and gather
+            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client))
+            {
+                InventoryComponent gatherer = client.PlayerObject?.GetComponent<InventoryComponent>();
+                TakeDamage(10f, gatherer);
+            }
+            else
+            {
+                TakeDamage(10f);
+            }
+        }
 
         public void SetupForTest(Item dropItem, int dropAmount)
         {
@@ -26,7 +54,13 @@ namespace ByteWar.Survival
             }
         }
 
-        public void TakeDamage(float amount, InventoryComponent gatherer = null)
+        /// <inheritdoc/>
+        public void TakeDamage(float amount)
+        {
+            TakeDamage(amount, gatherer: null);
+        }
+
+        public void TakeDamage(float amount, InventoryComponent gatherer)
         {
             if (!IsServer)
             {

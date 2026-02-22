@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d0051be24828a14a94b7c958cc09b4c, type: 3}
   m_Name: WallRecipe
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Building.BuildingRecipe
-  RecipeName: Wall
-  PieceType: 1
-  Cost:
+  _recipeName: Wall
+  _pieceType: 1
+  _cost:
   - Item: {fileID: 11400000, guid: f55c1bada33abee4a90ba78e9640ff03, type: 2}
     Amount: 3
   - Item: {fileID: 11400000, guid: e433122c592ead246b632ef795d7e2df, type: 2}

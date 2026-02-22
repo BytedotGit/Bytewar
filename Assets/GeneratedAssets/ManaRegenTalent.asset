@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6487a3242ff08c468a65bd1310d5c45, type: 3}
   m_Name: ManaRegenTalent
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Abilities.Talents.AbilityModifierTalent
-  TalentName: Mana Regeneration
-  Description: Increases maximum mana and reduces Fireball mana cost.
-  MaxRank: 3
-  HealthBonus: 0
-  ManaBonus: 50
+  _talentName: Mana Regeneration
+  _description: Increases maximum mana and reduces Fireball mana cost.
+  _maxRank: 3
+  _healthBonus: 0
+  _manaBonus: 50
   TargetAbilityName: Fireball
   CooldownReduction: 0
   ManaCostReduction: 5

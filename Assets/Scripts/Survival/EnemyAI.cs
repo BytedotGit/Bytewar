@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using ByteWar.Abilities;
+using ByteWar.Core;
 using System;
 
 namespace ByteWar.Survival
@@ -10,7 +11,7 @@ namespace ByteWar.Survival
     /// and dies when its AttributeSet Health reaches zero.
     /// </summary>
     [RequireComponent(typeof(AttributeSet))]
-    public class EnemyAI : NetworkBehaviour
+    public class EnemyAI : NetworkBehaviour, IDamageable, ICombatTarget
     {
         [SerializeField] private float _moveSpeed = 3f;
         [SerializeField] private float _attackRange = 2f;
@@ -22,6 +23,14 @@ namespace ByteWar.Survival
         private float _lastAttackTime;
         private float _lastLogTime;
         private bool _isDead;
+
+        // ── Interface implementations ─────────────────────────────────────────
+        /// <inheritdoc/>
+        public float CurrentHealth => _attributes != null ? _attributes.Health.Value : 0f;
+        /// <inheritdoc/>
+        public bool IsAlive => !_isDead;
+        /// <inheritdoc/>
+        AttributeSet ICombatTarget.Attributes => _attributes;
 
         /// <summary>
         /// Raised on the server when this enemy dies (before despawn).
@@ -115,6 +124,13 @@ namespace ByteWar.Survival
             Debug.Log($"[EnemyAI] '{gameObject.name}' (NetworkObjectId={NetworkObjectId}) died!");
             OnEnemyDied?.Invoke(this);
 
+            // Also raise on centralized event bus
+            GameEventBus.EnemyDied.Raise(new EnemyDiedEvent
+            {
+                NetworkObjectId = NetworkObjectId,
+                Position = transform.position,
+            });
+
             if (IsSpawned)
             {
                 NetworkObject.Despawn(true);
@@ -157,18 +173,7 @@ namespace ByteWar.Survival
 
             if (_targetPlayer == null)
             {
-                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-                float closestDistance = float.MaxValue;
-
-                foreach (var player in players)
-                {
-                    float distance = Vector3.Distance(transform.position, player.transform.position);
-                    if (distance < closestDistance)
-                    {
-                        closestDistance = distance;
-                        _targetPlayer = player.transform;
-                    }
-                }
+                _targetPlayer = PlayerRegistry.GetNearest(transform.position);
 
                 if (_targetPlayer != null)
                 {

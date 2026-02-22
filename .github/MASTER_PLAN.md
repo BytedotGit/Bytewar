@@ -1,6 +1,7 @@
 # Plan: Production-Grade Agent-Driven Unity Workspace for ByteWar
 
 ## TL;DR
+
 Rename the project from SurvivalRPG → ByteWar, then overhaul the workspace to production-grade standards: ECS (DOTS) for simulation, dedicated server build, architectural abstractions (interfaces, state machines, event bus, config system), robust agent-autonomy infrastructure (CI/CD, guardrails, conventions, specialized agents), and comprehensive instruction files with worked ECS templates — all designed so AI agents build the game autonomously with minimal human input.
 
 ---
@@ -12,6 +13,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 ---
 
 ### PHASE 1: Project Rename (SurvivalRPG → ByteWar)
+
 > **Precondition**: None. Do this first — everything else references the project name.
 > **Risk mitigation**: This touches nearly every file. Run full test suite before AND after. Commit the rename as a single atomic commit.
 
@@ -57,6 +59,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 ---
 
 ### PHASE 2: Core Abstractions & Interfaces
+
 > **Precondition**: Phase 1 complete (all refs are ByteWar).
 > **Risk mitigation (from Further Considerations)**: Splitting `NetworkPlayer` touches the most critical runtime class. Run all existing tests before AND after the split. If any test breaks, the split is wrong — revert and re-approach.
 
@@ -125,6 +128,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 ---
 
 ### PHASE 3: ECS / DOTS Integration
+
 > **Precondition**: Phase 2 complete (interfaces exist, responsibilities separated).
 > **Risk mitigation (from Further Considerations)**: ECS has less agent training data. The ECS instruction file (step 3.12) MUST include 2-3 fully worked code templates (component + system + bridge) that agents can use as copy-paste references.
 
@@ -171,6 +175,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 ---
 
 ### PHASE 4: Dedicated Server
+
 > **Precondition**: Phase 2 complete (state machine separates client/server concerns). Phase 3 optional but recommended.
 
 - [ ] **4.1** Create server build profile in Unity (Build Profiles or scripted)
@@ -204,6 +209,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 ---
 
 ### PHASE 5: Performance & Code Quality
+
 > **Precondition**: Phases 2-3 complete.
 
 - [ ] **5.1** Implement object pooling using `UnityEngine.Pool.ObjectPool<T>`:
@@ -225,6 +231,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 ---
 
 ### PHASE 6: Instruction Files & Agent Conventions
+
 > **Precondition**: Phases 2-4 complete (conventions must match implemented architecture).
 > **Note**: Step 6.2 (agent-workflow) has no code dependency and CAN be done earlier / in parallel with Phase 2.
 
@@ -280,6 +287,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 ---
 
 ### PHASE 7: CI/CD & Verification Infrastructure
+
 > **Precondition**: Phase 4 step 4.3 (server build method exists). Phase 6.2 can be in parallel.
 
 - [ ] **7.1** Create `Tools/verify.ps1`:
@@ -330,6 +338,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 ---
 
 ### PHASE 8: Agent Guardrails & Custom Agents
+
 > **Precondition**: Phase 6 complete (conventions exist to enforce).
 
 - [ ] **8.1** Create `.github/agents/architect.agent.md`:
@@ -360,6 +369,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 ---
 
 ### PHASE 9: Test Infrastructure Hardening
+
 > **Precondition**: Phases 2-4 complete (things to test exist).
 
 - [ ] **9.1** Create `Assets/Scripts/Tests/TestUtilities.cs`:
@@ -402,6 +412,7 @@ PHASE 1 (Rename)
 ```
 
 **Parallelism opportunities**:
+
 - 6.2 (agent-workflow instructions) can start during Phase 2
 - Phase 3 (ECS) and Phase 4 (Server) can run in parallel after Phase 2
 - Phase 5 runs after both 3 and 4
@@ -411,31 +422,31 @@ PHASE 1 (Rename)
 
 ## Decisions
 
-| Decision | Rationale |
-|----------|-----------|
-| Rename SurvivalRPG → ByteWar as Phase 1 | Eliminates name confusion early; single atomic commit |
-| Company name: BytedotGit | Matches GitHub org name for consistency |
-| Hybrid MB/ECS | NGO doesn't support ECS entities natively; full Netcode for Entities would be a complete rewrite |
-| ECS instruction templates | 3 fully worked examples to compensate for less agent training data on DOTS |
-| NetworkPlayer split first in Phase 2 | Highest-risk refactor; must be done early with full test validation before/after |
-| No DI framework | Interfaces + GetComponent<IFoo> + RequireComponent is sufficient; VContainer if needed later |
-| CI + local verification | Complementary: local = fast agent feedback; CI = safety net on push |
-| Max 3 retries in error recovery | Prevents infinite agent loops; forces escalation |
-| Single scene + additive loading | Confirmed by user; no multi-scene architecture needed |
+| Decision                                | Rationale                                                                                        |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Rename SurvivalRPG → ByteWar as Phase 1 | Eliminates name confusion early; single atomic commit                                            |
+| Company name: BytedotGit                | Matches GitHub org name for consistency                                                          |
+| Hybrid MB/ECS                           | NGO doesn't support ECS entities natively; full Netcode for Entities would be a complete rewrite |
+| ECS instruction templates               | 3 fully worked examples to compensate for less agent training data on DOTS                       |
+| NetworkPlayer split first in Phase 2    | Highest-risk refactor; must be done early with full test validation before/after                 |
+| No DI framework                         | Interfaces + GetComponent<IFoo> + RequireComponent is sufficient; VContainer if needed later     |
+| CI + local verification                 | Complementary: local = fast agent feedback; CI = safety net on push                              |
+| Max 3 retries in error recovery         | Prevents infinite agent loops; forces escalation                                                 |
+| Single scene + additive loading         | Confirmed by user; no multi-scene architecture needed                                            |
 
 ---
 
 ## Estimated File Count
 
-| Category | New Files | Modified Files |
-|----------|-----------|----------------|
-| Phase 1 (Rename) | 0 | ~80+ (global rename) |
-| Phase 2 (Abstractions) | ~15 | ~40 |
-| Phase 3 (ECS) | ~12 | ~8 |
-| Phase 4 (Server) | ~3 | ~15 |
-| Phase 5 (Perf) | ~3 | ~5 |
-| Phase 6 (Instructions) | ~6 | ~12 |
-| Phase 7 (CI/CD) | ~5 | ~2 |
-| Phase 8 (Agents) | ~4 | ~2 |
-| Phase 9 (Tests) | ~3 | ~20 |
-| **Total** | **~51** | **~80+** |
+| Category               | New Files | Modified Files       |
+| ---------------------- | --------- | -------------------- |
+| Phase 1 (Rename)       | 0         | ~80+ (global rename) |
+| Phase 2 (Abstractions) | ~15       | ~40                  |
+| Phase 3 (ECS)          | ~12       | ~8                   |
+| Phase 4 (Server)       | ~3        | ~15                  |
+| Phase 5 (Perf)         | ~3        | ~5                   |
+| Phase 6 (Instructions) | ~6        | ~12                  |
+| Phase 7 (CI/CD)        | ~5        | ~2                   |
+| Phase 8 (Agents)       | ~4        | ~2                   |
+| Phase 9 (Tests)        | ~3        | ~20                  |
+| **Total**              | **~51**   | **~80+**             |

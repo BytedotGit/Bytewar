@@ -7,8 +7,13 @@ namespace ByteWar.Survival
     [RequireComponent(typeof(AttributeSet))]
     public class EquipmentComponent : NetworkBehaviour
     {
-        public Item EquippedWeapon;
-        public Item EquippedArmor;
+        [SerializeField] private Item _equippedWeapon;
+        [SerializeField] private Item _equippedArmor;
+
+        /// <summary>Currently equipped weapon (read-only for external consumers).</summary>
+        public Item EquippedWeapon => _equippedWeapon;
+        /// <summary>Currently equipped armor (read-only for external consumers).</summary>
+        public Item EquippedArmor => _equippedArmor;
 
         private AttributeSet _attributes;
 
@@ -25,13 +30,13 @@ namespace ByteWar.Survival
             // For PoC, we just assume it's armor if it has armor, else weapon
             if (item.Armor > 0)
             {
-                if (EquippedArmor != null) UnequipItem(EquippedArmor);
-                EquippedArmor = item;
+                if (_equippedArmor != null) UnequipItem(_equippedArmor);
+                _equippedArmor = item;
             }
             else
             {
-                if (EquippedWeapon != null) UnequipItem(EquippedWeapon);
-                EquippedWeapon = item;
+                if (_equippedWeapon != null) UnequipItem(_equippedWeapon);
+                _equippedWeapon = item;
             }
 
             ApplyItemStats(item, 1);
@@ -42,8 +47,8 @@ namespace ByteWar.Survival
         {
             if (!IsServer) return;
 
-            if (EquippedWeapon == item) EquippedWeapon = null;
-            else if (EquippedArmor == item) EquippedArmor = null;
+            if (_equippedWeapon == item) _equippedWeapon = null;
+            else if (_equippedArmor == item) _equippedArmor = null;
             else return;
 
             ApplyItemStats(item, -1);

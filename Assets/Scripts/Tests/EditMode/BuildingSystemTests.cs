@@ -97,7 +97,7 @@ namespace ByteWar.Tests.EditMode
         public void SnapToGrid_SnapsCorrectly()
         {
             Vector3 input = new Vector3(5.3f, 1.0f, 7.8f);
-            Vector3 result = BuildingController.SnapToGrid(input, 4f);
+            Vector3 result = BuildingSnap.SnapToGrid(input, 4f);
             Assert.AreEqual(4f, result.x, 0.01f, "X should snap to 4");
             Assert.AreEqual(1f, result.y, 0.01f, "Y should not change");
             Assert.AreEqual(8f, result.z, 0.01f, "Z should snap to 8");
@@ -107,7 +107,7 @@ namespace ByteWar.Tests.EditMode
         public void SnapToGrid_ZeroGridSize_ReturnsOriginal()
         {
             Vector3 input = new Vector3(3f, 2f, 5f);
-            Vector3 result = BuildingController.SnapToGrid(input, 0f);
+            Vector3 result = BuildingSnap.SnapToGrid(input, 0f);
             Assert.AreEqual(input, result, "Grid size 0 should return original position.");
         }
 
@@ -115,7 +115,7 @@ namespace ByteWar.Tests.EditMode
         public void SnapToGrid_NegativePosition_SnapsCorrectly()
         {
             Vector3 input = new Vector3(-5.3f, 0f, -7.8f);
-            Vector3 result = BuildingController.SnapToGrid(input, 4f);
+            Vector3 result = BuildingSnap.SnapToGrid(input, 4f);
             Assert.AreEqual(-4f, result.x, 0.01f);
             Assert.AreEqual(-8f, result.z, 0.01f);
         }
@@ -129,16 +129,16 @@ namespace ByteWar.Tests.EditMode
             var wood = ScriptableObject.CreateInstance<Item>();
             wood.ItemName = "Wood";
 
-            recipe.Cost = new List<RecipeIngredient>
+            recipe.SetCost(new List<RecipeIngredient>
             {
                 new RecipeIngredient { Item = wood, Amount = 3 }
-            };
+            });
 
             var go = new GameObject("Player");
             var inv = go.AddComponent<InventoryComponent>();
-            inv.Items.Add(wood);
-            inv.Items.Add(wood);
-            inv.Items.Add(wood);
+            inv.AddItem(wood);
+            inv.AddItem(wood);
+            inv.AddItem(wood);
 
             Assert.IsTrue(recipe.CanAfford(inv));
 
@@ -154,14 +154,14 @@ namespace ByteWar.Tests.EditMode
             var wood = ScriptableObject.CreateInstance<Item>();
             wood.ItemName = "Wood";
 
-            recipe.Cost = new List<RecipeIngredient>
+            recipe.SetCost(new List<RecipeIngredient>
             {
                 new RecipeIngredient { Item = wood, Amount = 3 }
-            };
+            });
 
             var go = new GameObject("Player");
             var inv = go.AddComponent<InventoryComponent>();
-            inv.Items.Add(wood);
+            inv.AddItem(wood);
 
             Assert.IsFalse(recipe.CanAfford(inv));
 
@@ -174,7 +174,7 @@ namespace ByteWar.Tests.EditMode
         public void BuildingRecipe_CanAfford_NullInventory_ReturnsFalse()
         {
             var recipe = ScriptableObject.CreateInstance<BuildingRecipe>();
-            recipe.Cost = new List<RecipeIngredient>();
+            recipe.SetCost(new List<RecipeIngredient>());
 
             Assert.IsFalse(recipe.CanAfford(null));
 
@@ -189,16 +189,16 @@ namespace ByteWar.Tests.EditMode
             wood.ItemName = "Wood";
 
             recipe.RecipeName = "TestRecipe";
-            recipe.Cost = new List<RecipeIngredient>
+            recipe.SetCost(new List<RecipeIngredient>
             {
                 new RecipeIngredient { Item = wood, Amount = 2 }
-            };
+            });
 
             var go = new GameObject("Player");
             var inv = go.AddComponent<InventoryComponent>();
-            inv.Items.Add(wood);
-            inv.Items.Add(wood);
-            inv.Items.Add(wood);
+            inv.AddItem(wood);
+            inv.AddItem(wood);
+            inv.AddItem(wood);
 
             bool result = recipe.ConsumeResources(inv);
             Assert.IsTrue(result);
@@ -219,7 +219,9 @@ namespace ByteWar.Tests.EditMode
             data.Buildings.Add(new BuildingSaveEntry
             {
                 PieceType = (int)BuildingPieceType.Foundation,
-                PosX = 10f, PosY = 0f, PosZ = 20f,
+                PosX = 10f,
+                PosY = 0f,
+                PosZ = 20f,
                 RotY = 90f,
                 PlacedByClientId = 42,
             });
@@ -254,12 +256,20 @@ namespace ByteWar.Tests.EditMode
             data.Buildings.Add(new BuildingSaveEntry
             {
                 PieceType = (int)BuildingPieceType.Foundation,
-                PosX = 0, PosY = 0, PosZ = 0, RotY = 0, PlacedByClientId = 1
+                PosX = 0,
+                PosY = 0,
+                PosZ = 0,
+                RotY = 0,
+                PlacedByClientId = 1
             });
             data.Buildings.Add(new BuildingSaveEntry
             {
                 PieceType = (int)BuildingPieceType.Wall,
-                PosX = 4, PosY = 0, PosZ = 0, RotY = 180, PlacedByClientId = 2
+                PosX = 4,
+                PosY = 0,
+                PosZ = 0,
+                RotY = 180,
+                PlacedByClientId = 2
             });
 
             string json = JsonUtility.ToJson(data);

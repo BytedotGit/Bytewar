@@ -73,7 +73,7 @@ namespace ByteWar.Tests.PlayMode
             ability.AbilityName = "NoOp";
             ability.Cooldown = 5f;
             ability.ManaCost = 10f;
-            abilitySystem.LearnedAbilities.Add(ability);
+            abilitySystem.AddLearnedAbility(ability);
 
             // Create UI
             var uiGo = new GameObject("ActionBarUI");
@@ -144,12 +144,12 @@ namespace ByteWar.Tests.PlayMode
             // Create Station
             var stationGo = new GameObject("CraftingStation");
             var station = stationGo.AddComponent<CraftingStation>();
-            station.AvailableRecipes = new List<CraftingRecipe>();
+            station.SetAvailableRecipes(new List<CraftingRecipe>());
 
             var recipe = ScriptableObject.CreateInstance<CraftingRecipe>();
             recipe.RecipeName = "TestRecipe";
-            recipe.Ingredients = new List<RecipeIngredient>();
-            station.AvailableRecipes.Add(recipe);
+            recipe.SetIngredients(new List<RecipeIngredient>());
+            station.SetAvailableRecipes(new List<CraftingRecipe> { recipe });
 
             // Create UI
             var uiGo = new GameObject("CraftingUI");

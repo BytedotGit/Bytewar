@@ -44,7 +44,7 @@ namespace ByteWar.Tests.PlayMode
             mockAbility.Cooldown = 5f;
             mockAbility.DamageAmount = 25f;
 
-            abilitySystem.LearnedAbilities.Add(mockAbility);
+            abilitySystem.AddLearnedAbility(mockAbility);
 
             // Setup Enemy
             var enemyGo = new GameObject("Enemy");

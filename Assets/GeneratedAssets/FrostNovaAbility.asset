@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebd8e92c6767e8f45b5cae8b2b35c808, type: 3}
   m_Name: FrostNovaAbility
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Abilities.Mage.FrostNovaAbility
-  AbilityName: Frost Nova
-  ManaCost: 25
-  Cooldown: 8
+  _abilityName: Frost Nova
+  _manaCost: 25
+  _cooldown: 8
   Radius: 5
   RootEffect: {fileID: 0}
   DamageEffect: {fileID: 0}

@@ -5,13 +5,18 @@ namespace ByteWar.Abilities
     [CreateAssetMenu(fileName = "NewTalent", menuName = "ByteWar/Abilities/Talent")]
     public class Talent : ScriptableObject
     {
-        public string TalentName;
-        public string Description;
-        public int MaxRank = 1;
+        [SerializeField] private string _talentName;
+        [SerializeField] private string _description;
+        [SerializeField] private int _maxRank = 1;
 
-        // Example modifiers
-        public float HealthBonus;
-        public float ManaBonus;
+        [SerializeField] private float _healthBonus;
+        [SerializeField] private float _manaBonus;
+
+        public string TalentName { get => _talentName; internal set => _talentName = value; }
+        public string Description { get => _description; internal set => _description = value; }
+        public int MaxRank { get => _maxRank; internal set => _maxRank = value; }
+        public float HealthBonus { get => _healthBonus; internal set => _healthBonus = value; }
+        public float ManaBonus { get => _manaBonus; internal set => _manaBonus = value; }
 
         public virtual void ApplyTalent(AbilitySystemComponent target)
         {

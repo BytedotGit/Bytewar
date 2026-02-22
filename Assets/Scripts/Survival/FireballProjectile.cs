@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using ByteWar.Abilities;
+using ByteWar.Core;
 
 namespace ByteWar.Survival
 {
@@ -69,8 +70,7 @@ namespace ByteWar.Survival
                 }
                 else
                 {
-                    // Fallback: 25 flat damage
-                    targetAttributes.ApplyDamage(25f);
+                    targetAttributes.ApplyDamage(GameConstants.GetFireballFallbackDamage());
                     Debug.LogWarning("[FireballProjectile] No DamageEffect assigned — used flat 25 damage fallback.");
                 }
 

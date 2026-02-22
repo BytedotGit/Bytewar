@@ -7,7 +7,8 @@ namespace ByteWar.Survival
     {
         public NetworkVariable<float> Hunger = new NetworkVariable<float>(100f);
         public NetworkVariable<float> MaxHunger = new NetworkVariable<float>(100f);
-        public float HungerDecayRate = 1f; // Per second
+        [SerializeField] private float _hungerDecayRate = 1f;
+        public float HungerDecayRate => _hungerDecayRate;
 
         private void Update()
         {

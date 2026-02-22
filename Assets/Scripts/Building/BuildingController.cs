@@ -13,6 +13,8 @@ namespace ByteWar.Building
     /// Toggle with B key. Scroll wheel rotates piece. Number keys (1-9) select recipes.
     /// Left-click places. Middle-click removes. Right-click repairs.
     /// Supports edge-to-edge adjacency snapping. Server-authoritative cost + placement.
+    /// Preview rendering delegated to <see cref="BuildingPreview"/>.
+    /// Snap/support logic delegated to <see cref="BuildingSnap"/>.
     /// </summary>
     public class BuildingController : NetworkBehaviour
     {
@@ -32,14 +34,7 @@ namespace ByteWar.Building
         // Runtime state
         private bool _buildModeActive;
         private int _selectedRecipeIndex;
-        private GameObject _previewInstance;
-        private float _previewYaw;
-        private Vector3 _lastValidPosition;
-        private Quaternion _lastValidRotation;
-        private bool _positionValid;
-        private bool _isSnapped;
         private float _lastRemoveTime;
-        private MaterialPropertyBlock _previewPropBlock;
 
         // Non-alloc overlap
         private readonly Collider[] _overlapBuffer = new Collider[32];
@@ -47,10 +42,7 @@ namespace ByteWar.Building
         private PlayerInputHandler _inputHandler;
         private InventoryComponent _inventory;
         private ThirdPersonCamera _cameraController;
-
-        private static readonly int ColorPropId = Shader.PropertyToID("_Color");
-        private static readonly Color ValidColor = new(0.2f, 0.9f, 0.2f, 0.45f);
-        private static readonly Color InvalidColor = new(0.9f, 0.2f, 0.2f, 0.45f);
+        private BuildingPreview _preview;
 
         /// <summary>Raised on the owner when build mode is toggled. True = entered.</summary>
         public event Action<bool> OnBuildModeChanged;
@@ -68,7 +60,7 @@ namespace ByteWar.Building
         {
             _inputHandler = GetComponent<PlayerInputHandler>();
             _inventory = GetComponent<InventoryComponent>();
-            _previewPropBlock = new MaterialPropertyBlock();
+            _preview = new BuildingPreview();
         }
 
         public override void OnNetworkSpawn()
@@ -82,7 +74,7 @@ namespace ByteWar.Building
 
         public override void OnNetworkDespawn()
         {
-            ClearPreview();
+            _preview.Clear();
         }
 
         private void Update()
@@ -116,7 +108,7 @@ namespace ByteWar.Building
 
             if (!_buildModeActive)
             {
-                ClearPreview();
+                _preview.Clear();
             }
 
             OnBuildModeChanged?.Invoke(_buildModeActive);
@@ -139,7 +131,7 @@ namespace ByteWar.Building
                     {
                         _selectedRecipeIndex = i;
                         Debug.Log($"[BuildingController] Selected recipe [{i + 1}]: {_recipes[i].RecipeName}");
-                        ClearPreview();
+                        _preview.Clear();
                     }
                     break;
                 }
@@ -172,9 +164,7 @@ namespace ByteWar.Building
             if (Mathf.Abs(scroll) > 0.1f)
             {
                 float direction = scroll > 0f ? 1f : -1f;
-                _previewYaw = (_previewYaw + direction * _rotationStep) % 360f;
-                if (_previewYaw < 0f) _previewYaw += 360f;
-                Debug.Log($"[BuildingController] Rotated preview to {_previewYaw:0} degrees");
+                _preview.Rotate(direction, _rotationStep);
             }
         }
 
@@ -185,81 +175,26 @@ namespace ByteWar.Building
             if (_recipes.Count == 0) return;
 
             BuildingRecipe recipe = _recipes[_selectedRecipeIndex];
+            GameObject prefab = GetPrefabForType(recipe.PieceType);
+            if (prefab == null) return;
 
-            // Ensure preview exists
-            if (_previewInstance == null)
-            {
-                GameObject prefab = GetPrefabForType(recipe.PieceType);
-                if (prefab == null) return;
+            _preview.UpdatePreview(prefab, transform, Camera.main,
+                _maxPlacementDistance, _placementLayerMask, recipe.CanAfford(_inventory), true);
 
-                _previewInstance = Instantiate(prefab);
-                _previewInstance.name = "BuildingPreview";
-
-                // Strip networking and physics from preview
-                foreach (var nb in _previewInstance.GetComponentsInChildren<NetworkBehaviour>())
-                    Destroy(nb);
-                var no = _previewInstance.GetComponent<NetworkObject>();
-                if (no != null) Destroy(no);
-                foreach (var col in _previewInstance.GetComponentsInChildren<Collider>())
-                    col.enabled = false;
-                foreach (var rb in _previewInstance.GetComponentsInChildren<Rigidbody>())
-                    Destroy(rb);
-            }
-
-            // Raycast for placement position
-            Vector3 targetPos = transform.position + transform.forward * 5f;
-            _positionValid = false;
-            _isSnapped = false;
-
-            Camera cam = Camera.main;
-            if (cam != null && Mouse.current != null)
-            {
-                Vector2 screenPos = Mouse.current.position.ReadValue();
-                Ray ray = cam.ScreenPointToRay(new Vector3(screenPos.x, screenPos.y, 0));
-                if (Physics.Raycast(ray, out RaycastHit hit, _maxPlacementDistance, _placementLayerMask))
-                {
-                    targetPos = hit.point;
-                    _positionValid = true;
-                }
-            }
-
-            Quaternion previewRot = Quaternion.Euler(0f, _previewYaw, 0f);
-
-            // Grid snap first
-            targetPos = SnapToGrid(targetPos, _gridSize);
-
-            // Adjacency snap (edge-to-edge — overrides position AND rotation when close)
-            TryAdjacencySnap(ref targetPos, ref previewRot, recipe.PieceType);
-
-            _lastValidPosition = targetPos;
-            _lastValidRotation = previewRot;
-            _previewInstance.transform.position = targetPos;
-            _previewInstance.transform.rotation = previewRot;
+            // Get pending position/rotation from preview and apply adjacency snap
+            Vector3 pos = _preview.LastValidPosition;
+            Quaternion rot = _preview.LastValidRotation;
+            bool snapped = BuildingSnap.TryAdjacencySnap(
+                ref pos, ref rot, recipe.PieceType,
+                _adjacencySnapRadius, _gridSize, _overlapBuffer);
+            _preview.IsSnapped = snapped;
+            _preview.ApplySnappedTransform(pos, rot);
 
             // Validity: can afford + position valid + support check
             bool canAfford = recipe.CanAfford(_inventory);
-            bool supported = CheckSupport(targetPos, recipe.PieceType);
-            bool valid = _positionValid && canAfford && supported;
-            SetPreviewColor(valid ? ValidColor : InvalidColor);
-        }
-
-        private void ClearPreview()
-        {
-            if (_previewInstance != null)
-            {
-                Destroy(_previewInstance);
-                _previewInstance = null;
-            }
-        }
-
-        private void SetPreviewColor(Color color)
-        {
-            if (_previewInstance == null) return;
-            _previewPropBlock.SetColor(ColorPropId, color);
-            foreach (var r in _previewInstance.GetComponentsInChildren<Renderer>())
-            {
-                r.SetPropertyBlock(_previewPropBlock);
-            }
+            bool supported = BuildingSnap.CheckSupport(pos, recipe.PieceType, snapped, _gridSize, _overlapBuffer);
+            bool valid = _preview.PositionValid && canAfford && supported;
+            _preview.FinalizePreview(valid);
         }
 
         // ── Placement ─────────────────────────────────────────────────────────────
@@ -267,7 +202,7 @@ namespace ByteWar.Building
         private void HandlePlacement()
         {
             if (Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame) return;
-            if (!_positionValid || _recipes.Count == 0) return;
+            if (!_preview.PositionValid || _recipes.Count == 0) return;
 
             BuildingRecipe recipe = _recipes[_selectedRecipeIndex];
             if (!recipe.CanAfford(_inventory))
@@ -276,13 +211,14 @@ namespace ByteWar.Building
                 return;
             }
 
-            if (!CheckSupport(_lastValidPosition, recipe.PieceType))
+            if (!BuildingSnap.CheckSupport(_preview.LastValidPosition, recipe.PieceType,
+                    _preview.IsSnapped, _gridSize, _overlapBuffer))
             {
                 Debug.Log($"[BuildingController] Placement denied: no structural support.");
                 return;
             }
 
-            PlaceBuildingServerRpc(_lastValidPosition, _lastValidRotation, _selectedRecipeIndex);
+            PlaceBuildingServerRpc(_preview.LastValidPosition, _preview.LastValidRotation, _selectedRecipeIndex);
         }
 
         [ServerRpc]
@@ -439,93 +375,6 @@ namespace ByteWar.Building
                 if (_recipes[i].PieceType == type) return i;
             }
             return -1;
-        }
-
-        // ── Snapping ──────────────────────────────────────────────────────────────
-
-        /// <summary>Snap a world position to the nearest grid intersection.</summary>
-        internal static Vector3 SnapToGrid(Vector3 pos, float gridSize)
-        {
-            if (gridSize <= 0f) return pos;
-            return new Vector3(
-                Mathf.Round(pos.x / gridSize) * gridSize,
-                pos.y,
-                Mathf.Round(pos.z / gridSize) * gridSize
-            );
-        }
-
-        /// <summary>
-        /// Valheim-like edge-to-edge snapping. Finds the nearest SnapPoint from
-        /// existing BuildingPieces that matches the new piece type. Updates position
-        /// AND rotation (walls auto-orient to face outward from foundation edges).
-        /// </summary>
-        private void TryAdjacencySnap(ref Vector3 pos, ref Quaternion rotation, BuildingPieceType newType)
-        {
-            // Use non-alloc overlap sphere instead of FindObjectsByType
-            int count = Physics.OverlapSphereNonAlloc(pos, _adjacencySnapRadius + _gridSize, _overlapBuffer);
-
-            float bestDist = _adjacencySnapRadius;
-            SnapPoint bestSnap = default;
-            bool found = false;
-
-            for (int i = 0; i < count; i++)
-            {
-                var col = _overlapBuffer[i];
-                if (col == null) continue;
-
-                var piece = col.GetComponentInParent<BuildingPiece>();
-                if (piece == null || !piece.IsSpawned) continue;
-
-                SnapPoint[] snapPoints = piece.GetSnapPoints();
-                foreach (var sp in snapPoints)
-                {
-                    // Only snap to points that target our piece type
-                    if (sp.TargetType != newType) continue;
-
-                    float dist = Vector3.Distance(pos, sp.Position);
-                    if (dist < bestDist)
-                    {
-                        bestDist = dist;
-                        bestSnap = sp;
-                        found = true;
-                    }
-                }
-            }
-
-            if (found)
-            {
-                pos = bestSnap.Position;
-                rotation = bestSnap.Rotation;
-                _isSnapped = true;
-            }
-        }
-
-        // ── Support / Stability ───────────────────────────────────────────────────
-
-        /// <summary>
-        /// Basic stability check: Foundations can be placed freely (they're on the ground).
-        /// Walls must be near a Foundation edge to count as supported.
-        /// </summary>
-        private bool CheckSupport(Vector3 pos, BuildingPieceType type)
-        {
-            if (type == BuildingPieceType.Foundation) return true;
-
-            // Walls need to be snapped to a foundation edge
-            if (!_isSnapped) return false;
-
-            // Verify there's actually a foundation nearby
-            int count = Physics.OverlapSphereNonAlloc(pos, _gridSize * 0.75f, _overlapBuffer);
-            for (int i = 0; i < count; i++)
-            {
-                var col = _overlapBuffer[i];
-                if (col == null) continue;
-
-                var piece = col.GetComponentInParent<BuildingPiece>();
-                if (piece != null && piece.IsSpawned && piece.PieceType == BuildingPieceType.Foundation)
-                    return true;
-            }
-
-            return false;
         }
 
         // ── Prefab lookup ─────────────────────────────────────────────────────────

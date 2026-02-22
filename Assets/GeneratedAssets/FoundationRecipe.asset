@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d0051be24828a14a94b7c958cc09b4c, type: 3}
   m_Name: FoundationRecipe
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Building.BuildingRecipe
-  RecipeName: Foundation
-  PieceType: 0
-  Cost:
+  _recipeName: Foundation
+  _pieceType: 0
+  _cost:
   - Item: {fileID: 11400000, guid: f55c1bada33abee4a90ba78e9640ff03, type: 2}
     Amount: 4
   - Item: {fileID: 11400000, guid: e433122c592ead246b632ef795d7e2df, type: 2}

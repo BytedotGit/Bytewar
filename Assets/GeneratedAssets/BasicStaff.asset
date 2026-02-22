@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54f8c3520d0c9824a83965e11ba762ac, type: 3}
   m_Name: BasicStaff
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Survival.Item
-  ItemName: Basic Staff
-  Description: A simple wooden staff for casting spells.
-  Icon: {fileID: 0}
-  IsEquippable: 1
-  HealthBonus: 0
-  ManaBonus: 20
-  Armor: 0
-  DamageBonus: 5
+  _itemName: Basic Staff
+  _description: A simple wooden staff for casting spells.
+  _icon: {fileID: 0}
+  _isEquippable: 1
+  _healthBonus: 0
+  _manaBonus: 20
+  _armor: 0
+  _damageBonus: 5

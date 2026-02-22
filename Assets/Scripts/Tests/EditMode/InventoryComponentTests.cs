@@ -46,7 +46,7 @@ namespace ByteWar.Tests.EditMode
         public void HasItem_ReturnsTrue_WhenItemExists()
         {
             // Arrange
-            _inventory.Items.Add(_testItem);
+            _inventory.AddItem(_testItem);
 
             // Act
             bool hasItem = _inventory.HasItem(_testItem, 1);
@@ -74,8 +74,8 @@ namespace ByteWar.Tests.EditMode
         public void RemoveItem_DecreasesItemCount()
         {
             // Arrange
-            _inventory.Items.Add(_testItem);
-            _inventory.Items.Add(_testItem);
+            _inventory.AddItem(_testItem);
+            _inventory.AddItem(_testItem);
             int initialCount = _inventory.Items.Count;
 
             // Act

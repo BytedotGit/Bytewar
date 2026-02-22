@@ -64,11 +64,11 @@ namespace ByteWar.Tests.PlayMode
 
             var recipe = ScriptableObject.CreateInstance<CraftingRecipe>();
             recipe.RecipeName = "Staff Recipe";
-            recipe.Ingredients = new System.Collections.Generic.List<RecipeIngredient>
+            recipe.SetIngredients(new System.Collections.Generic.List<RecipeIngredient>
             {
                 new RecipeIngredient { Item = wood, Amount = 1 },
                 new RecipeIngredient { Item = stone, Amount = 1 }
-            };
+            });
             recipe.Result = staff;
             recipe.ResultAmount = 1;
 
@@ -76,7 +76,7 @@ namespace ByteWar.Tests.PlayMode
             var stationObj = new GameObject("CraftingStation");
             var stationNetObj = stationObj.AddComponent<NetworkObject>();
             var station = stationObj.AddComponent<CraftingStation>();
-            station.AvailableRecipes = new System.Collections.Generic.List<CraftingRecipe> { recipe };
+            station.SetAvailableRecipes(new System.Collections.Generic.List<CraftingRecipe> { recipe });
 
             stationNetObj.Spawn();
             yield return null;
@@ -101,7 +101,7 @@ namespace ByteWar.Tests.PlayMode
             damageEffect.Magnitude = 25f; // Enough to kill enemy
             fireball.DamageEffect = damageEffect;
 
-            abilitySystem.LearnedAbilities.Add(fireball);
+            abilitySystem.AddLearnedAbility(fireball);
 
             yield return null;
 

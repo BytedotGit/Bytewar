@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 using System.Collections.Generic;
+using ByteWar.Core;
 
 namespace ByteWar.Survival
 {
@@ -10,10 +11,13 @@ namespace ByteWar.Survival
     /// operations fire ClientRpc notifications so all clients (e.g. the owner's UI)
     /// can react without requiring a full NetworkList synchronisation.
     /// </summary>
-    public class InventoryComponent : NetworkBehaviour
+    public class InventoryComponent : NetworkBehaviour, IInventoryHolder
     {
         // Server-authoritative item list (ScriptableObject references)
-        public List<Item> Items = new List<Item>();
+        [SerializeField] private List<Item> _items = new List<Item>();
+
+        /// <summary>Read-only view of the inventory for external consumers.</summary>
+        public IReadOnlyList<Item> Items => _items;
 
         /// <summary>Raised on every client when an item is added. Parameter: item name.</summary>
         public event Action<string> OnItemAdded;
@@ -29,8 +33,8 @@ namespace ByteWar.Survival
             // local non-networked usage), allow logic to run without a NetworkManager.
             if (!IsServer && NetworkManager.Singleton != null) return;
 
-            Items.Add(item);
-            Debug.Log($"[InventoryComponent] Added '{item.ItemName}' to {gameObject.name}'s inventory. Total: {Items.Count}");
+            _items.Add(item);
+            Debug.Log($"[InventoryComponent] Added '{item.ItemName}' to {gameObject.name}'s inventory. Total: {_items.Count}");
 
             // Only dispatch RPCs when NGO is active and this object is spawned.
             if (NetworkManager.Singleton != null && IsSpawned)
@@ -46,7 +50,7 @@ namespace ByteWar.Survival
         public bool HasItem(Item item, int count)
         {
             int found = 0;
-            foreach (var i in Items)
+            foreach (var i in _items)
             {
                 if (i == item) found++;
             }
@@ -58,11 +62,11 @@ namespace ByteWar.Survival
             if (!IsServer && NetworkManager.Singleton != null) return;
 
             int removed = 0;
-            for (int i = Items.Count - 1; i >= 0; i--)
+            for (int i = _items.Count - 1; i >= 0; i--)
             {
-                if (Items[i] == item)
+                if (_items[i] == item)
                 {
-                    Items.RemoveAt(i);
+                    _items.RemoveAt(i);
                     removed++;
                     if (removed >= count) break;
                 }

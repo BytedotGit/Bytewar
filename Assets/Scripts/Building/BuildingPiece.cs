@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using ByteWar.Core;
 
 namespace ByteWar.Building
 {
@@ -15,7 +16,7 @@ namespace ByteWar.Building
     /// Stores the piece type, health, support flag, and snap metadata.
     /// Snap points return *target pivot positions* for neighbours (Valheim-like edge-to-edge placement).
     /// </summary>
-    public class BuildingPiece : NetworkBehaviour
+    public class BuildingPiece : NetworkBehaviour, IDamageable, IPersistable
     {
         [Header("Identity")]
         [SerializeField] private BuildingPieceType _pieceType;
@@ -36,6 +37,35 @@ namespace ByteWar.Building
 
         /// <summary>Current health. Server-writable.</summary>
         public NetworkVariable<float> Health = new(100f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+        // ── IDamageable ───────────────────────────────────────────────────────────
+        /// <inheritdoc/>
+        public float CurrentHealth => Health.Value;
+        /// <inheritdoc/>
+        public bool IsAlive => Health.Value > 0f;
+
+        // ── IPersistable ──────────────────────────────────────────────────────────
+        /// <inheritdoc/>
+        public string Serialize()
+        {
+            var entry = new BuildingSaveEntry
+            {
+                PieceType = (int)_pieceType,
+                PosX = transform.position.x,
+                PosY = transform.position.y,
+                PosZ = transform.position.z,
+                RotY = transform.eulerAngles.y,
+                PlacedByClientId = PlacedByClientId.Value,
+            };
+            return UnityEngine.JsonUtility.ToJson(entry);
+        }
+        /// <inheritdoc/>
+        public void Deserialize(string data)
+        {
+            var entry = UnityEngine.JsonUtility.FromJson<BuildingSaveEntry>(data);
+            transform.position = new UnityEngine.Vector3(entry.PosX, entry.PosY, entry.PosZ);
+            transform.rotation = UnityEngine.Quaternion.Euler(0f, entry.RotY, 0f);
+        }
 
         /// <summary>Owner client ID that placed this piece (set server-side on spawn).</summary>
         public NetworkVariable<ulong> PlacedByClientId = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);

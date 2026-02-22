@@ -7,6 +7,8 @@ namespace ByteWar.Core
     {
         public static GameManager Instance { get; private set; }
 
+        public GameStateMachine StateMachine { get; private set; }
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -18,8 +20,20 @@ namespace ByteWar.Core
             DontDestroyOnLoad(gameObject);
 
             // Fix for D3D12 VSync time drift bug that freezes Time.deltaTime
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = GameConstants.GetTargetFrameRate();
             QualitySettings.vSyncCount = 0;
+
+            StateMachine = new GameStateMachine();
+            StateMachine.OnStateChanged += (prev, next) =>
+            {
+                GameEventBus.GameStateChanged.Raise(new GameStateChangedEvent
+                {
+                    Previous = prev,
+                    Current = next,
+                });
+            };
+            StateMachine.TransitionTo(GameStateType.Initializing);
+            Debug.Log("[GameManager] GameStateMachine initialized.");
         }
 
         public override void OnNetworkSpawn()
@@ -27,7 +41,13 @@ namespace ByteWar.Core
             if (IsServer)
             {
                 Debug.Log("Server started. Waiting for players...");
+                StateMachine.TransitionTo(GameStateType.Playing);
             }
+        }
+
+        private void Update()
+        {
+            StateMachine?.Tick();
         }
     }
 }

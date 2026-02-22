@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89d97571ac2a172459a121e59eb6e211, type: 3}
   m_Name: FireballAbility
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Abilities.Mage.FireballAbility
-  AbilityName: Fireball
-  ManaCost: 15
-  Cooldown: 2
+  _abilityName: Fireball
+  _manaCost: 15
+  _cooldown: 2
   ProjectilePrefab: {fileID: 0}
   ProjectileSpeed: 20
   DamageEffect: {fileID: 0}

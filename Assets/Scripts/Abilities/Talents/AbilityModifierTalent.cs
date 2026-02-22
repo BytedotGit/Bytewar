@@ -18,16 +18,14 @@ namespace ByteWar.Abilities.Talents
             {
                 if (CooldownReduction > 0)
                 {
-                    if (!target.CooldownReductions.ContainsKey(TargetAbilityName))
-                        target.CooldownReductions[TargetAbilityName] = 0;
-                    target.CooldownReductions[TargetAbilityName] += CooldownReduction;
+                    float current = target.GetCooldownReduction(TargetAbilityName);
+                    target.SetCooldownReduction(TargetAbilityName, current + CooldownReduction);
                 }
 
                 if (ManaCostReduction > 0)
                 {
-                    if (!target.ManaCostReductions.ContainsKey(TargetAbilityName))
-                        target.ManaCostReductions[TargetAbilityName] = 0;
-                    target.ManaCostReductions[TargetAbilityName] += ManaCostReduction;
+                    float current = target.GetManaCostReduction(TargetAbilityName);
+                    target.SetManaCostReduction(TargetAbilityName, current + ManaCostReduction);
                 }
             }
         }

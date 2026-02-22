@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54f8c3520d0c9824a83965e11ba762ac, type: 3}
   m_Name: Wood
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Survival.Item
-  ItemName: Wood
-  Description: A basic crafting material.
-  Icon: {fileID: 0}
-  IsEquippable: 0
-  HealthBonus: 0
-  ManaBonus: 0
-  Armor: 0
-  DamageBonus: 0
+  _itemName: Wood
+  _description: A basic crafting material.
+  _icon: {fileID: 0}
+  _isEquippable: 0
+  _healthBonus: 0
+  _manaBonus: 0
+  _armor: 0
+  _damageBonus: 0

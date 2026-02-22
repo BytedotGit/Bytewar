@@ -65,11 +65,11 @@ namespace ByteWar.Tests.PlayMode
             var recipe = ScriptableObject.CreateInstance<BuildingRecipe>();
             recipe.RecipeName = "Foundation";
             recipe.PieceType = BuildingPieceType.Foundation;
-            recipe.Cost = new List<RecipeIngredient>
+            recipe.SetCost(new List<RecipeIngredient>
             {
                 new RecipeIngredient { Item = wood, Amount = 4 },
                 new RecipeIngredient { Item = stone, Amount = 2 }
-            };
+            });
 
             bc.SetRecipes(new List<BuildingRecipe> { recipe });
 
@@ -102,10 +102,10 @@ namespace ByteWar.Tests.PlayMode
             var recipe = ScriptableObject.CreateInstance<BuildingRecipe>();
             recipe.RecipeName = "Foundation";
             recipe.PieceType = BuildingPieceType.Foundation;
-            recipe.Cost = new List<RecipeIngredient>
+            recipe.SetCost(new List<RecipeIngredient>
             {
                 new RecipeIngredient { Item = wood, Amount = 10 }
-            };
+            });
 
             bc.SetRecipes(new List<BuildingRecipe> { recipe });
 

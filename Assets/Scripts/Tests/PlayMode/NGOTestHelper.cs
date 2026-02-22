@@ -154,6 +154,8 @@ namespace ByteWar.Tests.PlayMode
             playerGo.AddComponent<EquipmentComponent>();
             playerGo.AddComponent<PlayerInputHandler>();
             playerGo.AddComponent<PlayerInteraction>();
+            playerGo.AddComponent<PlayerMovement>();
+            playerGo.AddComponent<PlayerVisualSetup>();
             playerGo.AddComponent<NetworkPlayer>();
 
             // Spawn and mark as the client's player object.
@@ -173,6 +175,8 @@ namespace ByteWar.Tests.PlayMode
             go.AddComponent<EquipmentComponent>();
             go.AddComponent<PlayerInputHandler>();
             go.AddComponent<PlayerInteraction>();
+            go.AddComponent<PlayerMovement>();
+            go.AddComponent<PlayerVisualSetup>();
             go.AddComponent<NetworkPlayer>();
 
             return go;

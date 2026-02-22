@@ -11,9 +11,16 @@ namespace ByteWar.Building
     [CreateAssetMenu(fileName = "NewBuildingRecipe", menuName = "ByteWar/Building/BuildingRecipe")]
     public class BuildingRecipe : ScriptableObject
     {
-        public string RecipeName;
-        public BuildingPieceType PieceType;
-        public List<RecipeIngredient> Cost;
+        [SerializeField] private string _recipeName;
+        [SerializeField] private BuildingPieceType _pieceType;
+        [SerializeField] private List<RecipeIngredient> _cost;
+
+        public string RecipeName { get => _recipeName; internal set => _recipeName = value; }
+        public BuildingPieceType PieceType { get => _pieceType; internal set => _pieceType = value; }
+        public IReadOnlyList<RecipeIngredient> Cost => _cost;
+
+        /// <summary>Sets the cost list directly. Internal for test construction.</summary>
+        internal void SetCost(List<RecipeIngredient> cost) => _cost = cost;
 
         /// <summary>
         /// Returns true if the inventory contains all required ingredients.
