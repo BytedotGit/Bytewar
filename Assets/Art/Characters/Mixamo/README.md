@@ -8,19 +8,11 @@ Bytewar is a **public** repo. To reduce licensing risk and repo bloat, we do **n
 
 ## How to enable Mixamo usage locally
 
-Create this file (it is intentionally ignored by git):
+Drop the expected FBX files into this folder locally.
 
-`Assets/Art/Characters/Mixamo/ENABLE_MIXAMO_LOCAL.txt`
-
-When this marker exists:
-
-- `MixamoProcessor` will process Mixamo assets.
-- `AnimatorGenerator` will search Mixamo clips.
-- `PrefabGenerator` will prefer the Mixamo character model.
-
-When this marker does **not** exist:
-
-- The project uses **procedural fallback** visuals and **placeholder** animation clips.
+The project will **auto-detect** whether the required Mixamo files exist:
+- If present, generators will process and prefer the Mixamo character/animations.
+- If missing, the project uses **procedural fallback** visuals and **placeholder** animation clips.
 
 ## Expected files (if you import Mixamo)
 

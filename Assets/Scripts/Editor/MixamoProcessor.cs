@@ -6,8 +6,7 @@ namespace SurvivalRPG.Editor
 {
     public static class MixamoProcessor
     {
-        private const string MixamoFolder = "Assets/Art/Characters/Mixamo";
-        private const string EnableMarker = "Assets/Art/Characters/Mixamo/ENABLE_MIXAMO_LOCAL.txt";
+        private const string MixamoFolder = MixamoLocalAssets.MixamoFolder;
         private const string CharacterFile = "Character";
 
         // Animation file names (everything that is NOT the base mesh)
@@ -16,9 +15,9 @@ namespace SurvivalRPG.Editor
         [MenuItem("SurvivalRPG/Process Mixamo Assets")]
         public static void ProcessAssets()
         {
-            if (!File.Exists(EnableMarker))
+            if (!MixamoLocalAssets.AreAvailable(out string reason))
             {
-                Debug.Log("[MixamoProcessor] Mixamo processing disabled (no ENABLE_MIXAMO_LOCAL.txt marker). Using fallback content.");
+                Debug.Log($"[MixamoProcessor] Mixamo not available locally ({reason}). Using fallback content.");
                 return;
             }
 

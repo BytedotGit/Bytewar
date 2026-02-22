@@ -13,8 +13,6 @@ namespace SurvivalRPG.Editor
 {
     public static class PrefabGenerator
     {
-        private const string MixamoEnableMarker = "Assets/Art/Characters/Mixamo/ENABLE_MIXAMO_LOCAL.txt";
-
         [MenuItem("SurvivalRPG/Generate Prefabs")]
         public static void GeneratePrefabs()
         {
@@ -56,7 +54,7 @@ namespace SurvivalRPG.Editor
             }
 
             // Add a simple visual representation
-            GameObject mixamoPrefab = File.Exists(MixamoEnableMarker) ? FindMixamoCharacter() : null;
+            GameObject mixamoPrefab = MixamoLocalAssets.AreAvailable(out _) ? FindMixamoCharacter() : null;
             GameObject humanoidPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/GeneratedPrefabs/Models/HumanoidModel.prefab");
             // VisualRoot allows consistent mesh grounding across different imported model pivots.
             GameObject visualRoot = new GameObject("VisualRoot");

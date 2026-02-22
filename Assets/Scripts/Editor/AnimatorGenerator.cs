@@ -8,7 +8,6 @@ namespace SurvivalRPG.Editor
 {
     public static class AnimatorGenerator
     {
-        private const string MixamoEnableMarker = "Assets/Art/Characters/Mixamo/ENABLE_MIXAMO_LOCAL.txt";
         private const string PlaceholderFolder = "Assets/GeneratedPrefabs/Animations/Placeholders";
 
         [MenuItem("SurvivalRPG/Generate Animator Controller")]
@@ -39,10 +38,10 @@ namespace SurvivalRPG.Editor
             AnimatorStateMachine rootStateMachine = controller.layers[0].stateMachine;
 
             // Try to find Mixamo clips
-            bool mixamoEnabled = File.Exists(MixamoEnableMarker);
+            bool mixamoEnabled = MixamoLocalAssets.AreAvailable(out string reason);
             if (!mixamoEnabled)
             {
-                Debug.Log("[AnimatorGenerator] Mixamo disabled (no ENABLE_MIXAMO_LOCAL.txt marker). Generating placeholder clips.");
+                Debug.Log($"[AnimatorGenerator] Mixamo not available locally ({reason}). Generating placeholder clips.");
                 EnsureFolder(PlaceholderFolder);
             }
 
