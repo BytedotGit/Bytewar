@@ -13,11 +13,13 @@ Create this file (it is intentionally ignored by git):
 `Assets/Art/Characters/Mixamo/ENABLE_MIXAMO_LOCAL.txt`
 
 When this marker exists:
+
 - `MixamoProcessor` will process Mixamo assets.
 - `AnimatorGenerator` will search Mixamo clips.
 - `PrefabGenerator` will prefer the Mixamo character model.
 
 When this marker does **not** exist:
+
 - The project uses **procedural fallback** visuals and **placeholder** animation clips.
 
 ## Expected files (if you import Mixamo)

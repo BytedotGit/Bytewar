@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1434870647858270357
+--- !u!1 &7643673996957517962
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,11 +8,11 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8068295705012517873}
-  - component: {fileID: 7951528577558092538}
-  - component: {fileID: 1379083171726722672}
-  - component: {fileID: 2598197389985356019}
-  - component: {fileID: 3360113189957523590}
+  - component: {fileID: 7540529207114010884}
+  - component: {fileID: 4382735549489875594}
+  - component: {fileID: 3535251056958799375}
+  - component: {fileID: 4140763525470697858}
+  - component: {fileID: 1598964438224377696}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -20,13 +20,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8068295705012517873
+--- !u!4 &7540529207114010884
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1434870647858270357}
+  m_GameObject: {fileID: 7643673996957517962}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -35,13 +35,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7951528577558092538
+--- !u!114 &4382735549489875594
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1434870647858270357}
+  m_GameObject: {fileID: 7643673996957517962}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
@@ -50,8 +50,8 @@ MonoBehaviour:
   NetworkManagerExpanded: 0
   NetworkConfig:
     ProtocolVersion: 0
-    NetworkTransport: {fileID: 1379083171726722672}
-    PlayerPrefab: {fileID: 8009901338337353006, guid: 94c83a3bef9e16a40a1ba2458f205c02, type: 3}
+    NetworkTransport: {fileID: 3535251056958799375}
+    PlayerPrefab: {fileID: 5521402000870924002, guid: 94c83a3bef9e16a40a1ba2458f205c02, type: 3}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: f1d0436dd516ee64b8242a4b7631f54d, type: 2}
@@ -77,13 +77,13 @@ MonoBehaviour:
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 1
---- !u!114 &1379083171726722672
+--- !u!114 &3535251056958799375
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1434870647858270357}
+  m_GameObject: {fileID: 7643673996957517962}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
@@ -107,29 +107,29 @@ MonoBehaviour:
     PacketDelayMS: 0
     PacketJitterMS: 0
     PacketDropRate: 0
---- !u!114 &2598197389985356019
+--- !u!114 &4140763525470697858
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1434870647858270357}
+  m_GameObject: {fileID: 7643673996957517962}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f686829c86f23b49a249f59ff028ef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Networking.CustomNetworkManagerHUD
---- !u!114 &3360113189957523590
+--- !u!114 &1598964438224377696
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1434870647858270357}
+  m_GameObject: {fileID: 7643673996957517962}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19569cd3189331e4481d3b2d78882878, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Networking.NetworkBootstrapper
-  _playerPrefab: {fileID: 8009901338337353006, guid: 94c83a3bef9e16a40a1ba2458f205c02, type: 3}
-  _transport: {fileID: 1379083171726722672}
+  _playerPrefab: {fileID: 5521402000870924002, guid: 94c83a3bef9e16a40a1ba2458f205c02, type: 3}
+  _transport: {fileID: 3535251056958799375}

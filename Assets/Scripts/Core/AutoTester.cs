@@ -87,6 +87,78 @@ namespace SurvivalRPG.Core
                 yield break;
             }
 
+            // --- Camera sanity (WoW-default framing invariants) ---
+            var mainCam = Camera.main;
+            if (mainCam == null)
+            {
+                Debug.LogError("[AutoTester] FAIL: Camera.main is null.");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(23);
+                yield break;
+            }
+
+            var tpc = mainCam.GetComponent<ThirdPersonCamera>();
+            if (tpc == null)
+            {
+                Debug.LogError("[AutoTester] FAIL: ThirdPersonCamera missing on Main Camera.");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(24);
+                yield break;
+            }
+
+            // Allow a couple frames for NetworkPlayer to run SetupCamera.
+            yield return null;
+            yield return null;
+
+            if (tpc.Target == null)
+            {
+                Debug.LogError("[AutoTester] FAIL: ThirdPersonCamera.Target is null after initialization.");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(25);
+                yield break;
+            }
+
+            float pivotDelta = tpc.PivotWorldPosition.y - localPlayer.transform.position.y;
+            Debug.Log($"[AutoTester] Camera sanity: target='{tpc.Target.name}' pivotHeight={tpc.PivotHeight:0.00} pivotDeltaY={pivotDelta:0.00}");
+
+            // Pivot should be around upper-chest/head, not stacked to ~3m.
+            if (pivotDelta < 0.8f || pivotDelta > 2.0f)
+            {
+                Debug.LogError($"[AutoTester] FAIL: Camera pivot delta out of expected range. pivotDeltaY={pivotDelta:0.00}");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(26);
+                yield break;
+            }
+            Debug.Log("[AutoTester] PASS: Camera pivot sanity.");
+
+            // --- Grounding sanity (capsule bottom vs terrain height) ---
+            var cc = localPlayer.GetComponent<CharacterController>();
+            if (cc != null && Terrain.activeTerrain != null)
+            {
+                // Let gravity settle the capsule.
+                yield return new WaitForSeconds(0.5f);
+
+                float terrainY = Terrain.activeTerrain.SampleHeight(localPlayer.transform.position)
+                               + Terrain.activeTerrain.transform.position.y;
+                float capsuleBottom = localPlayer.transform.position.y + cc.center.y - (cc.height * 0.5f);
+                float delta = capsuleBottom - terrainY;
+                Debug.Log($"[AutoTester] Grounding sanity: capsuleBottom={capsuleBottom:0.000} terrainY={terrainY:0.000} delta={delta:0.000}");
+
+                // Allow a small epsilon (skin width + slope).
+                if (Mathf.Abs(delta) > 0.35f)
+                {
+                    Debug.LogError($"[AutoTester] FAIL: Player capsule not grounded within epsilon. delta={delta:0.000}");
+                    yield return new WaitForSeconds(0.25f);
+                    Application.Quit(27);
+                    yield break;
+                }
+                Debug.Log("[AutoTester] PASS: Grounding sanity.");
+            }
+            else
+            {
+                Debug.LogWarning("[AutoTester] Grounding sanity skipped (no CharacterController or no active Terrain).");
+            }
+
             // Verify real input subsystem is alive (this catches the common regression where simulated input passes).
             inputHandler.EnsureActionsEnabled("AutoTester preflight");
             bool hasKeyboard = Keyboard.current != null;

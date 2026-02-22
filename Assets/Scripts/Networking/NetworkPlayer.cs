@@ -113,7 +113,57 @@ namespace SurvivalRPG.Networking
 
             // Use CameraTarget child (head height) when available
             Transform pivot = transform.Find("CameraTarget");
-            _camController.SetTarget(pivot != null ? pivot : transform);
+            if (pivot != null)
+            {
+                float localY = ComputeCameraTargetLocalY();
+                pivot.localPosition = new Vector3(0f, localY, 0f);
+
+                // Hybrid strategy: CameraTarget carries the bulk of the height; camera adds only a small tweak.
+                _camController.SetTarget(pivot, pivotHeight: 0.20f);
+                Debug.Log($"[NetworkPlayer] CameraTarget set to localY={localY:0.00}; camera pivotHeight=0.20");
+            }
+            else
+            {
+                // Fallback for prefabs missing CameraTarget.
+                _camController.SetTarget(transform, pivotHeight: 1.40f);
+                Debug.Log("[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40");
+            }
+        }
+
+        private float ComputeCameraTargetLocalY()
+        {
+            // Prefer humanoid bones when available for consistent framing across models.
+            if (_animator != null && _animator.isHuman)
+            {
+                Transform bone = _animator.GetBoneTransform(HumanBodyBones.UpperChest)
+                                 ?? _animator.GetBoneTransform(HumanBodyBones.Chest)
+                                 ?? _animator.GetBoneTransform(HumanBodyBones.Head);
+                if (bone != null)
+                {
+                    float y = bone.position.y - transform.position.y;
+
+                    // Clamp into a reasonable band based on controller height (if present).
+                    float controllerHeight = _cc != null ? _cc.height : 2f;
+                    float min = Mathf.Max(0.8f, controllerHeight * 0.45f);
+                    float max = Mathf.Min(1.8f, controllerHeight * 0.95f);
+                    return Mathf.Clamp(y, min, max);
+                }
+            }
+
+            // Fallback: renderer bounds.
+            var renderers = GetComponentsInChildren<Renderer>();
+            if (renderers != null && renderers.Length > 0)
+            {
+                Bounds b = renderers[0].bounds;
+                for (int i = 1; i < renderers.Length; i++)
+                    b.Encapsulate(renderers[i].bounds);
+
+                float y = (b.center.y - transform.position.y) + 0.15f;
+                return Mathf.Clamp(y, 0.9f, 1.6f);
+            }
+
+            // Last resort.
+            return 1.25f;
         }
 
         private static void SetChildLayers(Transform parent, int layer)
@@ -206,15 +256,29 @@ namespace SurvivalRPG.Networking
             if (_inputHandler.ConsumeCastSpell1())
             {
                 Debug.Log("[NetworkPlayer] Spell 1 triggered.");
-                if (_netAnimator != null) _netAnimator.SetTrigger("Attack");
-                AbilitySystem.TryCastAbility(0, transform.position + transform.forward * 5f);
+                bool ok = AbilitySystem.TryCastAbility(0, transform.position + transform.forward * 5f);
+                if (ok)
+                {
+                    if (_netAnimator != null) _netAnimator.SetTrigger("Attack");
+                }
+                else
+                {
+                    Debug.Log("[NetworkPlayer] Spell 1 did not execute (empty slot / cooldown / insufficient mana).");
+                }
             }
 
             if (_inputHandler.ConsumeCastSpell2())
             {
                 Debug.Log("[NetworkPlayer] Spell 2 triggered.");
-                if (_netAnimator != null) _netAnimator.SetTrigger("Attack");
-                AbilitySystem.TryCastAbility(1, transform.position + transform.forward * 5f);
+                bool ok = AbilitySystem.TryCastAbility(1, transform.position + transform.forward * 5f);
+                if (ok)
+                {
+                    if (_netAnimator != null) _netAnimator.SetTrigger("Attack");
+                }
+                else
+                {
+                    Debug.Log("[NetworkPlayer] Spell 2 did not execute (empty slot / cooldown / insufficient mana).");
+                }
             }
         }
     }

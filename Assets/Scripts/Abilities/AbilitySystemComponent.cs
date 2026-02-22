@@ -36,18 +36,48 @@ namespace SurvivalRPG.Abilities
             }
         }
 
-        public void TryCastAbility(int abilityIndex, Vector3 targetPosition)
+        public bool TryCastAbility(int abilityIndex, Vector3 targetPosition)
         {
-            if (abilityIndex < 0 || abilityIndex >= LearnedAbilities.Count) return;
+            if (abilityIndex < 0 || abilityIndex >= LearnedAbilities.Count)
+            {
+                Debug.LogWarning($"[AbilitySystemComponent] TryCastAbility failed: index {abilityIndex} out of range (count={LearnedAbilities.Count}).");
+                return false;
+            }
 
             Ability ability = LearnedAbilities[abilityIndex];
+            if (ability == null)
+            {
+                Debug.LogWarning($"[AbilitySystemComponent] TryCastAbility failed: ability at index {abilityIndex} is null.");
+                return false;
+            }
+
             if (IsOnCooldown(ability.AbilityName))
             {
                 Debug.Log($"{ability.AbilityName} is on cooldown.");
-                return;
+                return false;
+            }
+
+            // Local preflight: avoid animation/no-op when mana is obviously insufficient.
+            float actualManaCost = ability.ManaCost;
+            if (ManaCostReductions.TryGetValue(ability.AbilityName, out float manaReduction))
+            {
+                actualManaCost = Mathf.Max(0f, actualManaCost - manaReduction);
+            }
+
+            if (Attributes == null)
+            {
+                Debug.LogWarning("[AbilitySystemComponent] TryCastAbility failed: Attributes is null.");
+                return false;
+            }
+
+            if (Attributes.Mana.Value < actualManaCost)
+            {
+                Debug.Log($"[AbilitySystemComponent] Not enough mana to cast {ability.AbilityName}. Need={actualManaCost:0.0} Have={Attributes.Mana.Value:0.0}");
+                return false;
             }
 
             CastAbilityServerRpc(abilityIndex, targetPosition);
+            return true;
         }
 
         [ServerRpc]

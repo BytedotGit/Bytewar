@@ -43,7 +43,16 @@ This roadmap outlines the steps required to reach a fully playable, multiplayer 
 - [x] **Tests**: `EnemyTargetTrackerTests` (EditMode), `MeleeAttackSmokeTests` (PlayMode), plus existing combat/resource smoke tests. Build: ✅ Exit 0. AutoTest: ✅ PASS. No exceptions.
 - [x] **Input Hardening**: Enforced `Active Input Handling = Both` (`activeInputHandler: 2`) via editor-load enforcer + build preprocessor; AutoTester now fails fast if `ENABLE_INPUT_SYSTEM` isn’t defined or devices/actions aren’t active.
 
-## Phase 14: Building System & Persistence (NEXT)
+## Phase 13.1: Player Feel Hotfix (NEXT)
+
+**Goal**: Lock down the core "feels like WoW" fundamentals so we don't regress into camera/grounding/input issues.
+
+- [x] **Camera Pivot Sanity**: Prevent stacked vertical offsets (CameraTarget + pivotHeight). AutoTester validates pivot delta is within a sane band.
+- [x] **Grounding Sanity**: Deterministic CharacterController config + visual grounding. AutoTester validates capsule bottom is within epsilon of sampled terrain.
+- [x] **Action Bar Correctness**: Ability keys only trigger cast animation when a cast request actually executes (no empty-slot cast animation).
+- [ ] **Manual Feel Pass**: Confirm camera framing is WoW-default and character feels grounded in Editor play (no obvious hovering).
+
+## Phase 14: Building System & Persistence
 
 **Goal**: Allow players to build structures and save their progress.
 

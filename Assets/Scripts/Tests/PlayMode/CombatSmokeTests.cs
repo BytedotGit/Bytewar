@@ -61,7 +61,7 @@ namespace SurvivalRPG.Tests.PlayMode
 
             // Act
             Debug.Log("[Test] Casting MockDamageAbility...");
-            abilitySystem.TryCastAbility(0, enemyGo.transform.position);
+            Assert.IsTrue(abilitySystem.TryCastAbility(0, enemyGo.transform.position), "TryCastAbility should return true for valid cast request.");
             yield return new WaitForSeconds(0.1f); // Wait for RPCs
 
             // Assert

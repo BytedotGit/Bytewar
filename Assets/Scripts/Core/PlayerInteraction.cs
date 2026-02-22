@@ -60,7 +60,6 @@ namespace SurvivalRPG.Core
             }
 
             HandleInteraction();
-            HandleSpellCasting();
         }
 
         private void HandleInteraction()
@@ -69,23 +68,6 @@ namespace SurvivalRPG.Core
             {
                 Debug.Log($"[{nameof(PlayerInteraction)}] Interact action triggered.");
                 PerformRaycastInteraction();
-            }
-        }
-
-        private void HandleSpellCasting()
-        {
-            if (_inputHandler.ConsumeCastSpell1())
-            {
-                Debug.Log($"[{nameof(PlayerInteraction)}] CastSpell1 action triggered.");
-                Vector3 targetPos = GetMouseWorldPosition();
-                if (_abilitySystem != null)
-                {
-                    _abilitySystem.TryCastAbility(0, targetPos);
-                }
-                else
-                {
-                    Debug.LogWarning($"[{nameof(PlayerInteraction)}] AbilitySystemComponent is missing on {gameObject.name}.");
-                }
             }
         }
 

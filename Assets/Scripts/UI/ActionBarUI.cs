@@ -69,8 +69,8 @@ namespace SurvivalRPG.UI
 
             // For testing, we just cast at the player's position or forward
             Vector3 targetPos = _abilitySystem.transform.position + _abilitySystem.transform.forward * 5f;
-            _abilitySystem.TryCastAbility(index, targetPos);
-            Debug.Log($"ActionBarUI: Clicked slot {index}");
+            bool ok = _abilitySystem.TryCastAbility(index, targetPos);
+            Debug.Log($"ActionBarUI: Clicked slot {index} (ok={ok})");
         }
 
         private void UpdateUI()

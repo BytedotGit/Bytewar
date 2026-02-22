@@ -21,6 +21,10 @@ namespace SurvivalRPG.Core
         public bool IsRightMouseHeld { get; private set; }
         public bool IsLeftMouseHeld { get; private set; }
 
+        public float PivotHeight => _pivotHeight;
+        public Transform Target => _target;
+        public Vector3 PivotWorldPosition => (_target != null) ? (_target.position + Vector3.up * _pivotHeight) : transform.position;
+
         // ── Settings ──────────────────────────────────────────────────────────────
         [Header("Pivot")]
         [SerializeField] private float _pivotHeight = 1.4f;
@@ -72,7 +76,13 @@ namespace SurvivalRPG.Core
 
         public void SetTarget(Transform target)
         {
+            SetTarget(target, _pivotHeight);
+        }
+
+        public void SetTarget(Transform target, float pivotHeight)
+        {
             _target = target;
+            _pivotHeight = pivotHeight;
             _yaw = target.eulerAngles.y;
             _smoothYaw = _yaw;
             _initialized = true;
@@ -82,7 +92,7 @@ namespace SurvivalRPG.Core
             _cachedRenderers = playerRoot.GetComponentsInChildren<Renderer>();
             _renderersVisible = true;
 
-            Debug.Log($"[ThirdPersonCamera] Target set to {target.name}. Cached {_cachedRenderers.Length} renderers.");
+            Debug.Log($"[ThirdPersonCamera] Target set to {target.name}. pivotHeight={_pivotHeight:0.00}. Cached {_cachedRenderers.Length} renderers.");
         }
 
         private void LateUpdate()

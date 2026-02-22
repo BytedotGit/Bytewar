@@ -13,7 +13,7 @@ namespace SurvivalRPG.Editor
 {
     public static class PrefabGenerator
     {
-    private const string MixamoEnableMarker = "Assets/Art/Characters/Mixamo/ENABLE_MIXAMO_LOCAL.txt";
+        private const string MixamoEnableMarker = "Assets/Art/Characters/Mixamo/ENABLE_MIXAMO_LOCAL.txt";
 
         [MenuItem("SurvivalRPG/Generate Prefabs")]
         public static void GeneratePrefabs()
@@ -36,11 +36,17 @@ namespace SurvivalRPG.Editor
             playerObj.AddComponent<InventoryComponent>();
             playerObj.AddComponent<PlayerInputHandler>();
             playerObj.AddComponent<PlayerInteraction>();
-            playerObj.AddComponent<CharacterController>();
+            CharacterController cc = playerObj.AddComponent<CharacterController>();
             playerObj.AddComponent<NetworkPlayer>();
             Animator animator = playerObj.AddComponent<Animator>();
             ClientNetworkAnimator netAnimator = playerObj.AddComponent<ClientNetworkAnimator>();
             netAnimator.Animator = animator;
+
+            // Deterministic controller config (prevents hovering from center.y = 0 defaults)
+            cc.height = 2.0f;
+            cc.radius = 0.35f;
+            cc.center = new Vector3(0f, cc.height * 0.5f, 0f);
+            cc.skinWidth = 0.08f;
 
             // Assign Animator Controller
             UnityEditor.Animations.AnimatorController controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/GeneratedPrefabs/Animations/PlayerAnimatorController.controller");
@@ -52,12 +58,19 @@ namespace SurvivalRPG.Editor
             // Add a simple visual representation
             GameObject mixamoPrefab = File.Exists(MixamoEnableMarker) ? FindMixamoCharacter() : null;
             GameObject humanoidPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/GeneratedPrefabs/Models/HumanoidModel.prefab");
+            // VisualRoot allows consistent mesh grounding across different imported model pivots.
+            GameObject visualRoot = new GameObject("VisualRoot");
+            visualRoot.transform.SetParent(playerObj.transform);
+            visualRoot.transform.localPosition = Vector3.zero;
+            visualRoot.transform.localRotation = Quaternion.identity;
+            visualRoot.transform.localScale = Vector3.one;
+
             GameObject playerVisual;
 
             if (mixamoPrefab != null)
             {
                 playerVisual = (GameObject)PrefabUtility.InstantiatePrefab(mixamoPrefab);
-                playerVisual.transform.SetParent(playerObj.transform);
+                playerVisual.transform.SetParent(visualRoot.transform);
                 playerVisual.transform.localPosition = Vector3.zero;
                 PrefabUtility.UnpackPrefabInstance(playerVisual, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
 
@@ -74,7 +87,7 @@ namespace SurvivalRPG.Editor
             {
                 Debug.Log("[PrefabGenerator] Mixamo disabled/unavailable. Using HumanoidModel fallback.");
                 playerVisual = (GameObject)PrefabUtility.InstantiatePrefab(humanoidPrefab);
-                playerVisual.transform.SetParent(playerObj.transform);
+                playerVisual.transform.SetParent(visualRoot.transform);
                 playerVisual.transform.localPosition = Vector3.zero;
                 // Unpack so visuals are embedded as plain GameObjects — avoids
                 // stale nested-prefab GUID errors when the model prefab is regenerated.
@@ -84,14 +97,17 @@ namespace SurvivalRPG.Editor
             else
             {
                 playerVisual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                playerVisual.transform.SetParent(playerObj.transform);
+                playerVisual.transform.SetParent(visualRoot.transform);
                 playerVisual.transform.localPosition = new Vector3(0, 1f, 0);
             }
+
+            // Ground visual so its lowest renderer point sits on y=0 relative to player root.
+            GroundVisualToFeet(visualRoot.transform, playerObj.transform);
 
             // Add Camera Target for Cinemachine
             GameObject cameraTarget = new GameObject("CameraTarget");
             cameraTarget.transform.SetParent(playerObj.transform);
-            cameraTarget.transform.localPosition = new Vector3(0, 1.5f, 0); // Head height
+            cameraTarget.transform.localPosition = new Vector3(0, 1.25f, 0); // Default; runtime may adjust based on rig/bounds
 
             GameObject playerPrefab = PrefabUtility.SaveAsPrefabAsset(playerObj, $"{basePath}/NetworkPlayer.prefab");
             Object.DestroyImmediate(playerObj);
@@ -209,6 +225,30 @@ namespace SurvivalRPG.Editor
                 }
             }
             return null;
+        }
+
+        private static void GroundVisualToFeet(Transform visualRoot, Transform playerRoot)
+        {
+            var renderers = visualRoot.GetComponentsInChildren<Renderer>();
+            if (renderers == null || renderers.Length == 0)
+            {
+                Debug.LogWarning("[PrefabGenerator] Visual grounding skipped: no renderers found.");
+                return;
+            }
+
+            float minLocalY = float.PositiveInfinity;
+            foreach (var r in renderers)
+            {
+                if (r == null) continue;
+                Vector3 localMin = playerRoot.InverseTransformPoint(r.bounds.min);
+                if (localMin.y < minLocalY) minLocalY = localMin.y;
+            }
+
+            if (float.IsInfinity(minLocalY)) return;
+
+            // If minLocalY is below 0, move visuals up; if above 0, move down.
+            visualRoot.localPosition += new Vector3(0f, -minLocalY, 0f);
+            Debug.Log($"[PrefabGenerator] Grounded VisualRoot by {-minLocalY:0.000} (minLocalY={minLocalY:0.000}).");
         }
     }
 }
