@@ -1,0 +1,54 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Mm]emoryCaptures/
+
+# Builds
+[Bb]uild/
+[Bb]uilds/
+
+# Local logs / artifacts
+*.log
+*.log.*
+build_*.log
+Editor.log
+
+# Unity license/activation requests (never commit)
+*.alf
+
+# Playwright MCP scratch
+.playwright-mcp/
+
+# Third-party character sources (local-only; do not commit)
+Assets/Art/Characters/Mixamo/*.fbx
+Assets/Art/Characters/Mixamo/*.fbx.meta
+
+# Visual Studio / Rider
+.vs/
+.vscode/
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Unity cache
+UserSettings/
+
+# VS / Unity generated solution variants
+*.slnx
+
+# Local one-off artifacts
+dotnet_build.txt
+SyncVS.log
