@@ -19,7 +19,7 @@ The project will **auto-detect** whether the required Mixamo files exist:
 
 In Unity, you can run:
 
-`SurvivalRPG/Diagnostics/Mixamo/Report Status`
+`ByteWar/Diagnostics/Mixamo/Report Status`
 
 If Mixamo files exist locally but the game is still showing the fallback model, the Editor will automatically regenerate the animator + prefabs on startup (once per Editor session).
 

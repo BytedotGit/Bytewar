@@ -1,9 +1,9 @@
 using NUnit.Framework;
 using UnityEngine;
-using SurvivalRPG.Survival;
-using SurvivalRPG.UI;
+using ByteWar.Survival;
+using ByteWar.UI;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     /// <summary>
     /// EditMode tests for EnemyTargetTracker event bus.

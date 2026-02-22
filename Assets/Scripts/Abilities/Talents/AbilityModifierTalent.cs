@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace SurvivalRPG.Abilities.Talents
+namespace ByteWar.Abilities.Talents
 {
-    [CreateAssetMenu(fileName = "AbilityModifierTalent", menuName = "SurvivalRPG/Abilities/Talents/AbilityModifierTalent")]
+    [CreateAssetMenu(fileName = "AbilityModifierTalent", menuName = "ByteWar/Abilities/Talents/AbilityModifierTalent")]
     public class AbilityModifierTalent : Talent
     {
         [Header("Ability Modifiers")]

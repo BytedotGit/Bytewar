@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="18" result="Passed" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:14Z" duration="2.3033187">
+  <test-suite type="TestSuite" id="1036" name="ByteWar" fullname="ByteWar" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:14Z" duration="2.303319" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1029" name="ByteWar.Tests.PlayMode.dll" fullname="C:/Projects/SurvivalRPG/Library/ScriptAssemblies/ByteWar.Tests.PlayMode.dll" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:14Z" duration="2.294702" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="64804" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1030" name="ByteWar" fullname="ByteWar" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:14Z" duration="2.293741" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1031" name="Tests" fullname="ByteWar.Tests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:14Z" duration="2.293041" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1032" name="PlayMode" fullname="ByteWar.Tests.PlayMode" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:14Z" duration="2.292257" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="BuildingPlacementSmokeTests" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:12Z" duration="0.392526" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1004" name="BuildingPiece_Spawns_WithCorrectType" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests.BuildingPiece_Spawns_WithCorrectType" methodname="BuildingPiece_Spawns_WithCorrectType" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" seed="1484729843" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:12Z" duration="0.334895" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 63525 for PlayMode test NetworkManager.
+NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry value of: 0!
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Awake.
+[NetworkPlayer] ThirdPersonCamera added to Main Camera at runtime.
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+[Test] BuildingPiece spawn test passed.
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+              <test-case id="1003" name="PlaceFoundation_WithoutResources_Fails" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests.PlaceFoundation_WithoutResources_Fails" methodname="PlaceFoundation_WithoutResources_Fails" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" seed="173623463" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:12Z" duration="0.016524" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 63526 for PlayMode test NetworkManager.
+NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry value of: 0!
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+[BuildingRecipe] Cannot afford 'Foundation'.
+[Test] Building placement denial test passed.
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+              <test-case id="1002" name="PlaceFoundation_WithResources_SpawnsBuildingPiece" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests.PlaceFoundation_WithResources_SpawnsBuildingPiece" methodname="PlaceFoundation_WithResources_SpawnsBuildingPiece" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" seed="410727268" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:12Z" duration="0.028605" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 63527 for PlayMode test NetworkManager.
+NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry value of: 0!
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+[InventoryComponent] Added 'Wood' to TestPlayer's inventory. Total: 1
+[InventoryComponent] (Client) Item added to inventory: 'Wood'.
+[InventoryComponent] Added 'Wood' to TestPlayer's inventory. Total: 2
+[InventoryComponent] (Client) Item added to inventory: 'Wood'.
+[InventoryComponent] Added 'Wood' to TestPlayer's inventory. Total: 3
+[InventoryComponent] (Client) Item added to inventory: 'Wood'.
+[InventoryComponent] Added 'Wood' to TestPlayer's inventory. Total: 4
+[InventoryComponent] (Client) Item added to inventory: 'Wood'.
+[InventoryComponent] Added 'Stone' to TestPlayer's inventory. Total: 5
+[InventoryComponent] (Client) Item added to inventory: 'Stone'.
+[InventoryComponent] Added 'Stone' to TestPlayer's inventory. Total: 6
+[InventoryComponent] (Client) Item added to inventory: 'Stone'.
+[InventoryComponent] Removed 4x 'Wood' from TestPlayer's inventory.
+[InventoryComponent] (Client) Item removed from inventory: 'Wood'.
+[InventoryComponent] Removed 2x 'Stone' from TestPlayer's inventory.
+[InventoryComponent] (Client) Item removed from inventory: 'Stone'.
+[BuildingRecipe] Consumed resources for 'Foundation'.
+[Test] Building placement smoke test: resources consumed successfully.
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1005" name="CombatSmokeTests" fullname="ByteWar.Tests.PlayMode.CombatSmokeTests" classname="ByteWar.Tests.PlayMode.CombatSmokeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:13Z" duration="0.121323" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1006" name="ClientCastsAbility_ServerProcessesManaAndCooldown_EnemyTakesDamage" fullname="ByteWar.Tests.PlayMode.CombatSmokeTests.ClientCastsAbility_ServerProcessesManaAndCooldown_EnemyTakesDamage" methodname="ClientCastsAbility_ServerProcessesManaAndCooldown_EnemyTakesDamage" classname="ByteWar.Tests.PlayMode.CombatSmokeTests" runstate="Runnable" seed="376429619" result="Passed" start-time="2026-02-22 13:45:12Z" end-time="2026-02-22 13:45:13Z" duration="0.120374" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 63528 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+[EnemyAI] Spawned 'Enemy' (NetworkObjectId=3) at (2.00, 0.00, 0.00).
+[Test] Casting MockDamageAbility...
+[MockDamageAbility] Executing at (2.00, 0.00, 0.00)
+[EnemyAI] 'Enemy' health: 100.0 → 75.0
+[MockDamageAbility] Applied 25 damage to Enemy
+Playing VFX for MockDamage at (2.00, 0.00, 0.00)
+[Test] Combat smoke test passed successfully.
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1007" name="EnemySpawnerTests" fullname="ByteWar.Tests.PlayMode.EnemySpawnerTests" classname="ByteWar.Tests.PlayMode.EnemySpawnerTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-22 13:45:13Z" end-time="2026-02-22 13:45:13Z" duration="0.512839" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1008" name="EnemySpawner_SpawnsEnemiesUpToMax" fullname="ByteWar.Tests.PlayMode.EnemySpawnerTests.EnemySpawner_SpawnsEnemiesUpToMax" methodname="EnemySpawner_SpawnsEnemiesUpToMax" classname="ByteWar.Tests.PlayMode.EnemySpawnerTests" runstate="Runnable" seed="477778649" result="Passed" start-time="2026-02-22 13:45:13Z" end-time="2026-02-22 13:45:13Z" duration="0.511988" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 63529 for PlayMode test NetworkManager.
+[EnemySpawner] Started spawner at (0.00, 0.00, 0.00). MaxEnemies=2
+[EnemyAI] Spawned 'EnemyPrefab(Clone)' (NetworkObjectId=3) at (-2.37, 0.00, 2.24).
+[EnemySpawner] Spawned enemy at (-2.37, 0.00, 2.24). Active enemies: 1/2
+[EnemyAI] Spawned 'EnemyPrefab(Clone)' (NetworkObjectId=4) at (-0.98, 0.00, 2.02).
+[EnemySpawner] Spawned enemy at (-0.98, 0.00, 2.02). Active enemies: 2/2
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1009" name="GameLoopTests" fullname="ByteWar.Tests.PlayMode.GameLoopTests" classname="ByteWar.Tests.PlayMode.GameLoopTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-22 13:45:13Z" end-time="2026-02-22 13:45:13Z" duration="0.028124" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1010" name="EndToEndGameLoop_GatherCraftEquipCombat" fullname="ByteWar.Tests.PlayMode.GameLoopTests.EndToEndGameLoop_GatherCraftEquipCombat" methodname="EndToEndGameLoop_GatherCraftEquipCombat" classname="ByteWar.Tests.PlayMode.GameLoopTests" runstate="Runnable" seed="2033484306" result="Passed" start-time="2026-02-22 13:45:13Z" end-time="2026-02-22 13:45:13Z" duration="0.027233" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 49769 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+Starting End-to-End Game Loop Test...
+Simulating Resource Gathering...
+[InventoryComponent] Added 'Wood' to TestPlayer's inventory. Total: 1
+[InventoryComponent] (Client) Item added to inventory: 'Wood'.
+[InventoryComponent] Added 'Stone' to TestPlayer's inventory. Total: 2
+[InventoryComponent] (Client) Item added to inventory: 'Stone'.
+Simulating Crafting...
+[InventoryComponent] Removed 1x 'Wood' from TestPlayer's inventory.
+[InventoryComponent] (Client) Item removed from inventory: 'Wood'.
+[InventoryComponent] Removed 1x 'Stone' from TestPlayer's inventory.
+[InventoryComponent] (Client) Item removed from inventory: 'Stone'.
+[InventoryComponent] Added 'Basic Staff' to TestPlayer's inventory. Total: 1
+[InventoryComponent] (Client) Item added to inventory: 'Basic Staff'.
+Player 0 crafted Basic Staff
+Simulating Equipping...
+Equipped Basic Staff
+Simulating Combat...
+End-to-End Game Loop Test Completed Successfully!
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1011" name="MeleeAttackSmokeTests" fullname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" classname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-02-22 13:45:13Z" end-time="2026-02-22 13:45:13Z" duration="0.322073" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1012" name="EnemyTakeDamage_ReducesHealth_AndDiesAtZero" fullname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests.EnemyTakeDamage_ReducesHealth_AndDiesAtZero" methodname="EnemyTakeDamage_ReducesHealth_AndDiesAtZero" classname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" runstate="Runnable" seed="1465079007" result="Passed" start-time="2026-02-22 13:45:13Z" end-time="2026-02-22 13:45:13Z" duration="0.310887" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 49770 for PlayMode test NetworkManager.
+[EnemyAI] Spawned 'TestEnemy' (NetworkObjectId=2) at (0.00, 0.00, 0.00).
+[Test] Dealing 10 damage to enemy...
+[EnemyAI] 'TestEnemy' health: 100.0 → 90.0
+[EnemyAI] 'TestEnemy' took 10 damage. Health=90
+[Test] Dealing lethal damage to enemy...
+[EnemyAI] 'TestEnemy' health: 90.0 → 0.0
+[EnemyAI] 'TestEnemy' (NetworkObjectId=2) died!
+[EnemyAI] 'TestEnemy' took 91 damage. Health=0
+[Test] MeleeAttack smoke test passed.
+]]></output>
+              </test-case>
+              <test-case id="1013" name="EnemyTargetTracker_SetTarget_FiresEvent" fullname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests.EnemyTargetTracker_SetTarget_FiresEvent" methodname="EnemyTargetTracker_SetTarget_FiresEvent" classname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" runstate="Runnable" seed="1550077714" result="Passed" start-time="2026-02-22 13:45:13Z" end-time="2026-02-22 13:45:13Z" duration="0.010116" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 49771 for PlayMode test NetworkManager.
+[EnemyAI] Spawned 'Target' (NetworkObjectId=2) at (0.00, 0.00, 0.00).
+[Test] EnemyTargetTracker test passed.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1014" name="PlayerInputTests" fullname="ByteWar.Tests.PlayMode.PlayerInputTests" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-22 13:45:13Z" end-time="2026-02-22 13:45:14Z" duration="0.549140" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1017" name="NetworkPlayer_MovesBasedOnInput" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.NetworkPlayer_MovesBasedOnInput" methodname="NetworkPlayer_MovesBasedOnInput" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="2135347886" result="Passed" start-time="2026-02-22 13:45:13Z" end-time="2026-02-22 13:45:14Z" duration="0.516133" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 49772 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+[NetworkPlayer] Moving: (0.00, 1.00)
+[PlayerInputHandler] MovementInput: (0.00, 1.00)
+[NetworkPlayer] Moving: (0.00, 1.00)
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+              <test-case id="1015" name="PlayerInputHandler_RegistersMovementInput" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.PlayerInputHandler_RegistersMovementInput" methodname="PlayerInputHandler_RegistersMovementInput" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="1290382288" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.018518" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 58001 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+[NetworkPlayer] Moving: (0.00, 1.00)
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+              <test-case id="1016" name="PlayerInteraction_ConsumesInteractAction" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.PlayerInteraction_ConsumesInteractAction" methodname="PlayerInteraction_ConsumesInteractAction" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="921960532" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.013115" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 58002 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1018" name="ResourceGatheringSmokeTests" fullname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests" classname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.118531" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1019" name="PlayerDamagesResourceNode_NodeDestroyed_ItemAddedToInventory" fullname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests.PlayerDamagesResourceNode_NodeDestroyed_ItemAddedToInventory" methodname="PlayerDamagesResourceNode_NodeDestroyed_ItemAddedToInventory" classname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests" runstate="Runnable" seed="1658828318" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.117608" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 58003 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+[ResourceNode] Spawned Tree with 100 health.
+[Test] Player attacking ResourceNode...
+[ResourceNode] Tree took 100 damage. Remaining health: 0
+[ResourceNode] Tree destroyed. Dropping items.
+[ResourceNode] Dropping 3x Wood from Tree.
+[InventoryComponent] Added 'Wood' to TestPlayer's inventory. Total: 1
+[InventoryComponent] (Client) Item added to inventory: 'Wood'.
+[InventoryComponent] Added 'Wood' to TestPlayer's inventory. Total: 2
+[InventoryComponent] (Client) Item added to inventory: 'Wood'.
+[InventoryComponent] Added 'Wood' to TestPlayer's inventory. Total: 3
+[InventoryComponent] (Client) Item added to inventory: 'Wood'.
+[Test] Resource gathering smoke test passed successfully.
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1020" name="ThirdPersonCameraFirstPersonTests" fullname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests" classname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.006283" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1021" name="FirstPersonMode_PlacesCameraAtPivot_AndHidesRenderers" fullname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests.FirstPersonMode_PlacesCameraAtPivot_AndHidesRenderers" methodname="FirstPersonMode_PlacesCameraAtPivot_AndHidesRenderers" classname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests" runstate="Runnable" seed="2059880395" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.005424" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[ThirdPersonCamera] Awake.
+[ThirdPersonCamera] Target set to CameraTarget. pivotHeight=0.20. Cached 1 renderers.
+[ThirdPersonCamera] First-person changed: enabled=True distance=0.000 targetDistance=0.000
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1022" name="UITests" fullname="ByteWar.Tests.PlayMode.UITests" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.193969" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1024" name="ActionBarUI_UpdatesWhenAbilityCast" fullname="ByteWar.Tests.PlayMode.UITests.ActionBarUI_UpdatesWhenAbilityCast" methodname="ActionBarUI_UpdatesWhenAbilityCast" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="55001053" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.130000" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 58004 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+ActionBarUI bound to local player AbilitySystemComponent.
+[NoOpAbility] Execute at (0.00, 0.00, 0.00)
+Playing VFX for NoOp at (0.00, 0.00, 0.00)
+ActionBarUI updated correctly.
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+              <test-case id="1026" name="CraftingUI_UpdatesWhenStationSet" fullname="ByteWar.Tests.PlayMode.UITests.CraftingUI_UpdatesWhenStationSet" methodname="CraftingUI_UpdatesWhenStationSet" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="1559864504" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.023937" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 58005 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+ActionBarUI bound to local player AbilitySystemComponent.
+CraftingUI bound to CraftingStation.
+CraftingUI updated correctly.
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+              <test-case id="1025" name="InventoryUI_UpdatesWhenItemAdded" fullname="ByteWar.Tests.PlayMode.UITests.InventoryUI_UpdatesWhenItemAdded" methodname="InventoryUI_UpdatesWhenItemAdded" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="1299484496" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.018722" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 58006 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+ActionBarUI bound to local player AbilitySystemComponent.
+[InventoryUI] Bound to local player InventoryComponent. Subscribing to events.
+[InventoryComponent] Added 'TestItem' to TestPlayer's inventory. Total: 1
+[InventoryComponent] (Client) Item added to inventory: 'TestItem'.
+[InventoryUI] Inventory changed (item: 'TestItem'). Flagging dirty.
+[InventoryUI] Rebuilt with 1 unique item types.
+InventoryUI updated correctly.
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+              <test-case id="1023" name="PlayerVitalsUI_UpdatesWhenAttributesChange" fullname="ByteWar.Tests.PlayMode.UITests.PlayerVitalsUI_UpdatesWhenAttributesChange" methodname="PlayerVitalsUI_UpdatesWhenAttributesChange" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="1800043212" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.019883" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 58007 for PlayMode test NetworkManager.
+[NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
+[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on TestPlayer.
+[PlayerInteraction] Initialized for local player (ClientId: 0).
+[PlayerInputHandler] InputActions enabled (context=PlayerInteraction OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Local player spawned — setting up camera.
+[PlayerInputHandler] InputActions enabled (context=NetworkPlayer OnNetworkSpawn (owner)). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Spawn via raycast: (0.00, 2.30, 0.00) (hit=TestPlayer)
+[ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
+[NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
+[NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+ActionBarUI bound to local player AbilitySystemComponent.
+[InventoryUI] Bound to local player InventoryComponent. Subscribing to events.
+[InventoryUI] Rebuilt with 0 unique item types.
+PlayerVitalsUI bound to local player AttributeSet.
+PlayerVitalsUI updated correctly.
+[PlayerInputHandler] Disabling Input Actions.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1027" name="VisualGroundingTests" fullname="ByteWar.Tests.PlayMode.VisualGroundingTests" classname="ByteWar.Tests.PlayMode.VisualGroundingTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.045094" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1028" name="NetworkPlayer_VisualGrounding_CorrectsSmallHover_UsingTerrain" fullname="ByteWar.Tests.PlayMode.VisualGroundingTests.NetworkPlayer_VisualGrounding_CorrectsSmallHover_UsingTerrain" methodname="NetworkPlayer_VisualGrounding_CorrectsSmallHover_UsingTerrain" classname="ByteWar.Tests.PlayMode.VisualGroundingTests" runstate="Runnable" seed="1105102317" result="Passed" start-time="2026-02-22 13:45:14Z" end-time="2026-02-22 13:45:14Z" duration="0.044212" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[PlayerInputHandler] Initializing Input Actions.
+[PlayerInputHandler] Devices: Keyboard=False Mouse=False
+[PlayerInputHandler] Enabling Input Actions.
+[PlayerInputHandler] InputActions enabled (context=OnEnable). Movement=True Cast1=True Interact=True Keyboard=False Mouse=False
+[NetworkPlayer] Awake on Player.
+[PlayerInputHandler] Disabling Input Actions.
+Saving results to: C:/Users/Elt-9/AppData/LocalLow/BytedotGit/ByteWar\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

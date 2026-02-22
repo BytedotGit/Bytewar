@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace SurvivalRPG.Core
+namespace ByteWar.Core
 {
     /// <summary>
     /// Captures Debug.Log / LogWarning / LogError and renders the last N messages

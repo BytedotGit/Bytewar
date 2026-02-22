@@ -1,9 +1,9 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
-using SurvivalRPG.Survival;
+using ByteWar.Survival;
 
-namespace SurvivalRPG.Building
+namespace ByteWar.Building
 {
     public class CraftingStation : NetworkBehaviour
     {

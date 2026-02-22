@@ -3,7 +3,7 @@ using Unity.Netcode;
 using System;
 using System.Collections.Generic;
 
-namespace SurvivalRPG.Survival
+namespace ByteWar.Survival
 {
     /// <summary>
     /// Manages a player's inventory.  Items are stored server-side; add/remove

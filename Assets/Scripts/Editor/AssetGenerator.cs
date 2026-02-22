@@ -1,17 +1,17 @@
 using UnityEngine;
 using UnityEditor;
-using SurvivalRPG.Survival;
-using SurvivalRPG.Building;
-using SurvivalRPG.Abilities.Mage;
-using SurvivalRPG.Abilities.Talents;
+using ByteWar.Survival;
+using ByteWar.Building;
+using ByteWar.Abilities.Mage;
+using ByteWar.Abilities.Talents;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     public static class AssetGenerator
     {
-        [MenuItem("SurvivalRPG/Generate Assets")]
+        [MenuItem("ByteWar/Generate Assets")]
         public static void GenerateAssets()
         {
             Debug.Log("[AssetGenerator] Starting asset generation...");
@@ -73,6 +73,25 @@ namespace SurvivalRPG.Editor
             manaRegenTalent.ManaBonus = 50f;
             manaRegenTalent.TargetAbilityName = "Fireball";
             manaRegenTalent.ManaCostReduction = 5f;
+
+            // Generate Building Recipes
+            BuildingRecipe foundationRecipe = CreateAsset<BuildingRecipe>($"{basePath}/FoundationRecipe.asset");
+            foundationRecipe.RecipeName = "Foundation";
+            foundationRecipe.PieceType = BuildingPieceType.Foundation;
+            foundationRecipe.Cost = new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 4 },
+                new RecipeIngredient { Item = stone, Amount = 2 }
+            };
+
+            BuildingRecipe wallRecipe = CreateAsset<BuildingRecipe>($"{basePath}/WallRecipe.asset");
+            wallRecipe.RecipeName = "Wall";
+            wallRecipe.PieceType = BuildingPieceType.Wall;
+            wallRecipe.Cost = new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 3 },
+                new RecipeIngredient { Item = stone, Amount = 1 }
+            };
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

@@ -1,10 +1,10 @@
 using UnityEngine;
 using Unity.Netcode;
-using SurvivalRPG.Survival;
+using ByteWar.Survival;
 
-namespace SurvivalRPG.Abilities.Mage
+namespace ByteWar.Abilities.Mage
 {
-    [CreateAssetMenu(fileName = "Fireball", menuName = "SurvivalRPG/Abilities/Mage/Fireball")]
+    [CreateAssetMenu(fileName = "Fireball", menuName = "ByteWar/Abilities/Mage/Fireball")]
     public class FireballAbility : Ability
     {
         public GameObject ProjectilePrefab;

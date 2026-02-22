@@ -4,7 +4,7 @@ Applies to all runtime C# under `Assets/Scripts`.
 
 ## Non-negotiables
 
-- Follow `.github/GAME_PROTOCOL.md` and `.github/copilot-instructions.md`.
+- Follow `.github/GAME_PROTOCOL.md` and the root `AGENTS.md`.
 - Add tests and logs for every change.
 - Avoid per-frame allocations and log spam.
 

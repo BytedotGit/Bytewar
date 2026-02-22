@@ -3,16 +3,16 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Netcode;
-using SurvivalRPG.UI;
-using SurvivalRPG.Abilities;
-using SurvivalRPG.Abilities.Mage;
-using SurvivalRPG.Survival;
-using SurvivalRPG.Building;
+using ByteWar.UI;
+using ByteWar.Abilities;
+using ByteWar.Abilities.Mage;
+using ByteWar.Survival;
+using ByteWar.Building;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-namespace SurvivalRPG.Tests.PlayMode
+namespace ByteWar.Tests.PlayMode
 {
     public class UITests
     {
@@ -23,7 +23,7 @@ namespace SurvivalRPG.Tests.PlayMode
         {
             _networkManager = NGOTestHelper.CreateNetworkManager();
             _networkManager.StartHost();
-            yield return new WaitForSeconds(0.1f);
+            yield return NGOTestHelper.WaitForLocalPlayerReady(_networkManager);
         }
 
         [UnityTearDown]
@@ -68,9 +68,9 @@ namespace SurvivalRPG.Tests.PlayMode
             var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject;
             var abilitySystem = localPlayer.GetComponent<AbilitySystemComponent>();
 
-            // Create a mock ability
-            var ability = ScriptableObject.CreateInstance<FireballAbility>();
-            ability.AbilityName = "Fireball";
+            // Create a mock ability that does not depend on prefabs/VFX.
+            var ability = ScriptableObject.CreateInstance<NoOpAbility>();
+            ability.AbilityName = "NoOp";
             ability.Cooldown = 5f;
             ability.ManaCost = 10f;
             abilitySystem.LearnedAbilities.Add(ability);
@@ -95,6 +95,14 @@ namespace SurvivalRPG.Tests.PlayMode
 
             Assert.IsTrue(slot.CooldownText.text != "", "Cooldown text should not be empty after casting.");
             Debug.Log("ActionBarUI updated correctly.");
+        }
+
+        private sealed class NoOpAbility : Ability
+        {
+            public override void Execute(AbilitySystemComponent caster, Vector3 targetPosition)
+            {
+                Debug.Log($"[NoOpAbility] Execute at {targetPosition}");
+            }
         }
 
         [UnityTest]

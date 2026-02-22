@@ -2,10 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
-using SurvivalRPG.Abilities;
+using ByteWar.Abilities;
 using System.Collections.Generic;
 
-namespace SurvivalRPG.UI
+namespace ByteWar.UI
 {
     public class ActionBarUI : MonoBehaviour
     {

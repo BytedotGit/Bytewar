@@ -2,20 +2,21 @@ using UnityEngine;
 using UnityEditor;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
-using SurvivalRPG.Networking;
-using SurvivalRPG.Abilities;
-using SurvivalRPG.Survival;
-using SurvivalRPG.Core;
+using ByteWar.Networking;
+using ByteWar.Abilities;
+using ByteWar.Survival;
+using ByteWar.Building;
+using ByteWar.Core;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     public static class PrefabGenerator
     {
         private const string BuildGenPrefix = "[BuildGen]";
 
-        [MenuItem("SurvivalRPG/Generate Prefabs")]
+        [MenuItem("ByteWar/Generate Prefabs")]
         public static void GeneratePrefabs()
         {
             Debug.Log($"{BuildGenPrefix} PrefabGenerator: start");
@@ -41,6 +42,32 @@ namespace SurvivalRPG.Editor
             Animator animator = playerObj.AddComponent<Animator>();
             ClientNetworkAnimator netAnimator = playerObj.AddComponent<ClientNetworkAnimator>();
             netAnimator.Animator = animator;
+
+            // Wire BuildingController onto the player
+            var buildingController = playerObj.AddComponent<BuildingController>();
+
+            // Generate building piece prefabs early so we can wire them into BuildingController before saving
+            GameObject foundationPrefab = GenerateBuildingPiecePrefab(basePath, BuildingPieceType.Foundation, "Foundation", new Vector3(4f, 0.4f, 4f), new Color(0.55f, 0.45f, 0.35f));
+            GameObject wallPrefab = GenerateBuildingPiecePrefab(basePath, BuildingPieceType.Wall, "Wall", new Vector3(4f, 3f, 0.3f), new Color(0.65f, 0.55f, 0.45f));
+            buildingController.SetBuildingPrefabs(foundationPrefab, wallPrefab);
+
+            // Wire building recipes if they exist
+            var foundationRecipe = AssetDatabase.LoadAssetAtPath<BuildingRecipe>("Assets/GeneratedAssets/FoundationRecipe.asset");
+            var wallRecipe = AssetDatabase.LoadAssetAtPath<BuildingRecipe>("Assets/GeneratedAssets/WallRecipe.asset");
+            var recipes = new List<BuildingRecipe>();
+            if (foundationRecipe != null) recipes.Add(foundationRecipe);
+            if (wallRecipe != null) recipes.Add(wallRecipe);
+            if (recipes.Count > 0)
+            {
+                buildingController.SetRecipes(recipes);
+                Debug.Log($"{BuildGenPrefix} PrefabGenerator: wired {recipes.Count} building recipes into BuildingController.");
+            }
+            else
+            {
+                Debug.LogWarning($"{BuildGenPrefix} PrefabGenerator: No building recipes found. Run Generate Assets first.");
+            }
+
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: created building piece prefabs.");
 
             // Deterministic controller config (prevents hovering from center.y = 0 defaults)
             cc.height = 2.0f;
@@ -195,8 +222,8 @@ namespace SurvivalRPG.Editor
             GameObject networkManagerObj = new GameObject("NetworkManager");
             NetworkManager networkManager = networkManagerObj.AddComponent<NetworkManager>();
             UnityTransport transport = networkManagerObj.AddComponent<UnityTransport>();
-            networkManagerObj.AddComponent<SurvivalRPG.Networking.CustomNetworkManagerHUD>();
-            var bootstrapper = networkManagerObj.AddComponent<SurvivalRPG.Networking.NetworkBootstrapper>();
+            networkManagerObj.AddComponent<ByteWar.Networking.CustomNetworkManagerHUD>();
+            var bootstrapper = networkManagerObj.AddComponent<ByteWar.Networking.NetworkBootstrapper>();
 
             // Do NOT replace NetworkConfig with `new` — it breaks prefab serialization.
             // Modify the existing serialized instance instead.
@@ -213,6 +240,12 @@ namespace SurvivalRPG.Editor
             networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = playerPrefab });
             networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = resourcePrefab });
             networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = enemyPrefab });
+            networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = foundationPrefab });
+            networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = wallPrefab });
+
+            // Wire WorldPersistence onto NetworkManager
+            var worldPersistence = networkManagerObj.AddComponent<WorldPersistence>();
+            worldPersistence.SetBuildingPrefabs(foundationPrefab, wallPrefab);
 
             GameObject networkManagerPrefab = PrefabUtility.SaveAsPrefabAsset(networkManagerObj, $"{basePath}/NetworkManager.prefab");
             Object.DestroyImmediate(networkManagerObj);
@@ -265,6 +298,66 @@ namespace SurvivalRPG.Editor
             // If minLocalY is below 0, move visuals up; if above 0, move down.
             visualRoot.localPosition += new Vector3(0f, -minLocalY, 0f);
             Debug.Log($"[PrefabGenerator] Grounded VisualRoot by {-minLocalY:0.000} (minLocalY={minLocalY:0.000}).");
+        }
+
+        /// <summary>
+        /// Generates a simple box-based building piece prefab with a NetworkObject and BuildingPiece component.
+        /// </summary>
+        private static GameObject GenerateBuildingPiecePrefab(string basePath, BuildingPieceType type, string name, Vector3 size, Color color)
+        {
+            GameObject obj = new GameObject($"Building_{name}");
+            obj.AddComponent<NetworkObject>();
+            var piece = obj.AddComponent<BuildingPiece>();
+
+            // Set piece type via SerializedObject (private field)
+            var tempPrefabPath = $"{basePath}/Building_{name}.prefab";
+
+            // Visual: simple cube scaled to size
+            GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            visual.name = $"{name}Visual";
+            visual.transform.SetParent(obj.transform);
+            visual.transform.localScale = size;
+            visual.transform.localPosition = new Vector3(0f, size.y * 0.5f, 0f);
+
+            // Apply color
+            var mat = new Material(Shader.Find("Standard")) { color = color };
+            visual.GetComponent<Renderer>().sharedMaterial = mat;
+
+            // Save material as asset to avoid runtime leak warnings
+            string matPath = $"{basePath}/Building_{name}_Material.mat";
+            Material existingMat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+            if (existingMat != null)
+            {
+                existingMat.color = color;
+                EditorUtility.SetDirty(existingMat);
+                visual.GetComponent<Renderer>().sharedMaterial = existingMat;
+                Object.DestroyImmediate(mat);
+            }
+            else
+            {
+                AssetDatabase.CreateAsset(mat, matPath);
+                visual.GetComponent<Renderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+            }
+
+            // Collider on root for physics interaction
+            BoxCollider col = obj.AddComponent<BoxCollider>();
+            col.center = new Vector3(0f, size.y * 0.5f, 0f);
+            col.size = size;
+
+            // Remove the primitive's collider (we use the root one)
+            Object.DestroyImmediate(visual.GetComponent<Collider>());
+
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(obj, tempPrefabPath);
+            Object.DestroyImmediate(obj);
+
+            // Set private _pieceType via SerializedObject on the saved prefab
+            var pieceSO = new SerializedObject(prefab.GetComponent<BuildingPiece>());
+            pieceSO.FindProperty("_pieceType").enumValueIndex = (int)type;
+            pieceSO.ApplyModifiedProperties();
+            EditorUtility.SetDirty(prefab);
+
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: created Building_{name} prefab at {tempPrefabPath}");
+            return prefab;
         }
     }
 }

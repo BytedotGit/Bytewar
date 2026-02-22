@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace SurvivalRPG.Abilities.Mage
+namespace ByteWar.Abilities.Mage
 {
-    [CreateAssetMenu(fileName = "FrostNova", menuName = "SurvivalRPG/Abilities/Mage/FrostNova")]
+    [CreateAssetMenu(fileName = "FrostNova", menuName = "ByteWar/Abilities/Mage/FrostNova")]
     public class FrostNovaAbility : Ability
     {
         public float Radius = 5f;

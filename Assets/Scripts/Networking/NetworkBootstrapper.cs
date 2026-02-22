@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 
-namespace SurvivalRPG.Networking
+namespace ByteWar.Networking
 {
     /// <summary>
     /// Validates and self-repairs the NetworkManager configuration at runtime,

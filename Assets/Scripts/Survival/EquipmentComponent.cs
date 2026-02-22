@@ -1,8 +1,8 @@
 using UnityEngine;
 using Unity.Netcode;
-using SurvivalRPG.Abilities;
+using ByteWar.Abilities;
 
-namespace SurvivalRPG.Survival
+namespace ByteWar.Survival
 {
     [RequireComponent(typeof(AttributeSet))]
     public class EquipmentComponent : NetworkBehaviour

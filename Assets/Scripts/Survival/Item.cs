@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace SurvivalRPG.Survival
+namespace ByteWar.Survival
 {
-    [CreateAssetMenu(fileName = "NewItem", menuName = "SurvivalRPG/Survival/Item")]
+    [CreateAssetMenu(fileName = "NewItem", menuName = "ByteWar/Survival/Item")]
     public class Item : ScriptableObject
     {
         public string ItemName;

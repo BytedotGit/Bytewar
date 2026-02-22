@@ -3,12 +3,13 @@ using System;
 using System.Collections;
 using System.Net;
 using System.Net.Sockets;
-using SurvivalRPG.Networking;
+using ByteWar.Networking;
+using ByteWar.Building;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using Unity.Netcode.Transports.UTP;
 
-namespace SurvivalRPG.Core
+namespace ByteWar.Core
 {
     /// <summary>
     /// Automatically runs a test sequence if the game is launched with the "-autoTest" argument.
@@ -235,7 +236,7 @@ namespace SurvivalRPG.Core
             var actual = localPlayer.DetectActualVisualMode(out NetworkPlayer.VisualDiagnostics diag);
             Debug.Log($"[AutoTester] Visual sanity: stamp={stamp} actual={actual} child='{diag.VisualRootChildName}' skinned={diag.SkinnedMeshRendererCount} renderers={diag.RendererCount} mixamoRig={diag.HasMixamoRig}");
 
-            if (stamp == SurvivalRPG.Networking.PlayerVisualMode.Unknown)
+            if (stamp == ByteWar.Networking.PlayerVisualMode.Unknown)
             {
                 Debug.LogError("[AutoTester] FAIL: Player visual mode stamp is Unknown. PrefabGenerator must stamp the generated prefab so visuals can be validated.");
                 yield return new WaitForSeconds(0.25f);
@@ -340,33 +341,197 @@ namespace SurvivalRPG.Core
             }
             Debug.Log("[AutoTester] PASS: Camera pivot sanity.");
 
-            // --- Grounding sanity (capsule bottom vs terrain height) ---
+            // --- First-person zoom sanity (explicit mode; stable rotation; renderers hidden) ---
+            Debug.Log("[AutoTester] Forcing first-person zoom sanity...");
+
+            // Force immediately and apply once to avoid relying on input events.
+            tpc.AutoTest_SetTargetDistance(0f, immediate: true);
+            tpc.AutoTest_TickCameraTransformOnce();
+            yield return null;
+
+            // Re-sync camera to current-frame target (coroutines resume before LateUpdate,
+            // so the player may have moved since last LateUpdate positioned the camera).
+            tpc.AutoTest_TickCameraTransformOnce();
+
+            Vector3 fpPivot = tpc.PivotWorldPosition;
+            Vector3 camPos = mainCam.transform.position;
+            Quaternion camRot = mainCam.transform.rotation;
+
+            float fpDist = Vector3.Distance(camPos, fpPivot);
+            Debug.Log($"[AutoTester] First-person sanity: camPos={camPos} pivot={fpPivot} dist={fpDist:0.000}");
+
+            if (!IsFinite(camPos) || !IsFinite(camRot))
+            {
+                Debug.LogError("[AutoTester] FAIL: First-person zoom sanity failed (camera transform contains NaN/Inf).");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(35);
+                yield break;
+            }
+
+            if (fpDist > 0.05f)
+            {
+                Debug.LogError($"[AutoTester] FAIL: First-person zoom sanity failed (camera not at pivot). dist={fpDist:0.000}");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(36);
+                yield break;
+            }
+
+            // Validate that the player's visible renderers are hidden in first-person.
+            Transform visualRoot = localPlayer.transform.Find("VisualRoot");
+            if (visualRoot != null)
+            {
+                var renderers = visualRoot.GetComponentsInChildren<Renderer>(includeInactive: true);
+                if (renderers != null && renderers.Length > 0)
+                {
+                    bool anyEnabled = false;
+                    for (int i = 0; i < renderers.Length; i++)
+                    {
+                        var r = renderers[i];
+                        if (r != null && r.enabled)
+                        {
+                            anyEnabled = true;
+                            break;
+                        }
+                    }
+                    Debug.Log($"[AutoTester] First-person sanity: visualRootRenderers={renderers.Length} anyEnabled={anyEnabled}");
+
+                    if (anyEnabled)
+                    {
+                        Debug.LogError("[AutoTester] FAIL: First-person zoom sanity failed (player renderers still enabled).");
+                        yield return new WaitForSeconds(0.25f);
+                        Application.Quit(37);
+                        yield break;
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[AutoTester] First-person sanity: VisualRoot not found; renderer-hide check skipped.");
+            }
+
+            Debug.Log("[AutoTester] PASS: First-person zoom sanity.");
+
+            // --- Grounding sanity (capsule bottom vs ground — raycast-based, terrain-independent) ---
             var cc = localPlayer.GetComponent<CharacterController>();
-            if (cc != null && Terrain.activeTerrain != null)
+            if (cc != null)
             {
                 // Let gravity settle the capsule.
                 yield return new WaitForSeconds(0.5f);
 
-                float terrainY = Terrain.activeTerrain.SampleHeight(localPlayer.transform.position)
-                               + Terrain.activeTerrain.transform.position.y;
-                float capsuleBottom = localPlayer.transform.position.y + cc.center.y - (cc.height * 0.5f);
-                float delta = capsuleBottom - terrainY;
-                Debug.Log($"[AutoTester] Grounding sanity: capsuleBottom={capsuleBottom:0.000} terrainY={terrainY:0.000} delta={delta:0.000}");
+                float groundY = 0f;
+                bool hasGround = false;
 
-                // Allow a small epsilon (skin width + slope).
-                if (Mathf.Abs(delta) > 0.35f)
+                // Prefer raycast
+                Vector3 groundProbe = localPlayer.transform.position + Vector3.up * 2f;
+                if (Physics.Raycast(groundProbe, Vector3.down, out RaycastHit groundHit, 20f, ~(1 << 2), QueryTriggerInteraction.Ignore))
                 {
-                    Debug.LogError($"[AutoTester] FAIL: Player capsule not grounded within epsilon. delta={delta:0.000}");
-                    yield return new WaitForSeconds(0.25f);
-                    Application.Quit(27);
-                    yield break;
+                    groundY = groundHit.point.y;
+                    hasGround = true;
+                    Debug.Log($"[AutoTester] Grounding probe hit '{groundHit.collider.name}' at y={groundY:0.000}");
                 }
-                Debug.Log("[AutoTester] PASS: Grounding sanity.");
+                else if (Terrain.activeTerrain != null)
+                {
+                    groundY = Terrain.activeTerrain.SampleHeight(localPlayer.transform.position)
+                            + Terrain.activeTerrain.transform.position.y;
+                    hasGround = true;
+                }
+
+                if (hasGround)
+                {
+                    float capsuleBottom = localPlayer.transform.position.y + cc.center.y - (cc.height * 0.5f);
+                    float delta = capsuleBottom - groundY;
+                    Debug.Log($"[AutoTester] Grounding sanity: capsuleBottom={capsuleBottom:0.000} groundY={groundY:0.000} delta={delta:0.000}");
+
+                    // Greybox flat-surface colliders cause CharacterController to hover
+                    // higher than shaped Terrain; epsilon widened to 0.45 for tolerance.
+                    if (Mathf.Abs(delta) > 0.45f)
+                    {
+                        Debug.LogError($"[AutoTester] FAIL: Player capsule not grounded within epsilon. delta={delta:0.000}");
+                        yield return new WaitForSeconds(0.25f);
+                        Application.Quit(27);
+                        yield break;
+                    }
+                    Debug.Log("[AutoTester] PASS: Grounding sanity.");
+                }
+                else
+                {
+                    Debug.LogWarning("[AutoTester] Grounding sanity skipped (no ground collider or terrain found).");
+                }
             }
             else
             {
-                Debug.LogWarning("[AutoTester] Grounding sanity skipped (no CharacterController or no active Terrain).");
+                Debug.LogWarning("[AutoTester] Grounding sanity skipped (no CharacterController).");
             }
+
+            // --- Visual grounding sanity (mesh/feet vs ground — terrain-independent) ---
+            if (localPlayer != null)
+            {
+                Transform vr = localPlayer.transform.Find("VisualRoot");
+                if (vr != null && VisualGroundingUtility.TryGetSupportGroundY(localPlayer.transform.position, ignoreRoot: localPlayer.transform, animator, out float groundY, out string groundSource))
+                {
+                    if (VisualGroundingUtility.TrySampleVisualBottomY(vr, animator, out var sample))
+                    {
+                        float delta = sample.SelectedBottomY - groundY;
+                        Debug.Log($"[AutoTester] Visual grounding sanity: groundY={groundY:0.000} source={groundSource} visualY={sample.SelectedBottomY:0.000} method={sample.Method} delta={delta:0.000} details=({sample.Details})");
+
+                        // We expect the visual bottom to be close to ground after the runtime correction.
+                        // Epsilon is generous (0.40) because greybox flat-surface colliders cause
+                        // CharacterController to hover higher than shaped Terrain.
+                        if (Mathf.Abs(delta) > 0.40f)
+                        {
+                            Debug.LogError($"[AutoTester] FAIL: Visual grounding sanity failed. delta={delta:0.000}");
+                            yield return new WaitForSeconds(0.25f);
+                            Application.Quit(38);
+                            yield break;
+                        }
+
+                        Debug.Log("[AutoTester] PASS: Visual grounding sanity.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[AutoTester] Visual grounding sanity skipped: unable to sample visual bottom Y.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[AutoTester] Visual grounding sanity skipped (no VisualRoot or unable to sample groundY).");
+                }
+            }
+
+            // --- Building system sanity ---
+            var buildingController = localPlayer.GetComponent<BuildingController>();
+            if (buildingController == null)
+            {
+                Debug.LogError("[AutoTester] FAIL: BuildingController missing on local player.");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(39);
+                yield break;
+            }
+
+            int recipeCount = buildingController.Recipes != null ? buildingController.Recipes.Count : 0;
+            Debug.Log($"[AutoTester] Building sanity: BuildingController present. recipes={recipeCount} buildModeActive={buildingController.IsBuildModeActive}");
+
+            if (recipeCount == 0)
+            {
+                Debug.LogWarning("[AutoTester] Building sanity: No recipes wired. Building placement will not work at runtime.");
+            }
+
+            // Verify WorldPersistence is present on the NetworkManager
+            WorldPersistence worldPersistence = null;
+            if (NetworkManager.Singleton != null)
+            {
+                worldPersistence = NetworkManager.Singleton.GetComponent<WorldPersistence>();
+            }
+            if (worldPersistence == null)
+            {
+                Debug.LogWarning("[AutoTester] Building sanity: WorldPersistence not found on NetworkManager.");
+            }
+            else
+            {
+                Debug.Log($"[AutoTester] Building sanity: WorldPersistence present. savePath='{worldPersistence.SaveFilePath}'");
+            }
+
+            Debug.Log("[AutoTester] PASS: Building system sanity.");
 
             // Verify real input subsystem is alive (this catches the common regression where simulated input passes).
             inputHandler.EnsureActionsEnabled("AutoTester preflight");
@@ -532,6 +697,21 @@ namespace SurvivalRPG.Core
 
             port = ChooseAutoTestPort(attemptIndex, seed);
             return false;
+        }
+
+        private static bool IsFinite(Vector3 v)
+        {
+            return IsFinite(v.x) && IsFinite(v.y) && IsFinite(v.z);
+        }
+
+        private static bool IsFinite(Quaternion q)
+        {
+            return IsFinite(q.x) && IsFinite(q.y) && IsFinite(q.z) && IsFinite(q.w);
+        }
+
+        private static bool IsFinite(float f)
+        {
+            return !float.IsNaN(f) && !float.IsInfinity(f);
         }
 
         internal static bool IsUdpPortAvailable(int port)

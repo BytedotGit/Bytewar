@@ -1,8 +1,8 @@
 using UnityEngine;
 using Unity.Netcode;
-using SurvivalRPG.Abilities;
+using ByteWar.Abilities;
 
-namespace SurvivalRPG.Survival
+namespace ByteWar.Survival
 {
     /// <summary>
     /// Server-authoritative Fireball projectile.

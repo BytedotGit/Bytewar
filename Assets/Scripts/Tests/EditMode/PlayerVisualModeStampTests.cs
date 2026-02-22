@@ -1,10 +1,10 @@
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
-using SurvivalRPG.Editor;
-using SurvivalRPG.Networking;
+using ByteWar.Editor;
+using ByteWar.Networking;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     public class PlayerVisualModeStampTests
     {

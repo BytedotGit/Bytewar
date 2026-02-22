@@ -30,8 +30,15 @@ applyTo: "Assets/Scripts/**/*.cs"
 
 - You MUST NOT ask the user to test a build or verify a fix until you have tested it yourself.
 - To test a build, use the terminal to run the Unity batchmode build command.
-- Once built, launch the executable in the background using `Start-Process -FilePath "Builds\Windows\SurvivalRPG.exe" -ArgumentList "-autoTest" -NoNewWindow`.
+- Once built, launch the executable in the background using `Start-Process -FilePath "Builds\Windows\ByteWar.exe" -ArgumentList "-autoTest" -NoNewWindow`.
 - The `-autoTest` flag will trigger the `AutoTester` script to simulate input and automatically close the game after a few seconds. DO NOT use OS-level input simulation (like `user32.dll` or `keybd_event`) as it steals focus and interrupts the user.
-- Read the `Player.log` (located at `$env:USERPROFILE\AppData\LocalLow\DefaultCompany\SurvivalRPG\Player.log` on Windows) to verify that no exceptions were thrown and that the expected logs (e.g., "Server started", "Player spawned", "[AutoTester]") are present.
+- Read the `Player.log` (located at `$env:USERPROFILE\AppData\LocalLow\BytedotGit\ByteWar\Player.log` on Windows) to verify that no exceptions were thrown and that the expected logs (e.g., "Server started", "Player spawned", "[AutoTester]") are present.
 - **CRITICAL**: Keep iterating on the code and self-testing until you have achieved the task or resolved the issue.
 - For example, if movement isn't working, identify the issue, resolve it, test the movement in-game (via logs or automated input) to confirm it's working as intended, and ONLY THEN ask the user to test. Apply this logic to everything.
+
+## 6. Defect Tracking (Error Log)
+
+- If a user-visible defect is reported and not fully resolved in the same session, you MUST add/update an entry in `.github/ERROR_LOG.md` with:
+  - exact repro steps
+  - expected vs actual
+  - the most relevant log lines (e.g., from `Player.log`)

@@ -3,11 +3,11 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     public static class SceneGenerator
     {
-        [MenuItem("SurvivalRPG/Generate Test Scene")]
+        [MenuItem("ByteWar/Generate Test Scene")]
         public static void GenerateTestScene()
         {
             Debug.Log("[SceneGenerator] Starting test scene generation...");
@@ -19,30 +19,8 @@ namespace SurvivalRPG.Editor
             string scenePath = "Assets/Scenes/TestScene.unity";
             Scene newScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            // ── 1. Terrain ────────────────────────────────────────────────────────
-            TerrainData terrainData = AssetDatabase.LoadAssetAtPath<TerrainData>(
-                "Assets/GeneratedPrefabs/GeneratedTerrainData.asset");
-            if (terrainData != null)
-            {
-                GameObject terrainObj = Terrain.CreateTerrainGameObject(terrainData);
-                terrainObj.name = "GeneratedTerrain";
-                terrainObj.transform.position = new Vector3(-250f, 0f, -250f);
-                var terrain = terrainObj.GetComponent<Terrain>();
-                terrain.drawTreesAndFoliage = true;
-                terrain.heightmapMaximumLOD = 0;
-                terrain.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.TwoSided;
-                Debug.Log("[SceneGenerator] Terrain added.");
-            }
-            else
-            {
-                // Fallback: large coloured plane
-                GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
-                floor.name = "Floor";
-                floor.transform.position = Vector3.zero;
-                floor.transform.localScale = new Vector3(50f, 1f, 50f);
-                floor.GetComponent<Renderer>().sharedMaterial.color = new Color(0.22f, 0.50f, 0.18f);
-                Debug.LogWarning("[SceneGenerator] TerrainData not found — using fallback plane.");
-            }
+            // ── 1. Greybox Ground ─────────────────────────────────────────────────
+            GenerateGreyboxGround();
 
             // ── 2. Procedural Skybox & Render Settings ────────────────────────────
             SetupSkyboxAndAmbient();
@@ -82,7 +60,7 @@ namespace SurvivalRPG.Editor
             cameraObj.transform.position = new Vector3(0f, 8f, -10f);
             cameraObj.transform.rotation = Quaternion.Euler(25f, 0f, 0f);
             cameraObj.AddComponent<AudioListener>();
-            cameraObj.AddComponent<SurvivalRPG.Core.ThirdPersonCamera>();
+            cameraObj.AddComponent<ByteWar.Core.ThirdPersonCamera>();
             Debug.Log("[SceneGenerator] ThirdPersonCamera added to Main Camera.");
 
             // ── 6. NetworkManager ─────────────────────────────────────────────────
@@ -118,7 +96,7 @@ namespace SurvivalRPG.Editor
             GameObject spawnerObj = new GameObject("EnemySpawner");
             spawnerObj.transform.position = new Vector3(30f, 0f, 30f);
             spawnerObj.AddComponent<Unity.Netcode.NetworkObject>();
-            var spawner = spawnerObj.AddComponent<SurvivalRPG.Survival.EnemySpawner>();
+            var spawner = spawnerObj.AddComponent<ByteWar.Survival.EnemySpawner>();
             GameObject enemyPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
                 "Assets/GeneratedPrefabs/EnemyAI.prefab");
             if (enemyPrefab != null)
@@ -145,10 +123,10 @@ namespace SurvivalRPG.Editor
             Debug.Log("[SceneGenerator] EventSystem with InputSystemUIInputModule added.");
             // ── 10b. Screen Logger for build-time debugging ─────────────────────
             GameObject loggerObj = new GameObject("ScreenLogger");
-            loggerObj.AddComponent<SurvivalRPG.Core.ScreenLogger>();
+            loggerObj.AddComponent<ByteWar.Core.ScreenLogger>();
             Debug.Log("[SceneGenerator] ScreenLogger added (toggle with F1).");
-            // ── 11. Scatter environment objects ───────────────────────────────────
-            EnvironmentGenerator.GenerateEnvironment();
+            // ── 11. Scatter greybox environment props ────────────────────────────
+            GenerateGreyboxProps();
 
             // ── Save ──────────────────────────────────────────────────────────────
             EditorSceneManager.SaveScene(newScene, scenePath);
@@ -192,6 +170,100 @@ namespace SurvivalRPG.Editor
             RenderSettings.fogDensity = 0.0025f;
 
             Debug.Log("[SceneGenerator] Sky, ambient and fog configured.");
+        }
+
+        // ── Greybox Ground ────────────────────────────────────────────────────────
+
+        private static Material GetOrCreateGreyboxMaterial(string name, Color color, string basePath)
+        {
+            string matPath = $"{basePath}/Greybox_{name}.mat";
+            var existing = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+            if (existing != null)
+            {
+                existing.color = color;
+                EditorUtility.SetDirty(existing);
+                return existing;
+            }
+
+            var mat = new Material(Shader.Find("Standard")) { color = color };
+            AssetDatabase.CreateAsset(mat, matPath);
+            return AssetDatabase.LoadAssetAtPath<Material>(matPath);
+        }
+
+        private static void GenerateGreyboxGround()
+        {
+            const string basePath = "Assets/GeneratedPrefabs";
+
+            // Materials
+            Material groundMat = GetOrCreateGreyboxMaterial("Ground", new Color(0.45f, 0.45f, 0.45f), basePath);
+            Material accentMat = GetOrCreateGreyboxMaterial("Accent", new Color(0.35f, 0.35f, 0.38f), basePath);
+
+            // Main ground: a large flat cube centered at origin. Thickness = 1m, top surface at Y=0.
+            GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ground.name = "GreyboxGround";
+            ground.isStatic = true;
+            ground.transform.position = new Vector3(0f, -0.5f, 0f);
+            ground.transform.localScale = new Vector3(200f, 1f, 200f);
+            ground.GetComponent<Renderer>().sharedMaterial = groundMat;
+            ground.layer = LayerMask.NameToLayer("Default");
+
+            // Raised platform near center for variety
+            GameObject platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            platform.name = "GreyboxPlatform";
+            platform.isStatic = true;
+            platform.transform.position = new Vector3(30f, 0.5f, 20f);
+            platform.transform.localScale = new Vector3(12f, 1f, 12f);
+            platform.GetComponent<Renderer>().sharedMaterial = accentMat;
+
+            // Ramp connecting platform to ground
+            GameObject ramp = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ramp.name = "GreyboxRamp";
+            ramp.isStatic = true;
+            ramp.transform.position = new Vector3(24f, 0.25f, 20f);
+            ramp.transform.localScale = new Vector3(8f, 0.1f, 6f);
+            ramp.transform.rotation = Quaternion.Euler(0f, 0f, -7f);
+            ramp.GetComponent<Renderer>().sharedMaterial = accentMat;
+
+            // A few walls / obstacles for navigation testing
+            CreateGreyboxWall("GreyboxWallA", new Vector3(-15f, 1.5f, 10f), new Vector3(0.5f, 3f, 8f), accentMat);
+            CreateGreyboxWall("GreyboxWallB", new Vector3(10f, 1.5f, -20f), new Vector3(12f, 3f, 0.5f), accentMat);
+
+            Debug.Log("[SceneGenerator] Greybox ground generated (200x200m, Y=0 surface).");
+        }
+
+        private static void CreateGreyboxWall(string name, Vector3 pos, Vector3 scale, Material mat)
+        {
+            GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            wall.name = name;
+            wall.isStatic = true;
+            wall.transform.position = pos;
+            wall.transform.localScale = scale;
+            wall.GetComponent<Renderer>().sharedMaterial = mat;
+        }
+
+        private static void GenerateGreyboxProps()
+        {
+            const string basePath = "Assets/GeneratedPrefabs";
+            Material propMat = GetOrCreateGreyboxMaterial("Props", new Color(0.40f, 0.42f, 0.40f), basePath);
+
+            // Scatter a few simple cubes as "rocks" around the map
+            var rng = new System.Random(42);
+            for (int i = 0; i < 20; i++)
+            {
+                float x = (float)(rng.NextDouble() * 160 - 80);
+                float z = (float)(rng.NextDouble() * 160 - 80);
+                float scale = 0.8f + (float)rng.NextDouble() * 1.5f;
+
+                GameObject prop = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                prop.name = $"GreyboxRock_{i}";
+                prop.isStatic = true;
+                prop.transform.position = new Vector3(x, scale * 0.5f, z);
+                prop.transform.localScale = new Vector3(scale, scale * 0.7f, scale * 0.9f);
+                prop.transform.rotation = Quaternion.Euler(0f, (float)(rng.NextDouble() * 360), 0f);
+                prop.GetComponent<Renderer>().sharedMaterial = propMat;
+            }
+
+            Debug.Log("[SceneGenerator] Greybox props scattered (20 rocks).");
         }
     }
 }

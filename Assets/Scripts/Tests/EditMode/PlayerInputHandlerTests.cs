@@ -1,10 +1,10 @@
 using NUnit.Framework;
-using SurvivalRPG.Core;
+using ByteWar.Core;
 using System.Reflection;
 using UnityEngine;
 using System.Linq;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     public class PlayerInputHandlerTests
     {

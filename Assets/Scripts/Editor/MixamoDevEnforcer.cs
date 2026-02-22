@@ -2,7 +2,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     /// <summary>
     /// Dev-only safety rail:
@@ -27,7 +27,7 @@ namespace SurvivalRPG.Editor
             EditorApplication.delayCall += Run;
         }
 
-        [MenuItem("SurvivalRPG/Diagnostics/Mixamo/Report Status")]
+        [MenuItem("ByteWar/Diagnostics/Mixamo/Report Status")]
         public static void ReportStatusMenu()
         {
             Run(reportOnly: true);

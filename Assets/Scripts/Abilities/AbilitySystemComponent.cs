@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
 
-namespace SurvivalRPG.Abilities
+namespace ByteWar.Abilities
 {
     [RequireComponent(typeof(AttributeSet))]
     public class AbilitySystemComponent : NetworkBehaviour
@@ -18,7 +18,38 @@ namespace SurvivalRPG.Abilities
 
         private void Awake()
         {
+            EnsureAttributesAssigned("Awake");
+        }
+
+        private void OnEnable()
+        {
+            // Some NGO test harnesses instantiate prefabs inactive and then activate clones.
+            // Ensure Attributes is always available even if Awake ordering gets unusual.
+            EnsureAttributesAssigned("OnEnable");
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            EnsureAttributesAssigned("OnNetworkSpawn");
+        }
+
+        private void EnsureAttributesAssigned(string context)
+        {
+            if (Attributes != null) return;
+
             Attributes = GetComponent<AttributeSet>();
+            if (Attributes == null)
+            {
+                Debug.LogError($"[AbilitySystemComponent] Attributes missing (context={context}) on '{gameObject.name}'. This should never happen due to [RequireComponent].");
+                return;
+            }
+
+            // Only log when we had to repair a null reference to avoid log noise.
+            if (context != "Awake")
+            {
+                Debug.LogWarning($"[AbilitySystemComponent] Repaired null Attributes via GetComponent (context={context}) on '{gameObject.name}'.");
+            }
         }
 
         // Reusable list to avoid GC allocation every frame
@@ -38,6 +69,8 @@ namespace SurvivalRPG.Abilities
 
         public bool TryCastAbility(int abilityIndex, Vector3 targetPosition)
         {
+            EnsureAttributesAssigned("TryCastAbility");
+
             if (abilityIndex < 0 || abilityIndex >= LearnedAbilities.Count)
             {
                 Debug.LogWarning($"[AbilitySystemComponent] TryCastAbility failed: index {abilityIndex} out of range (count={LearnedAbilities.Count}).");
@@ -83,6 +116,8 @@ namespace SurvivalRPG.Abilities
         [ServerRpc]
         private void CastAbilityServerRpc(int abilityIndex, Vector3 targetPosition)
         {
+            EnsureAttributesAssigned("CastAbilityServerRpc");
+
             Ability ability = LearnedAbilities[abilityIndex];
 
             float actualManaCost = ability.ManaCost;
@@ -91,7 +126,7 @@ namespace SurvivalRPG.Abilities
                 actualManaCost = Mathf.Max(0, actualManaCost - manaReduction);
             }
 
-            if (Attributes.ConsumeMana(actualManaCost))
+            if (Attributes != null && Attributes.ConsumeMana(actualManaCost))
             {
                 ability.Execute(this, targetPosition);
 

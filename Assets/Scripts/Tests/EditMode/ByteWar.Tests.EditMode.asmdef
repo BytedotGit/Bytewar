@@ -1,16 +1,17 @@
 {
-    "name": "SurvivalRPG.Tests.PlayMode",
-    "rootNamespace": "SurvivalRPG.Tests.PlayMode",
+    "name": "ByteWar.Tests.EditMode",
+    "rootNamespace": "ByteWar.Tests.EditMode",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "SurvivalRPG",
-        "Unity.Netcode.Runtime",
         "Unity.InputSystem",
-        "Unity.InputSystem.TestFramework",
-        "Unity.TextMeshPro"
+        "ByteWar",
+        "ByteWar.Editor",
+        "Unity.Netcode.Runtime"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

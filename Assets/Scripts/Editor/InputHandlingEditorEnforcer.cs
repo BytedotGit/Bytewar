@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     /// <summary>
     /// Ensures that entering Play Mode doesn't happen with legacy-only input.

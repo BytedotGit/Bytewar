@@ -3,9 +3,9 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Netcode;
-using SurvivalRPG.Survival;
+using ByteWar.Survival;
 
-namespace SurvivalRPG.Tests.PlayMode
+namespace ByteWar.Tests.PlayMode
 {
     public class ResourceGatheringSmokeTests
     {
@@ -16,7 +16,7 @@ namespace SurvivalRPG.Tests.PlayMode
         {
             _networkManager = NGOTestHelper.CreateNetworkManager();
             _networkManager.StartHost();
-            yield return null;
+            yield return NGOTestHelper.WaitForLocalPlayerReady(_networkManager);
         }
 
         [UnityTearDown]

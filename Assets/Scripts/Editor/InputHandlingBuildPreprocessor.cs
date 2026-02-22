@@ -2,7 +2,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     /// <summary>
     /// Hardening layer: runs for all builds (editor UI or batchmode) and enforces

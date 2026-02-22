@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     /// <summary>
     /// Generates detailed character models using Unity primitives with metallic materials.
@@ -16,7 +16,7 @@ namespace SurvivalRPG.Editor
         // ──────────────────────────────────────────────────────────────────────────
         //  PLAYER — Armoured Knight
         // ──────────────────────────────────────────────────────────────────────────
-        [MenuItem("SurvivalRPG/Generate Humanoid Model")]
+        [MenuItem("ByteWar/Generate Humanoid Model")]
         public static void GenerateHumanoidModel()
         {
             Debug.Log($"{BuildGenPrefix} CharacterGenerator: generating armoured knight model...");

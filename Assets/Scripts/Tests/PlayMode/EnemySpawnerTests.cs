@@ -3,9 +3,9 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Netcode;
-using SurvivalRPG.Survival;
+using ByteWar.Survival;
 
-namespace SurvivalRPG.Tests.PlayMode
+namespace ByteWar.Tests.PlayMode
 {
     public class EnemySpawnerTests
     {

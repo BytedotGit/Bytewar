@@ -1,11 +1,11 @@
 using System;
-using SurvivalRPG.Survival;
+using ByteWar.Survival;
 
-namespace SurvivalRPG.UI
+namespace ByteWar.UI
 {
     /// <summary>
     /// Static event bus for communicating the currently targeted enemy
-    /// from <see cref="SurvivalRPG.Core.PlayerInteraction"/> to <see cref="EnemyHealthUI"/>.
+    /// from <see cref="ByteWar.Core.PlayerInteraction"/> to <see cref="EnemyHealthUI"/>.
     /// </summary>
     public static class EnemyTargetTracker
     {

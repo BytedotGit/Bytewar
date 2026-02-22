@@ -1,14 +1,14 @@
 using NUnit.Framework;
 using UnityEngine;
 using UnityEditor;
-using SurvivalRPG.Editor;
-using SurvivalRPG.Survival;
-using SurvivalRPG.Building;
-using SurvivalRPG.Abilities.Mage;
-using SurvivalRPG.Abilities.Talents;
+using ByteWar.Editor;
+using ByteWar.Survival;
+using ByteWar.Building;
+using ByteWar.Abilities.Mage;
+using ByteWar.Abilities.Talents;
 using System.IO;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     public class GeneratorTests
     {
@@ -63,7 +63,7 @@ namespace SurvivalRPG.Tests.EditMode
 
             GameObject networkPlayer = AssetDatabase.LoadAssetAtPath<GameObject>($"{basePath}/NetworkPlayer.prefab");
             Assert.IsNotNull(networkPlayer, "NetworkPlayer prefab should be generated.");
-            Assert.IsNotNull(networkPlayer.GetComponent<SurvivalRPG.Networking.NetworkPlayer>(), "NetworkPlayer should have NetworkPlayer component.");
+            Assert.IsNotNull(networkPlayer.GetComponent<ByteWar.Networking.NetworkPlayer>(), "NetworkPlayer should have NetworkPlayer component.");
 
             GameObject resourceNode = AssetDatabase.LoadAssetAtPath<GameObject>($"{basePath}/ResourceNode.prefab");
             Assert.IsNotNull(resourceNode, "ResourceNode prefab should be generated.");

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     public static class MixamoProcessor
     {
@@ -13,7 +13,7 @@ namespace SurvivalRPG.Editor
         // Animation file names (everything that is NOT the base mesh)
         private static readonly string[] AnimationFiles = { "Idle", "Walking", "Running", "Jump", "Attack" };
 
-        [MenuItem("SurvivalRPG/Process Mixamo Assets")]
+        [MenuItem("ByteWar/Process Mixamo Assets")]
         public static void ProcessAssets()
         {
             Debug.Log($"{BuildGenPrefix} MixamoProcessor: start");

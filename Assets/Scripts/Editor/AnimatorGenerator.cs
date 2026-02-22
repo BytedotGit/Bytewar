@@ -4,7 +4,7 @@ using UnityEditor.Animations;
 using System.Linq;
 using System.IO;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     public static class AnimatorGenerator
     {
@@ -12,7 +12,7 @@ namespace SurvivalRPG.Editor
         private const string PlaceholderFolder = "Assets/GeneratedPrefabs/Animations/Placeholders";
         private const string ResourcesControllerPath = "Assets/Resources/Generated/PlayerAnimatorController.controller";
 
-        [MenuItem("SurvivalRPG/Generate Animator Controller")]
+        [MenuItem("ByteWar/Generate Animator Controller")]
         public static void GenerateAnimatorController()
         {
             Debug.Log($"{BuildGenPrefix} AnimatorGenerator: start");

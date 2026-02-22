@@ -1294,6 +1294,7 @@ GameObject:
   - component: {fileID: 8274630057137456099}
   - component: {fileID: 3330233741951287639}
   - component: {fileID: 8154845273091435660}
+  - component: {fileID: 1630240832376271120}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Untagged
@@ -1354,7 +1355,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b25fffb7da14d094c8c8d9a3018b1b43, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Abilities.AttributeSet
+  m_EditorClassIdentifier: ByteWar::ByteWar.Abilities.AttributeSet
   ShowTopMostFoldoutHeaderGroup: 1
   Health:
     m_InternalValue: 100
@@ -1379,7 +1380,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c30d45b7836172a4db69193aac0cec60, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Abilities.AbilitySystemComponent
+  m_EditorClassIdentifier: ByteWar::ByteWar.Abilities.AbilitySystemComponent
   ShowTopMostFoldoutHeaderGroup: 1
   LearnedAbilities: []
   LearnedTalents: []
@@ -1394,7 +1395,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e91f9d82b7b4d8c4e9abc8c836add528, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Survival.SurvivalStats
+  m_EditorClassIdentifier: ByteWar::ByteWar.Survival.SurvivalStats
   ShowTopMostFoldoutHeaderGroup: 1
   Hunger:
     m_InternalValue: 100
@@ -1412,7 +1413,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3bc82160df57b148b04b3b193aa62ec, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Survival.InventoryComponent
+  m_EditorClassIdentifier: ByteWar::ByteWar.Survival.InventoryComponent
   ShowTopMostFoldoutHeaderGroup: 1
   Items: []
 --- !u!114 &8157273361827948761
@@ -1426,7 +1427,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a9ee84b3f8df9dd47ad6392162d0ecba, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Core.PlayerInputHandler
+  m_EditorClassIdentifier: ByteWar::ByteWar.Core.PlayerInputHandler
 --- !u!114 &4731006830645899204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1438,7 +1439,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b212ec8e0217d66488c9f233b866d18c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Core.PlayerInteraction
+  m_EditorClassIdentifier: ByteWar::ByteWar.Core.PlayerInteraction
   ShowTopMostFoldoutHeaderGroup: 1
 --- !u!143 &5825863772744535774
 CharacterController:
@@ -1476,7 +1477,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ebbb4d73e88f5e344a0c864ff12baa19, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Networking.NetworkPlayer
+  m_EditorClassIdentifier: ByteWar::ByteWar.Networking.NetworkPlayer
   ShowTopMostFoldoutHeaderGroup: 1
   _generatedVisualModeStamp: 1
 --- !u!95 &3330233741951287639
@@ -1489,7 +1490,7 @@ Animator:
   m_GameObject: {fileID: 5174049880952391945}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 420482b791f1c7346a392005930902b1, type: 3}
-  m_Controller: {fileID: 9100000, guid: 927e953f854540a40be6a45b6f868f27, type: 2}
+  m_Controller: {fileID: 9100000, guid: 8383ee0b31f268940b72d7e9aa1f367a, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1512,7 +1513,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 84ca46513a33dc54683fa8df97efbcad, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Networking.ClientNetworkAnimator
+  m_EditorClassIdentifier: ByteWar::ByteWar.Networking.ClientNetworkAnimator
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkAnimatorExpanded: 0
   AuthorityMode: 0
@@ -1537,6 +1538,32 @@ MonoBehaviour:
       Synchronize: 1
       ParameterType: 9
   AnimatorParametersExpanded: 0
+--- !u!114 &1630240832376271120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5174049880952391945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90db0a9806991414aa82dd10c32a7591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ByteWar::ByteWar.Building.BuildingController
+  ShowTopMostFoldoutHeaderGroup: 1
+  _recipes:
+  - {fileID: 11400000, guid: e9e3d905fb68e36489cf00062572e681, type: 2}
+  - {fileID: 11400000, guid: 8cf3b2e59e7486048b57e5a3f3d7a75e, type: 2}
+  _placementLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _maxPlacementDistance: 20
+  _gridSize: 4
+  _adjacencySnapRadius: 3
+  _rotationStep: 45
+  _removeCooldown: 0.3
+  _foundationPrefab: {fileID: 129791130063525223, guid: 61c8eb9b2fca07445963b45d3bbcbb08, type: 3}
+  _wallPrefab: {fileID: 4314267179206263010, guid: 67580faf99687144cab8a47f2212f3c1, type: 3}
 --- !u!1 &5178042719677505337
 GameObject:
   m_ObjectHideFlags: 0

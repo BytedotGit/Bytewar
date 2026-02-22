@@ -2,6 +2,10 @@
 
 This repository is designed to be developed with GitHub Copilot Chat using **Plan mode** and **Agent mode**.
 
+**ROADMAP**: Always consult `.github/ROADMAP.md` to understand the current project state and the next steps required to reach a playable build. You MUST automatically update it whenever a significant feature, phase, or bugfix is completed.
+
+**Testing & Debugging**: See `.github/instructions/testing.instructions.md` for strict enforcement rules on test coverage, smoke tests, logging, file size limits, and the self-testing loop.
+
 ## Mode responsibilities
 
 ### Plan mode (Phase 1)
@@ -42,6 +46,10 @@ This repository is designed to be developed with GitHub Copilot Chat using **Pla
 - Only touch files required for the chosen scope.
 - If you spot unrelated issues, add an entry to `TECH_DEBT.md`.
 
+3b. **Defect tracking**
+
+- If a user-visible defect is reported and not fully resolved in the same session, add/update an entry in `.github/ERROR_LOG.md` with repro steps and the most relevant logs.
+
 4. **Atomic state sync**
 
 - Code + docs + tracking must not drift.
@@ -53,7 +61,31 @@ This repository is designed to be developed with GitHub Copilot Chat using **Pla
 ## Build/self-test loop (mandatory)
 
 1. Build the game (batchmode).
-2. Run `Builds/Windows/SurvivalRPG.exe -autoTest`.
-3. Inspect Player.log for:
+2. Launch the executable with `-autoTest` (e.g., `Start-Process -FilePath "Builds\Windows\ByteWar.exe" -ArgumentList "-autoTest" -NoNewWindow`). DO NOT use OS-level input simulation that steals focus.
+3. Wait for `AutoTester` to finish and close the game, then inspect Player.log for:
    - no exceptions
    - PASS markers for the feature being changed
+4. Keep iterating until the fix/feature is verified. ONLY THEN let the user know to test.
+
+## General Unity C# Conventions
+
+- Use modern C# features where applicable.
+- Prefer `SerializeField` over `public` for inspector variables.
+- Keep `Update` methods clean; use events or coroutines for complex logic.
+- Use `ScriptableObject`s for data-driven design (e.g., items, talents, abilities).
+
+## Networking (Netcode for GameObjects — NGO)
+
+- Use `NetworkBehaviour` instead of `MonoBehaviour` for networked objects.
+- Use `NetworkVariable` for state synchronization (e.g., Health, Mana).
+- Use `ServerRpc` for client-to-server requests (e.g., casting a spell, placing a building).
+- Use `ClientRpc` for server-to-client broadcasts (e.g., playing visual effects).
+- Ensure critical logic (damage, spawning, inventory) is server-authoritative.
+
+## Custom Ability System Architecture
+
+- The game uses a lightweight, custom implementation of the Gameplay Ability System (GAS).
+- `AbilitySystemComponent` manages a player's spells, cooldowns, and effects.
+- `AttributeSet` manages stats like Health, Mana, and Stamina.
+- `GameplayEffect` handles buffs, debuffs, and damage over time.
+- See `.github/instructions/abilities.instructions.md` for detailed ability/talent creation rules.

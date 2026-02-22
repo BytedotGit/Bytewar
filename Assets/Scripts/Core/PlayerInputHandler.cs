@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace SurvivalRPG.Core
+namespace ByteWar.Core
 {
     public class PlayerInputHandler : MonoBehaviour
     {
@@ -207,6 +207,11 @@ namespace SurvivalRPG.Core
         public void ClearSimulatedMovement()
         {
             _isSimulated = false;
+        }
+
+        public void SimulateInteractPress()
+        {
+            InteractTriggered = true;
         }
 
         public void EnsureActionsEnabled(string context)

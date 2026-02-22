@@ -1,9 +1,9 @@
 using NUnit.Framework;
 using UnityEngine;
-using SurvivalRPG.Survival;
+using ByteWar.Survival;
 using System.Collections.Generic;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     public class InventoryComponentTests
     {

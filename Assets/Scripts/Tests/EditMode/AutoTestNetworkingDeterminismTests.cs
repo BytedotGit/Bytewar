@@ -1,10 +1,10 @@
 using NUnit.Framework;
-using SurvivalRPG.Core;
-using SurvivalRPG.Networking;
+using ByteWar.Core;
+using ByteWar.Networking;
 using System.Net;
 using System.Net.Sockets;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     public class AutoTestNetworkingDeterminismTests
     {

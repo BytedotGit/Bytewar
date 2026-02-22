@@ -1,7 +1,7 @@
 using Unity.Netcode.Components;
 using UnityEngine;
 
-namespace SurvivalRPG.Networking
+namespace ByteWar.Networking
 {
     /// <summary>
     /// A NetworkAnimator that allows the client owner to trigger animations and set parameters.

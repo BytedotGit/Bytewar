@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 
-namespace SurvivalRPG.Survival
+namespace ByteWar.Survival
 {
     public class EnemySpawner : NetworkBehaviour
     {

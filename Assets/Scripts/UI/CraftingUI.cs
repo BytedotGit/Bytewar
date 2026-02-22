@@ -2,10 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
-using SurvivalRPG.Building;
+using ByteWar.Building;
 using System.Collections.Generic;
 
-namespace SurvivalRPG.UI
+namespace ByteWar.UI
 {
     public class CraftingUI : MonoBehaviour
     {

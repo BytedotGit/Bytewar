@@ -2,10 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
-using SurvivalRPG.Survival;
-using SurvivalRPG.Abilities;
+using ByteWar.Survival;
+using ByteWar.Abilities;
 
-namespace SurvivalRPG.UI
+namespace ByteWar.UI
 {
     /// <summary>
     /// Displays the health of the currently targeted enemy in the HUD.

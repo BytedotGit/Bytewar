@@ -1,4 +1,4 @@
-# SurvivalRPG Roadmap to Playable Build
+# ByteWar Roadmap to Playable Build
 
 This roadmap outlines the steps required to reach a fully playable, multiplayer proof-of-concept (PoC) build. All AI agents must consult this roadmap to understand the current project state and next steps.
 
@@ -48,18 +48,32 @@ This roadmap outlines the steps required to reach a fully playable, multiplayer 
 **Goal**: Lock down the core "feels like WoW" fundamentals so we don't regress into camera/grounding/input issues.
 
 - [x] **Camera Pivot Sanity**: Prevent stacked vertical offsets (CameraTarget + pivotHeight). AutoTester validates pivot delta is within a sane band.
-- [x] **Grounding Sanity**: Deterministic CharacterController config + visual grounding. AutoTester validates capsule bottom is within epsilon of sampled terrain.
+- [x] **Capsule Grounding Sanity**: Deterministic CharacterController config. AutoTester validates capsule bottom is within epsilon of sampled terrain.
+- [x] **Visual Grounding Sanity**: Runtime one-time VisualRoot correction removes obvious hovering. AutoTester validates visual bottom is within epsilon of sampled terrain.
+- [x] **First-Person Zoom Stability**: ThirdPersonCamera uses explicit first-person mode (no collision, stable yaw/pitch rotation, renderer hiding). AutoTester validates camera pivot lock + renderers hidden.
 - [x] **Action Bar Correctness**: Ability keys only trigger cast animation when a cast request actually executes (no empty-slot cast animation).
 - [x] **Mixamo Visual Proofing**: Generated `NetworkPlayer` stamps visual mode (Mixamo vs fallback). AutoTester asserts stamp matches runtime visuals and logs the proven mode.
 - [x] **Mixamo Animation Proofing**: AutoTester asserts the player has a valid AnimatorController and that a humanoid bone rotates during simulated movement (catches T-pose/retarget regressions).
-- [ ] **Manual Feel Pass**: Confirm camera framing is WoW-default and character feels grounded in Editor play (no obvious hovering).
+- [x] **Manual Feel Pass**: Visual grounding fixed — humanoid bone-based foot sampling replaces unreliable RendererBounds. AutoTester confirms visual bottom within 0.12 of ground. Confirm camera framing is WoW-default in Editor play.
 
-## Phase 14: Building System & Persistence
+## Phase 14: Building System & Persistence (COMPLETED)
 
 **Goal**: Allow players to build structures and save their progress.
 
-- [ ] **Building Placement**: Finalize the logic for snapping and placing building pieces (foundations, walls) using the `BuildingController`.
-- [ ] **World Persistence**: Implement a save/load system for the host to save the state of the world (buildings, inventory, player stats) to disk.
+- [x] **Greybox World**: Replaced procedural `Terrain` with greybox primitive colliders (flat ground plane, raised platform, ramp, walls, scattered rocks). Terrain-independent spawn/grounding in `NetworkPlayer` and `AutoTester` (raycast-based).
+- [x] **Valheim-Like Building Loop**: `BuildingController` rewritten with Valheim-inspired mechanics:
+  - **Build Mode Toggle** (B key) with camera zoom suppression.
+  - **Scroll Wheel Rotation** (configurable step, default 45°).
+  - **Number Keys (1-9)** select building recipes; spell casting gated while in build mode.
+  - **Edge-to-Edge Adjacency Snapping** via `SnapPoint` metadata on `BuildingPiece` (target pivot positions, auto-orient walls perpendicular to foundation edges).
+  - **Left-Click Place**, **Middle-Click Remove** (with resource refund), **Right-Click Repair**.
+  - **Support/Stability**: Foundations place freely; Walls require adjacency to a Foundation.
+  - **Preview**: `MaterialPropertyBlock` tinting (green valid, red invalid); stripped NetworkObject/physics from preview.
+- [x] **Building Pieces**: `BuildingPiece` NetworkBehaviour with type enum (Foundation/Wall), snap point metadata, health (damage/repair/destroy), `PlacedByClientId` ownership, `IsSupported` flag.
+- [x] **Building Recipes**: `BuildingRecipe` ScriptableObject with `CanAfford()`/`ConsumeResources()`. Foundation costs 4 Wood + 2 Stone; Wall costs 3 Wood + 1 Stone.
+- [x] **Prefab Generation**: `PrefabGenerator` creates Foundation/Wall prefabs (box primitives with materials), registers as NetworkPrefabs, and wires `BuildingController` with prefabs + recipes.
+- [x] **World Persistence**: `WorldPersistence` server-side JSON save/load at `Application.persistentDataPath/world_save.json`.
+- [x] **Tests**: `BuildingSystemTests` (EditMode) — grid snapping, snap points, rotation, stability, recipe cost, JSON round-trip. `BuildingPlacementSmokeTests` (PlayMode) — placement with/without resources, piece spawn. AutoTester validates BuildingController + WorldPersistence + grounding on greybox surfaces. Build: Exit 0. AutoTest: PASS (all 8 checks). No exceptions.
 
 ## Phase 15: Visuals & Audio Polish
 

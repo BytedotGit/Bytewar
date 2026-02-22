@@ -1,13 +1,13 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     public class BuildScript
     {
         private const string BuildGenPrefix = "[BuildGen]";
 
-        [MenuItem("SurvivalRPG/Build Windows Client")]
+        [MenuItem("ByteWar/Build Windows Client")]
         public static void BuildWindowsClient()
         {
             Debug.Log($"{BuildGenPrefix} Starting Windows Client Build...");
@@ -27,7 +27,7 @@ namespace SurvivalRPG.Editor
             Debug.Log($"{BuildGenPrefix} Pre-build generation complete.");
 
             string[] scenes = { "Assets/Scenes/TestScene.unity" };
-            string buildPath = "Builds/Windows/SurvivalRPG.exe";
+            string buildPath = "Builds/Windows/ByteWar.exe";
 
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
             {

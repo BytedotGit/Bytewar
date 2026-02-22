@@ -1,9 +1,9 @@
 using NUnit.Framework;
 using UnityEngine;
-using SurvivalRPG.Abilities;
+using ByteWar.Abilities;
 using Unity.Netcode;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     public class AttributeSetTests
     {

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4236716069518643491}
   - component: {fileID: 3709166521400111535}
   - component: {fileID: 8955972160915199897}
+  - component: {fileID: 8204268291771892974}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -118,7 +119,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f686829c86f23b49a249f59ff028ef1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Networking.CustomNetworkManagerHUD
+  m_EditorClassIdentifier: ByteWar::ByteWar.Networking.CustomNetworkManagerHUD
 --- !u!114 &8955972160915199897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,6 +131,22 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19569cd3189331e4481d3b2d78882878, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Networking.NetworkBootstrapper
+  m_EditorClassIdentifier: ByteWar::ByteWar.Networking.NetworkBootstrapper
   _playerPrefab: {fileID: 5174049880952391945, guid: 94c83a3bef9e16a40a1ba2458f205c02, type: 3}
   _transport: {fileID: 4236716069518643491}
+--- !u!114 &8204268291771892974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5057010086326421689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03f8f04b752a0874480df9518dac2dcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ByteWar::ByteWar.Building.WorldPersistence
+  ShowTopMostFoldoutHeaderGroup: 1
+  _saveFileName: world_save.json
+  _foundationPrefab: {fileID: 129791130063525223, guid: 61c8eb9b2fca07445963b45d3bbcbb08, type: 3}
+  _wallPrefab: {fileID: 4314267179206263010, guid: 67580faf99687144cab8a47f2212f3c1, type: 3}

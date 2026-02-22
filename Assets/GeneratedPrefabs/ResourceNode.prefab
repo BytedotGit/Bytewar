@@ -183,7 +183,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1339ecbc1c756064a9822b03de9f8905, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SurvivalRPG::SurvivalRPG.Survival.ResourceNode
+  m_EditorClassIdentifier: ByteWar::ByteWar.Survival.ResourceNode
   ShowTopMostFoldoutHeaderGroup: 1
   _maxHealth: 100
   _dropItem: {fileID: 0}

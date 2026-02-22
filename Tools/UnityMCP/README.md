@@ -5,7 +5,7 @@ This is a Model Context Protocol (MCP) server that allows AI assistants to inter
 ## Prerequisites
 
 1. Node.js v18 or higher
-2. Unity Editor running with the `SurvivalRPG` project open.
+2. Unity Editor running with the `ByteWar` project open.
 
 ## Setup
 

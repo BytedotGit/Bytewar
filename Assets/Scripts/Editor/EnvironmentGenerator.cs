@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     /// <summary>
     /// Generates and scatters environment props (rocks, boulders, fallen logs) across the terrain.
@@ -14,7 +14,7 @@ namespace SurvivalRPG.Editor
         private const string BoulderPrefabPath = "Assets/GeneratedPrefabs/Boulder.prefab";
         private const string LogPrefabPath = "Assets/GeneratedPrefabs/FallenLog.prefab";
 
-        [MenuItem("SurvivalRPG/Generate Environment Objects")]
+        [MenuItem("ByteWar/Generate Environment Objects")]
         public static void GenerateEnvironment()
         {
             Debug.Log("[EnvironmentGenerator] Starting environment object generation...");

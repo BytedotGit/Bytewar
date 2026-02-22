@@ -1,9 +1,9 @@
 using UnityEngine;
 using Unity.Netcode;
-using SurvivalRPG.Abilities;
+using ByteWar.Abilities;
 using System;
 
-namespace SurvivalRPG.Survival
+namespace ByteWar.Survival
 {
     /// <summary>
     /// Server-authoritative enemy AI.  Pursues the nearest player, attacks on cooldown,

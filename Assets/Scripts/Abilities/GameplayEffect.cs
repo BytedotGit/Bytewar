@@ -1,11 +1,11 @@
 using UnityEngine;
 
-namespace SurvivalRPG.Abilities
+namespace ByteWar.Abilities
 {
     public enum EffectType { Damage, Healing, Buff, Debuff }
     public enum DurationType { Instant, Duration, Infinite }
 
-    [CreateAssetMenu(fileName = "NewGameplayEffect", menuName = "SurvivalRPG/Abilities/GameplayEffect")]
+    [CreateAssetMenu(fileName = "NewGameplayEffect", menuName = "ByteWar/Abilities/GameplayEffect")]
     public class GameplayEffect : ScriptableObject
     {
         public string EffectName;

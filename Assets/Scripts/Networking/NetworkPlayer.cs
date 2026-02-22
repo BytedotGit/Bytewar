@@ -1,11 +1,13 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
-using SurvivalRPG.Abilities;
-using SurvivalRPG.Survival;
-using SurvivalRPG.Core;
+using ByteWar.Abilities;
+using ByteWar.Survival;
+using ByteWar.Building;
+using ByteWar.Core;
 
-namespace SurvivalRPG.Networking
+namespace ByteWar.Networking
 {
     public enum PlayerVisualMode
     {
@@ -52,6 +54,9 @@ namespace SurvivalRPG.Networking
         private bool _initialized;
         private float _nextMoveLogTime;
 
+        private bool _runtimeVisualGroundingStarted;
+        private bool _runtimeVisualGroundingApplied;
+
         [Header("Generated Prefab Diagnostics")]
         [Tooltip("Set by PrefabGenerator so runtime/tests can prove which visual branch was baked (Mixamo vs fallback).")]
         [SerializeField] private PlayerVisualMode _generatedVisualModeStamp = PlayerVisualMode.Unknown;
@@ -84,6 +89,14 @@ namespace SurvivalRPG.Networking
             // Ensure all clients have an AnimatorController, not just the owner.
             EnsureAnimatorControllerAssigned("OnNetworkSpawn");
 
+            // One-time: reduce obvious visual hovering without changing CharacterController physics.
+            // This runs for all spawned players so visuals remain consistent across clients.
+            if (!_runtimeVisualGroundingStarted)
+            {
+                _runtimeVisualGroundingStarted = true;
+                StartCoroutine(RuntimeApplyVisualGroundingOnce());
+            }
+
             if (!IsOwner)
             {
                 if (_inputHandler != null) _inputHandler.enabled = false;
@@ -102,27 +115,32 @@ namespace SurvivalRPG.Networking
                 _inputHandler.EnsureActionsEnabled("NetworkPlayer OnNetworkSpawn (owner)");
             }
 
-            // Spawn on terrain surface at world-space center of the terrain
-            if (Terrain.activeTerrain != null)
+            // Spawn on ground surface at world origin. Prefer raycast (greybox/any collider);
+            // fall back to Terrain if present; otherwise stay at origin.
+            Vector3 spawnPos = new Vector3(0f, 2f, 0f);
+            if (Physics.Raycast(new Vector3(0f, 50f, 0f), Vector3.down, out RaycastHit spawnHit, 100f, ~0, QueryTriggerInteraction.Ignore))
+            {
+                spawnPos = spawnHit.point + Vector3.up * 1.5f;
+                Debug.Log($"[NetworkPlayer] Spawn via raycast: {spawnPos} (hit={spawnHit.collider.name})");
+            }
+            else if (Terrain.activeTerrain != null)
             {
                 Terrain t = Terrain.activeTerrain;
-                // Center of terrain in world space
                 Vector3 terrainCenter = t.transform.position
                     + new Vector3(t.terrainData.size.x * 0.5f, 0f, t.terrainData.size.z * 0.5f);
                 float groundY = t.SampleHeight(terrainCenter);
-                Vector3 spawnPos = new Vector3(terrainCenter.x, groundY + t.transform.position.y + 2f, terrainCenter.z);
-
-                // Disable CharacterController during teleport — otherwise it blocks position changes
-                if (_cc != null) _cc.enabled = false;
-                transform.position = spawnPos;
-                if (_cc != null) _cc.enabled = true;
-
-                Debug.Log($"[NetworkPlayer] Placed at terrain center: {spawnPos} (terrain pos={t.transform.position}, size={t.terrainData.size})");
+                spawnPos = new Vector3(terrainCenter.x, groundY + t.transform.position.y + 2f, terrainCenter.z);
+                Debug.Log($"[NetworkPlayer] Spawn via Terrain center: {spawnPos}");
             }
             else
             {
-                Debug.LogWarning("[NetworkPlayer] No active terrain found! Player stays at origin.");
+                Debug.LogWarning("[NetworkPlayer] No ground collider or terrain found! Spawning at default position.");
             }
+
+            // Disable CharacterController during teleport — otherwise it blocks position changes
+            if (_cc != null) _cc.enabled = false;
+            transform.position = spawnPos;
+            if (_cc != null) _cc.enabled = true;
 
             // Put player on its own layer so the camera SphereCast ignores them
             gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
@@ -150,6 +168,104 @@ namespace SurvivalRPG.Networking
             }
 
             _initialized = true;
+        }
+
+        private IEnumerator RuntimeApplyVisualGroundingOnce()
+        {
+            // Bounded wait: allow CharacterController to settle so we don't apply a huge correction mid-air.
+            const float maxWaitSeconds = 2.0f;
+            float start = Time.realtimeSinceStartup;
+            while (Time.realtimeSinceStartup - start < maxWaitSeconds)
+            {
+                if (_cc != null && _cc.enabled && _cc.isGrounded)
+                    break;
+                yield return null;
+            }
+
+            // Let Animator/bones update at least once.
+            yield return null;
+
+            if (_runtimeVisualGroundingApplied)
+                yield break;
+
+            // Retry a few times in case the player is still settling or moves onto a collider above terrain.
+            const int maxAttempts = 4;
+            float totalApplied = 0f;
+            string lastDiag = "";
+            bool anyApplied = false;
+
+            for (int attempt = 0; attempt < maxAttempts; attempt++)
+            {
+                bool applied = TryApplyVisualGroundingNow(desiredDelta: -0.035f, maxOffset: 0.60f, out float appliedOffset, out string diagnostics);
+                lastDiag = diagnostics;
+                if (applied)
+                {
+                    anyApplied = true;
+                    totalApplied += appliedOffset;
+                }
+                else
+                {
+                    break;
+                }
+
+                // Give transforms a frame to update, then re-sample.
+                yield return null;
+            }
+
+            if (IsOwner)
+            {
+                if (anyApplied)
+                {
+                    Debug.Log($"[NetworkPlayer] Visual grounding applied: totalOffset={totalApplied:0.000} netObj={NetworkObjectId} ownerClient={OwnerClientId} stamp={_generatedVisualModeStamp} diag={lastDiag}");
+
+                    // VisualRoot moved; refresh camera pivot so first-person/third-person framing stays consistent.
+                    SetupCamera();
+                }
+                else
+                {
+                    Debug.Log($"[NetworkPlayer] Visual grounding not needed: netObj={NetworkObjectId} ownerClient={OwnerClientId} stamp={_generatedVisualModeStamp} diag={lastDiag}");
+                }
+            }
+
+            _runtimeVisualGroundingApplied = anyApplied;
+        }
+
+        internal bool TryApplyVisualGroundingNow(float desiredDelta, float maxOffset, out float appliedOffset, out string diagnostics)
+        {
+            appliedOffset = 0f;
+            diagnostics = "";
+
+            Transform visualRoot = transform.Find("VisualRoot");
+            if (visualRoot == null)
+            {
+                // Many tests use a minimal prefab without VisualRoot.
+                return false;
+            }
+
+            if (!VisualGroundingUtility.TryGetSupportGroundY(transform.position, ignoreRoot: transform, _animator, out float groundY, out string groundSource))
+            {
+                if (IsOwner)
+                    Debug.LogWarning($"[NetworkPlayer] Visual grounding skipped: unable to determine groundY (no Terrain and no raycast hit). netObj={NetworkObjectId} ownerClient={OwnerClientId}");
+                return false;
+            }
+
+            if (!VisualGroundingUtility.TrySampleVisualBottomY(visualRoot, _animator, out var sample))
+            {
+                if (IsOwner)
+                    Debug.LogWarning($"[NetworkPlayer] Visual grounding skipped: unable to sample visual bottom Y (no bones/renderers). netObj={NetworkObjectId} ownerClient={OwnerClientId}");
+                return false;
+            }
+
+            bool applied = VisualGroundingUtility.TryApplyHoverCorrection(
+                visualRoot,
+                visualBottomY: sample.SelectedBottomY,
+                groundY: groundY,
+                desiredDelta: desiredDelta,
+                maxOffset: maxOffset,
+                out appliedOffset);
+
+            diagnostics = $"groundY={groundY:0.000} source={groundSource} visualY={sample.SelectedBottomY:0.000} method={sample.Method} details=({sample.Details})";
+            return applied;
         }
 
         private void EnsureAnimatorControllerAssigned(string context)
@@ -371,6 +487,10 @@ namespace SurvivalRPG.Networking
         private void HandleAbilities()
         {
             if (AbilitySystem == null) return;
+
+            // Don't cast spells while in build mode (number keys used for recipe selection)
+            var buildCtrl = GetComponent<BuildingController>();
+            if (buildCtrl != null && buildCtrl.IsBuildModeActive) return;
 
             if (_inputHandler.ConsumeCastSpell1())
             {

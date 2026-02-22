@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
-using SurvivalRPG.Survival;
+using ByteWar.Survival;
 
-namespace SurvivalRPG.Building
+namespace ByteWar.Building
 {
     [System.Serializable]
     public struct RecipeIngredient
@@ -11,7 +11,7 @@ namespace SurvivalRPG.Building
         public int Amount;
     }
 
-    [CreateAssetMenu(fileName = "NewRecipe", menuName = "SurvivalRPG/Building/CraftingRecipe")]
+    [CreateAssetMenu(fileName = "NewRecipe", menuName = "ByteWar/Building/CraftingRecipe")]
     public class CraftingRecipe : ScriptableObject
     {
         public string RecipeName;

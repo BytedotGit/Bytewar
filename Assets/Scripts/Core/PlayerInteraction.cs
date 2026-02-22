@@ -1,10 +1,10 @@
 using UnityEngine;
 using Unity.Netcode;
-using SurvivalRPG.Survival;
-using SurvivalRPG.Abilities;
-using SurvivalRPG.UI;
+using ByteWar.Survival;
+using ByteWar.Abilities;
+using ByteWar.UI;
 
-namespace SurvivalRPG.Core
+namespace ByteWar.Core
 {
     [RequireComponent(typeof(PlayerInputHandler))]
     [RequireComponent(typeof(NetworkObject))]

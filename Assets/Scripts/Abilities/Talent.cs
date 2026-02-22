@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace SurvivalRPG.Abilities
+namespace ByteWar.Abilities
 {
-    [CreateAssetMenu(fileName = "NewTalent", menuName = "SurvivalRPG/Abilities/Talent")]
+    [CreateAssetMenu(fileName = "NewTalent", menuName = "ByteWar/Abilities/Talent")]
     public class Talent : ScriptableObject
     {
         public string TalentName;

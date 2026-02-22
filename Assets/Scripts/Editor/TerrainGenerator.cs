@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     /// <summary>
     /// Generates a high-quality procedural terrain with multi-octave FBM heightmap,
@@ -15,7 +15,7 @@ namespace SurvivalRPG.Editor
         private const string TdPath = "Assets/GeneratedPrefabs/GeneratedTerrainData.asset";
         private const string TreePrefabPath = "Assets/GeneratedPrefabs/TreePrefab.prefab";
 
-        [MenuItem("SurvivalRPG/Generate Terrain")]
+        [MenuItem("ByteWar/Generate Terrain")]
         public static void GenerateTerrain()
         {
             Debug.Log("[TerrainGenerator] Starting high-quality terrain generation...");

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SurvivalRPG.Abilities
+namespace ByteWar.Abilities
 {
     public abstract class Ability : ScriptableObject
     {

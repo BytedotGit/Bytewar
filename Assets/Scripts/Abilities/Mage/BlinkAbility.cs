@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace SurvivalRPG.Abilities.Mage
+namespace ByteWar.Abilities.Mage
 {
-    [CreateAssetMenu(fileName = "Blink", menuName = "SurvivalRPG/Abilities/Mage/Blink")]
+    [CreateAssetMenu(fileName = "Blink", menuName = "ByteWar/Abilities/Mage/Blink")]
     public class BlinkAbility : Ability
     {
         public float MaxDistance = 15f;

@@ -1,7 +1,7 @@
 using NUnit.Framework;
-using SurvivalRPG.Networking;
+using ByteWar.Networking;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     public class CustomNetworkManagerHUDTests
     {

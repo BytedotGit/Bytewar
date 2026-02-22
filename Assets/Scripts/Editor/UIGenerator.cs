@@ -2,11 +2,11 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     public static class UIGenerator
     {
-        [MenuItem("SurvivalRPG/Generate UI Prefab")]
+        [MenuItem("ByteWar/Generate UI Prefab")]
         public static void GenerateUIPrefab()
         {
             Debug.Log("[UIGenerator] Generating UI Prefab...");
@@ -58,7 +58,7 @@ namespace SurvivalRPG.Editor
             GameObject staminaBar = CreateBar("StaminaBar", vitalsObj.transform, Color.green, new Vector2(0, -60));
 
             // Add PlayerVitalsUI component
-            SurvivalRPG.UI.PlayerVitalsUI vitalsUI = canvasObj.AddComponent<SurvivalRPG.UI.PlayerVitalsUI>();
+            ByteWar.UI.PlayerVitalsUI vitalsUI = canvasObj.AddComponent<ByteWar.UI.PlayerVitalsUI>();
             vitalsUI.healthSlider = healthBar.GetComponent<Slider>();
             vitalsUI.manaSlider = manaBar.GetComponent<Slider>();
             vitalsUI.staminaSlider = staminaBar.GetComponent<Slider>();

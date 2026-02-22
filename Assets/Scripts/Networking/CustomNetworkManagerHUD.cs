@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Unity.Netcode;
 
-namespace SurvivalRPG.Networking
+namespace ByteWar.Networking
 {
     /// <summary>
     /// Network HUD using IMGUI. Requires activeInputHandler set to "Both" (2)

@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 
-namespace SurvivalRPG.Abilities
+namespace ByteWar.Abilities
 {
     public class AttributeSet : NetworkBehaviour
     {

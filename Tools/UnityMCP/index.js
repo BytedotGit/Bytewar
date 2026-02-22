@@ -21,7 +21,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             type: { 
               type: "string", 
-              description: "Assembly-qualified type name (e.g., 'SurvivalRPG.Editor.MCPCommands, SurvivalRPG.Editor')" 
+              description: "Assembly-qualified type name (e.g., 'ByteWar.Editor.MCPCommands, ByteWar.Editor')" 
             },
             method: { 
               type: "string", 
@@ -75,16 +75,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     type = request.params.arguments.type;
     method = request.params.arguments.method;
   } else if (request.params.name === "unity_generate_all") {
-    type = "SurvivalRPG.Editor.MCPCommands, SurvivalRPG.Editor";
+    type = "ByteWar.Editor.MCPCommands, ByteWar.Editor";
     method = "GenerateAll";
   } else if (request.params.name === "unity_generate_terrain") {
-    type = "SurvivalRPG.Editor.MCPCommands, SurvivalRPG.Editor";
+    type = "ByteWar.Editor.MCPCommands, ByteWar.Editor";
     method = "GenerateTerrain";
   } else if (request.params.name === "unity_build_project") {
-    type = "SurvivalRPG.Editor.MCPCommands, SurvivalRPG.Editor";
+    type = "ByteWar.Editor.MCPCommands, ByteWar.Editor";
     method = "BuildProject";
   } else if (request.params.name === "unity_get_scene_hierarchy") {
-    type = "SurvivalRPG.Editor.MCPCommands, SurvivalRPG.Editor";
+    type = "ByteWar.Editor.MCPCommands, ByteWar.Editor";
     method = "GetSceneHierarchy";
   } else {
     throw new Error("Tool not found");

@@ -1,8 +1,8 @@
 using NUnit.Framework;
 using System.IO;
-using SurvivalRPG.Editor;
+using ByteWar.Editor;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     public class ProjectInputHandlingTests
     {

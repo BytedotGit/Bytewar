@@ -1,14 +1,16 @@
 {
-    "name": "SurvivalRPG",
-    "rootNamespace": "SurvivalRPG",
+    "name": "ByteWar.Editor",
+    "rootNamespace": "ByteWar.Editor",
     "references": [
+        "ByteWar",
         "Unity.Netcode.Runtime",
-        "Unity.InputSystem",
-        "Unity.TextMeshPro",
-        "UnityEngine.UI",
-        "Unity.Cinemachine"
+        "Unity.Netcode.Editor",
+        "Unity.Cinemachine",
+        "Unity.InputSystem"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

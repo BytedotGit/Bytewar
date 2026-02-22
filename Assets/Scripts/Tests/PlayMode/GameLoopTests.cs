@@ -3,13 +3,13 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Netcode;
-using SurvivalRPG.Survival;
-using SurvivalRPG.Abilities;
-using SurvivalRPG.Building;
-using SurvivalRPG.Abilities.Mage;
-using SurvivalRPG.Networking;
+using ByteWar.Survival;
+using ByteWar.Abilities;
+using ByteWar.Building;
+using ByteWar.Abilities.Mage;
+using ByteWar.Networking;
 
-namespace SurvivalRPG.Tests.PlayMode
+namespace ByteWar.Tests.PlayMode
 {
     public class GameLoopTests
     {
@@ -22,7 +22,7 @@ namespace SurvivalRPG.Tests.PlayMode
             _networkManager = NGOTestHelper.CreateNetworkManager();
             _playerPrefab = _networkManager.NetworkConfig.PlayerPrefab;
             _networkManager.StartHost();
-            yield return null;
+            yield return NGOTestHelper.WaitForLocalPlayerReady(_networkManager);
         }
 
         [UnityTearDown]
@@ -38,10 +38,18 @@ namespace SurvivalRPG.Tests.PlayMode
             Debug.Log("Starting End-to-End Game Loop Test...");
 
             // 1. Setup Player and Environment
-            var player = _playerPrefab.GetComponent<NetworkPlayer>();
-            var inventory = player.GetComponent<InventoryComponent>();
-            var equipment = player.GetComponent<EquipmentComponent>();
-            var abilitySystem = player.GetComponent<AbilitySystemComponent>();
+            var playerObj = _networkManager.SpawnManager.GetLocalPlayerObject();
+            Assert.IsNotNull(playerObj, "Local player object should exist.");
+
+            var player = playerObj.GetComponent<NetworkPlayer>();
+            var inventory = playerObj.GetComponent<InventoryComponent>();
+            var equipment = playerObj.GetComponent<EquipmentComponent>();
+            var abilitySystem = playerObj.GetComponent<AbilitySystemComponent>();
+
+            Assert.IsNotNull(player, "NetworkPlayer should be attached to the spawned player.");
+            Assert.IsNotNull(inventory, "InventoryComponent should be attached to the spawned player.");
+            Assert.IsNotNull(equipment, "EquipmentComponent should be attached to the spawned player.");
+            Assert.IsNotNull(abilitySystem, "AbilitySystemComponent should be attached to the spawned player.");
 
             // Create mock items and recipe
             var wood = ScriptableObject.CreateInstance<Item>();
@@ -52,6 +60,7 @@ namespace SurvivalRPG.Tests.PlayMode
             staff.ItemName = "Basic Staff";
             staff.IsEquippable = true;
             staff.DamageBonus = 10f;
+            staff.HealthBonus = 10f;
 
             var recipe = ScriptableObject.CreateInstance<CraftingRecipe>();
             recipe.RecipeName = "Staff Recipe";
@@ -65,12 +74,20 @@ namespace SurvivalRPG.Tests.PlayMode
 
             // Create Crafting Station
             var stationObj = new GameObject("CraftingStation");
+            var stationNetObj = stationObj.AddComponent<NetworkObject>();
             var station = stationObj.AddComponent<CraftingStation>();
             station.AvailableRecipes = new System.Collections.Generic.List<CraftingRecipe> { recipe };
 
+            stationNetObj.Spawn();
+            yield return null;
+
             // Create Enemy
             var enemyObj = new GameObject("Enemy");
+            var enemyNetObj = enemyObj.AddComponent<NetworkObject>();
             var enemyAttr = enemyObj.AddComponent<AttributeSet>();
+            enemyNetObj.Spawn();
+            yield return null;
+
             enemyAttr.Health.Value = 20f;
             enemyAttr.MaxHealth.Value = 20f;
 
@@ -108,7 +125,7 @@ namespace SurvivalRPG.Tests.PlayMode
             Debug.Log("Simulating Equipping...");
             equipment.EquipItem(staff);
             Assert.AreEqual(staff, equipment.EquippedWeapon, "Staff should be equipped");
-            Assert.AreEqual(110f, abilitySystem.Attributes.MaxHealth.Value, "Stats should increase (assuming base 100 + 10 from staff if we set health bonus, but we set damage bonus. Let's just check it's equipped)");
+            Assert.AreEqual(110f, abilitySystem.Attributes.MaxHealth.Value, "Equipping the staff should apply HealthBonus (+10).");
 
             // 5. Combat
             Debug.Log("Simulating Combat...");

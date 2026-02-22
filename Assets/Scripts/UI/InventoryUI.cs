@@ -2,10 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
-using SurvivalRPG.Survival;
+using ByteWar.Survival;
 using System.Collections.Generic;
 
-namespace SurvivalRPG.UI
+namespace ByteWar.UI
 {
     public class InventoryUI : MonoBehaviour
     {

@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     public static class MCPCommands
     {

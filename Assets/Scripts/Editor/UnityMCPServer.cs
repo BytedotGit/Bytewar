@@ -8,7 +8,7 @@ using System.Text;
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace SurvivalRPG.Editor
+namespace ByteWar.Editor
 {
     [InitializeOnLoad]
     public static class UnityMCPServer
@@ -26,6 +26,13 @@ namespace SurvivalRPG.Editor
 
         static UnityMCPServer()
         {
+            // Command-line test runs and CI builds should be deterministic and avoid starting background services.
+            // In practice, auto-starting the MCP server in batchmode can interfere with headless workflows.
+            if (Application.isBatchMode)
+            {
+                return;
+            }
+
             StartServer();
             EditorApplication.update += ProcessRequests;
             EditorApplication.quitting += StopServer;

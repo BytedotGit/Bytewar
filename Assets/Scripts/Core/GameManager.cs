@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 
-namespace SurvivalRPG.Core
+namespace ByteWar.Core
 {
     public class GameManager : NetworkBehaviour
     {

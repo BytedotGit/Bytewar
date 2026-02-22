@@ -3,11 +3,11 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Netcode;
-using SurvivalRPG.Abilities;
-using SurvivalRPG.Survival;
-using SurvivalRPG.UI;
+using ByteWar.Abilities;
+using ByteWar.Survival;
+using ByteWar.UI;
 
-namespace SurvivalRPG.Tests.PlayMode
+namespace ByteWar.Tests.PlayMode
 {
     /// <summary>
     /// PlayMode smoke tests for the melee attack interaction:

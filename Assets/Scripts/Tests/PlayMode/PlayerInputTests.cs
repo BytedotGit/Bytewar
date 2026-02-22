@@ -3,28 +3,30 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Netcode;
-using SurvivalRPG.Core;
-using SurvivalRPG.Networking;
-using UnityEngine.InputSystem;
+using ByteWar.Core;
+using ByteWar.Networking;
 
-namespace SurvivalRPG.Tests.PlayMode
+namespace ByteWar.Tests.PlayMode
 {
+    /// <summary>
+    /// Deterministic input tests using PlayerInputHandler simulation API.
+    /// Real InputSystem device injection is validated by AutoTester at build time.
+    /// </summary>
     public class PlayerInputTests
     {
         private NetworkManager _networkManager;
-        private GameObject _playerPrefab;
 
         [SetUp]
         public void Setup()
         {
             _networkManager = NGOTestHelper.CreateNetworkManager();
-            _playerPrefab = _networkManager.NetworkConfig.PlayerPrefab;
         }
 
-        [TearDown]
-        public void TearDown()
+        [UnityTearDown]
+        public IEnumerator TearDown()
         {
             NGOTestHelper.CleanUp();
+            yield return null;
         }
 
         [UnityTest]
@@ -32,29 +34,28 @@ namespace SurvivalRPG.Tests.PlayMode
         {
             // Arrange
             _networkManager.StartHost();
-            yield return new WaitForSeconds(0.1f);
+            yield return NGOTestHelper.WaitForLocalPlayerReady(_networkManager);
 
             var playerObj = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
             var inputHandler = playerObj.GetComponent<PlayerInputHandler>();
-
             Assert.IsNotNull(inputHandler, "PlayerInputHandler should be attached to the player.");
 
-            // Act
-            var keyboard = InputSystem.AddDevice<Keyboard>();
-            InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.W));
-            InputSystem.Update();
-            yield return null; // Wait for input system to process
-
-            // Assert
-            Assert.AreEqual(new Vector2(0, 1), inputHandler.MovementInput, "Movement input should register 'W' as (0, 1).");
-
-            // Act
-            InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.A));
-            InputSystem.Update();
+            // Act — simulate forward (W)
+            inputHandler.SetSimulatedMovement(new Vector2(0, 1));
             yield return null;
 
             // Assert
-            Assert.AreEqual(new Vector2(-1, 0), inputHandler.MovementInput, "Movement input should register 'A' as (-1, 0).");
+            Assert.AreEqual(new Vector2(0, 1), inputHandler.MovementInput, "Movement input should register forward as (0, 1).");
+
+            // Act — simulate left (A)
+            inputHandler.SetSimulatedMovement(new Vector2(-1, 0));
+            yield return null;
+
+            // Assert
+            Assert.AreEqual(new Vector2(-1, 0), inputHandler.MovementInput, "Movement input should register left as (-1, 0).");
+
+            // Cleanup
+            inputHandler.ClearSimulatedMovement();
         }
 
         [UnityTest]
@@ -62,20 +63,18 @@ namespace SurvivalRPG.Tests.PlayMode
         {
             // Arrange
             _networkManager.StartHost();
-            yield return new WaitForSeconds(0.1f);
+            yield return NGOTestHelper.WaitForLocalPlayerReady(_networkManager);
 
             var playerObj = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
             var inputHandler = playerObj.GetComponent<PlayerInputHandler>();
+            Assert.IsNotNull(inputHandler, "PlayerInputHandler should be attached to the player.");
 
-            var keyboard = InputSystem.AddDevice<Keyboard>();
-
-            // Act
-            InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.E));
-            InputSystem.Update();
-            yield return null;
+            // Act — simulate interact press and assert immediately
+            // (do NOT yield — PlayerInteraction.Update() would consume the flag)
+            inputHandler.SimulateInteractPress();
 
             // Assert
-            Assert.IsTrue(inputHandler.InteractTriggered, "InteractTriggered should be true after pressing 'E'.");
+            Assert.IsTrue(inputHandler.InteractTriggered, "InteractTriggered should be true after SimulateInteractPress().");
 
             bool consumed = inputHandler.ConsumeInteract();
             Assert.IsTrue(consumed, "ConsumeInteract should return true.");
@@ -85,31 +84,31 @@ namespace SurvivalRPG.Tests.PlayMode
         [UnityTest]
         public IEnumerator NetworkPlayer_MovesBasedOnInput()
         {
-            // Arrange
-            // Create a camera for camera-relative movement
+            // Arrange — camera for camera-relative movement
             GameObject camObj = new GameObject("Main Camera");
             camObj.tag = "MainCamera";
-            Camera cam = camObj.AddComponent<Camera>();
+            camObj.AddComponent<Camera>();
             camObj.transform.position = new Vector3(0, 5, -10);
             camObj.transform.rotation = Quaternion.identity;
 
             _networkManager.StartHost();
-            yield return new WaitForSeconds(0.1f);
+            yield return NGOTestHelper.WaitForLocalPlayerReady(_networkManager);
 
             var playerObj = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+            var inputHandler = playerObj.GetComponent<PlayerInputHandler>();
+            Assert.IsNotNull(inputHandler, "PlayerInputHandler should be attached to the player.");
+
             var initialPosition = playerObj.transform.position;
 
-            var keyboard = InputSystem.AddDevice<Keyboard>();
-
-            // Act
-            InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.W));
-            InputSystem.Update();
-            yield return new WaitForSeconds(0.5f); // Wait for movement to apply over time
+            // Act — simulate forward movement for several frames
+            inputHandler.SetSimulatedMovement(new Vector2(0, 1));
+            yield return new WaitForSeconds(0.5f);
 
             // Assert
             Assert.Greater(playerObj.transform.position.z, initialPosition.z, "Player should have moved forward along the Z axis relative to camera.");
 
             // Cleanup
+            inputHandler.ClearSimulatedMovement();
             Object.Destroy(camObj);
         }
     }

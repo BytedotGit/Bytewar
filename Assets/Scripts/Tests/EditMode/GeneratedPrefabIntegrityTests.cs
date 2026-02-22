@@ -2,7 +2,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-namespace SurvivalRPG.Tests.EditMode
+namespace ByteWar.Tests.EditMode
 {
     public class GeneratedPrefabIntegrityTests
     {
