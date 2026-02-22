@@ -25,11 +25,22 @@ namespace SurvivalRPG.Survival
 
         public void AddItem(Item item)
         {
-            if (!IsServer) return;
+            // Server-authoritative when NGO is active. In offline contexts (EditMode tests or
+            // local non-networked usage), allow logic to run without a NetworkManager.
+            if (!IsServer && NetworkManager.Singleton != null) return;
 
             Items.Add(item);
             Debug.Log($"[InventoryComponent] Added '{item.ItemName}' to {gameObject.name}'s inventory. Total: {Items.Count}");
-            NotifyItemAddedClientRpc(item.ItemName);
+
+            // Only dispatch RPCs when NGO is active and this object is spawned.
+            if (NetworkManager.Singleton != null && IsSpawned)
+            {
+                NotifyItemAddedClientRpc(item.ItemName);
+            }
+            else
+            {
+                OnItemAdded?.Invoke(item.ItemName);
+            }
         }
 
         public bool HasItem(Item item, int count)
@@ -44,7 +55,7 @@ namespace SurvivalRPG.Survival
 
         public void RemoveItem(Item item, int count)
         {
-            if (!IsServer) return;
+            if (!IsServer && NetworkManager.Singleton != null) return;
 
             int removed = 0;
             for (int i = Items.Count - 1; i >= 0; i--)
@@ -60,7 +71,14 @@ namespace SurvivalRPG.Survival
             Debug.Log($"[InventoryComponent] Removed {removed}x '{item.ItemName}' from {gameObject.name}'s inventory.");
             if (removed > 0)
             {
-                NotifyItemRemovedClientRpc(item.ItemName);
+                if (NetworkManager.Singleton != null && IsSpawned)
+                {
+                    NotifyItemRemovedClientRpc(item.ItemName);
+                }
+                else
+                {
+                    OnItemRemoved?.Invoke(item.ItemName);
+                }
             }
         }
 

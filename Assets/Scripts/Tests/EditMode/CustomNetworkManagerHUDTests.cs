@@ -42,7 +42,7 @@ namespace SurvivalRPG.Tests.EditMode
         }
 
         [Test]
-        public void ShouldAutoHost_ReturnsTrue_WhenAutoTestFlagPresent()
+        public void ShouldAutoHost_ReturnsFalse_WhenAutoTestFlagPresent()
         {
             bool result = CustomNetworkManagerHUD.ShouldAutoHost(
                 isEditor: false,
@@ -50,7 +50,7 @@ namespace SurvivalRPG.Tests.EditMode
                 isClient: false,
                 args: new[] { "-autoTest" });
 
-            Assert.True(result);
+            Assert.False(result);
         }
 
         [Test]

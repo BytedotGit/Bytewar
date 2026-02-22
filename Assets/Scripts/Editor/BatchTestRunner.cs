@@ -21,7 +21,7 @@ namespace SurvivalRPG.Editor
             _running = true;
             Debug.Log("[BatchTestRunner] Starting EditMode tests...");
 
-            _api = new TestRunnerApi();
+            _api = ScriptableObject.CreateInstance<TestRunnerApi>();
             _api.RegisterCallbacks(new Callbacks());
 
             var filter = new Filter

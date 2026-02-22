@@ -11,6 +11,7 @@ namespace SurvivalRPG.Networking
     public class CustomNetworkManagerHUD : MonoBehaviour
     {
         private const string NoAutoHostArg = "-noAutoHost";
+        private const string AutoTestArg = "-autoTest";
 
         private GUIStyle _buttonStyle;
         private GUIStyle _labelStyle;
@@ -45,7 +46,7 @@ namespace SurvivalRPG.Networking
 
             if (!shouldAutoHost)
             {
-                Debug.Log($"[HUD] Auto-host skipped. editor={Application.isEditor} server={NetworkManager.Singleton.IsServer} client={NetworkManager.Singleton.IsClient} hasNoAutoHostArg={HasArg(args, NoAutoHostArg)}");
+                Debug.Log($"[HUD] Auto-host skipped. editor={Application.isEditor} server={NetworkManager.Singleton.IsServer} client={NetworkManager.Singleton.IsClient} hasNoAutoHostArg={HasArg(args, NoAutoHostArg)} isAutoTest={HasArg(args, AutoTestArg)}");
                 return;
             }
 
@@ -71,6 +72,7 @@ namespace SurvivalRPG.Networking
             if (isEditor) return false;
             if (isServer || isClient) return false;
             if (HasArg(args, NoAutoHostArg)) return false;
+            if (HasArg(args, AutoTestArg)) return false;
             return true;
         }
 

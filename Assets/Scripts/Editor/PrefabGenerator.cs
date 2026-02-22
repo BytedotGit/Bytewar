@@ -47,10 +47,19 @@ namespace SurvivalRPG.Editor
             cc.skinWidth = 0.08f;
 
             // Assign Animator Controller
-            UnityEditor.Animations.AnimatorController controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/GeneratedPrefabs/Animations/PlayerAnimatorController.controller");
+            // Prefer the Resources copy so the controller is guaranteed to be present in builds.
+            RuntimeAnimatorController controller = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Resources/Generated/PlayerAnimatorController.controller");
+            if (controller == null)
+            {
+                controller = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/GeneratedPrefabs/Animations/PlayerAnimatorController.controller");
+            }
             if (controller != null)
             {
                 animator.runtimeAnimatorController = controller;
+            }
+            else
+            {
+                Debug.LogError("[PrefabGenerator] AnimatorController missing; NetworkPlayer will T-pose. Run Generate Animator Controller.");
             }
 
             // Add a simple visual representation
@@ -64,6 +73,8 @@ namespace SurvivalRPG.Editor
             visualRoot.transform.localScale = Vector3.one;
 
             GameObject playerVisual;
+
+            var networkPlayer = playerObj.GetComponent<NetworkPlayer>();
 
             if (mixamoPrefab != null)
             {
@@ -79,6 +90,7 @@ namespace SurvivalRPG.Editor
                     animator.avatar = childAnimator.avatar;
                     Object.DestroyImmediate(childAnimator);
                 }
+                if (networkPlayer != null) networkPlayer.SetGeneratedVisualModeStamp(PlayerVisualMode.Mixamo);
                 Debug.Log($"[PrefabGenerator] Attached Mixamo character: {mixamoPrefab.name}");
             }
             else if (humanoidPrefab != null)
@@ -91,12 +103,15 @@ namespace SurvivalRPG.Editor
                 // stale nested-prefab GUID errors when the model prefab is regenerated.
                 PrefabUtility.UnpackPrefabInstance(playerVisual,
                     PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+                if (networkPlayer != null) networkPlayer.SetGeneratedVisualModeStamp(PlayerVisualMode.HumanoidFallback);
             }
             else
             {
                 playerVisual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                playerVisual.name = "FallbackCapsule";
                 playerVisual.transform.SetParent(visualRoot.transform);
                 playerVisual.transform.localPosition = new Vector3(0, 1f, 0);
+                if (networkPlayer != null) networkPlayer.SetGeneratedVisualModeStamp(PlayerVisualMode.PrimitiveFallback);
             }
 
             // Ground visual so its lowest renderer point sits on y=0 relative to player root.

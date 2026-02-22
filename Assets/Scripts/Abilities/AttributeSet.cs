@@ -16,19 +16,21 @@ namespace SurvivalRPG.Abilities
 
         public void ApplyDamage(float amount)
         {
-            if (!IsServer) return;
+            // Server-authoritative when NGO is active. In offline contexts (EditMode tests or
+            // local non-networked usage), allow logic to run without a NetworkManager.
+            if (!IsServer && NetworkManager.Singleton != null) return;
             Health.Value = Mathf.Clamp(Health.Value - amount, 0, MaxHealth.Value);
         }
 
         public void ApplyHealing(float amount)
         {
-            if (!IsServer) return;
+            if (!IsServer && NetworkManager.Singleton != null) return;
             Health.Value = Mathf.Clamp(Health.Value + amount, 0, MaxHealth.Value);
         }
 
         public bool ConsumeMana(float amount)
         {
-            if (!IsServer) return false;
+            if (!IsServer && NetworkManager.Singleton != null) return false;
             if (Mana.Value >= amount)
             {
                 Mana.Value -= amount;

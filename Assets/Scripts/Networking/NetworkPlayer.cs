@@ -7,12 +7,31 @@ using SurvivalRPG.Core;
 
 namespace SurvivalRPG.Networking
 {
+    public enum PlayerVisualMode
+    {
+        Unknown = 0,
+        Mixamo = 1,
+        HumanoidFallback = 2,
+        PrimitiveFallback = 3,
+        OtherSkinned = 4,
+    }
+
     [RequireComponent(typeof(AbilitySystemComponent))]
     [RequireComponent(typeof(SurvivalStats))]
     [RequireComponent(typeof(PlayerInputHandler))]
     [RequireComponent(typeof(CharacterController))]
     public class NetworkPlayer : NetworkBehaviour
     {
+        private const string ResourcesAnimatorControllerPath = "Generated/PlayerAnimatorController";
+
+        public struct VisualDiagnostics
+        {
+            public int SkinnedMeshRendererCount;
+            public int RendererCount;
+            public bool HasMixamoRig;
+            public string VisualRootChildName;
+        }
+
         // ── Movement constants ────────────────────────────────────────────────────
         private const float MoveSpeed = 6f;
         private const float TurnSpeed = 14f;
@@ -33,6 +52,17 @@ namespace SurvivalRPG.Networking
         private bool _initialized;
         private float _nextMoveLogTime;
 
+        [Header("Generated Prefab Diagnostics")]
+        [Tooltip("Set by PrefabGenerator so runtime/tests can prove which visual branch was baked (Mixamo vs fallback).")]
+        [SerializeField] private PlayerVisualMode _generatedVisualModeStamp = PlayerVisualMode.Unknown;
+
+        public PlayerVisualMode GeneratedVisualModeStamp => _generatedVisualModeStamp;
+
+        public void SetGeneratedVisualModeStamp(PlayerVisualMode mode)
+        {
+            _generatedVisualModeStamp = mode;
+        }
+
         // ── Unity lifecycle ───────────────────────────────────────────────────────
         private void Awake()
         {
@@ -43,10 +73,17 @@ namespace SurvivalRPG.Networking
             _netAnimator = GetComponent<ClientNetworkAnimator>();
             _cc = GetComponent<CharacterController>();
             Debug.Log($"[NetworkPlayer] Awake on {gameObject.name}.");
+
+            // Runtime hardening: in some build scenarios the controller reference can be null.
+            // This is a one-time repair (no per-frame work).
+            EnsureAnimatorControllerAssigned("Awake");
         }
 
         public override void OnNetworkSpawn()
         {
+            // Ensure all clients have an AnimatorController, not just the owner.
+            EnsureAnimatorControllerAssigned("OnNetworkSpawn");
+
             if (!IsOwner)
             {
                 if (_inputHandler != null) _inputHandler.enabled = false;
@@ -93,13 +130,88 @@ namespace SurvivalRPG.Networking
 
             SetupCamera();
 
-            // Visual diagnostics (one-time): helps detect Mixamo vs fallback usage quickly.
-            var visualRoot = transform.Find("VisualRoot");
-            int skinnedCount = GetComponentsInChildren<SkinnedMeshRenderer>(includeInactive: true).Length;
-            string visualChild = (visualRoot != null && visualRoot.childCount > 0) ? visualRoot.GetChild(0).name : "(none)";
-            Debug.Log($"[NetworkPlayer] Visual diagnostics: VisualRoot={(visualRoot != null)} child='{visualChild}' SkinnedMeshRenderers={skinnedCount}");
+            // Visual diagnostics (one-time): make Mixamo vs fallback provable in Player.log.
+            PlayerVisualMode actual = DetectActualVisualMode(out VisualDiagnostics diag);
+            Debug.Log($"[NetworkPlayer] VisualMode: stamp={_generatedVisualModeStamp} actual={actual} child='{diag.VisualRootChildName}' skinned={diag.SkinnedMeshRendererCount} renderers={diag.RendererCount} mixamoRig={diag.HasMixamoRig} netObj={NetworkObjectId} ownerClient={OwnerClientId}");
+
+            if (_animator != null)
+            {
+                string controllerName = _animator.runtimeAnimatorController != null ? _animator.runtimeAnimatorController.name : "(null)";
+                string avatarName = _animator.avatar != null ? _animator.avatar.name : "(null)";
+                int clipCount = 0;
+                try { clipCount = _animator.runtimeAnimatorController != null ? _animator.runtimeAnimatorController.animationClips.Length : 0; }
+                catch { /* ignore */ }
+
+                Debug.Log($"[NetworkPlayer] Animator wiring: enabled={_animator.enabled} isHuman={_animator.isHuman} controller='{controllerName}' avatar='{avatarName}' clips={clipCount}");
+            }
+            if (_generatedVisualModeStamp != PlayerVisualMode.Unknown && actual != _generatedVisualModeStamp)
+            {
+                Debug.LogWarning($"[NetworkPlayer] VisualMode mismatch: stamp={_generatedVisualModeStamp} actual={actual} (this indicates stale generated prefabs, missing local assets, or an unexpected visual hierarchy).");
+            }
 
             _initialized = true;
+        }
+
+        private void EnsureAnimatorControllerAssigned(string context)
+        {
+            if (_animator == null) return;
+            if (_animator.runtimeAnimatorController != null) return;
+
+            var controller = Resources.Load<RuntimeAnimatorController>(ResourcesAnimatorControllerPath);
+            if (controller == null)
+            {
+                Debug.LogError($"[NetworkPlayer] AnimatorController missing at runtime (context={context}). Resources.Load failed for '{ResourcesAnimatorControllerPath}'. netObj={NetworkObjectId} ownerClient={OwnerClientId}");
+                return;
+            }
+
+            _animator.runtimeAnimatorController = controller;
+            _animator.Rebind();
+            _animator.Update(0f);
+            Debug.LogWarning($"[NetworkPlayer] Repaired null AnimatorController via Resources (context={context}) -> '{controller.name}'. netObj={NetworkObjectId} ownerClient={OwnerClientId}");
+        }
+
+        public PlayerVisualMode DetectActualVisualMode(out VisualDiagnostics diagnostics)
+        {
+            Transform visualRoot = transform.Find("VisualRoot");
+            string childName = (visualRoot != null && visualRoot.childCount > 0) ? visualRoot.GetChild(0).name : "(none)";
+
+            var renderers = GetComponentsInChildren<Renderer>(includeInactive: true);
+            var skinned = GetComponentsInChildren<SkinnedMeshRenderer>(includeInactive: true);
+
+            bool hasMixamoRig = false;
+            var allTransforms = GetComponentsInChildren<Transform>(includeInactive: true);
+            for (int i = 0; i < allTransforms.Length; i++)
+            {
+                var t = allTransforms[i];
+                if (t != null && t.name.StartsWith("mixamorig:"))
+                {
+                    hasMixamoRig = true;
+                    break;
+                }
+            }
+
+            diagnostics = new VisualDiagnostics
+            {
+                VisualRootChildName = childName,
+                RendererCount = renderers != null ? renderers.Length : 0,
+                SkinnedMeshRendererCount = skinned != null ? skinned.Length : 0,
+                HasMixamoRig = hasMixamoRig,
+            };
+
+            if (diagnostics.SkinnedMeshRendererCount > 0 && diagnostics.HasMixamoRig)
+                return PlayerVisualMode.Mixamo;
+
+            if (diagnostics.SkinnedMeshRendererCount > 0)
+                return PlayerVisualMode.OtherSkinned;
+
+            if (visualRoot != null && visualRoot.childCount > 0)
+            {
+                if (childName == "FallbackCapsule")
+                    return PlayerVisualMode.PrimitiveFallback;
+                return PlayerVisualMode.HumanoidFallback;
+            }
+
+            return PlayerVisualMode.PrimitiveFallback;
         }
 
         private void SetupCamera()

@@ -79,9 +79,13 @@ namespace SurvivalRPG.Editor
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
             if (prefab == null) return false;
 
-            // Dependencies contain the FBX path when referenced.
-            var deps = AssetDatabase.GetDependencies(prefabPath, recursive: true);
-            return deps.Any(d => d.StartsWith(MixamoLocalAssets.MixamoFolder));
+            // Structural check: avoids false positives where only animation clips reference Mixamo.
+            // Mixamo rig has SkinnedMeshRenderers AND bone names that start with "mixamorig:".
+            var skinned = prefab.GetComponentsInChildren<SkinnedMeshRenderer>(includeInactive: true);
+            if (skinned == null || skinned.Length == 0) return false;
+
+            var transforms = prefab.GetComponentsInChildren<Transform>(includeInactive: true);
+            return transforms.Any(t => t != null && t.name.StartsWith("mixamorig:"));
         }
     }
 }

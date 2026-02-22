@@ -7,6 +7,32 @@ namespace SurvivalRPG.Tests.EditMode
     public class GeneratedPrefabIntegrityTests
     {
         [Test]
+        public void Resources_HasGeneratedPlayerAnimatorController()
+        {
+            var controller = Resources.Load<RuntimeAnimatorController>("Generated/PlayerAnimatorController");
+            Assert.IsNotNull(controller, "Resources/Generated/PlayerAnimatorController.controller is missing. Run Generate Animator Controller.");
+        }
+
+        [Test]
+        public void NetworkPlayerPrefab_HasAnimatorController()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/GeneratedPrefabs/NetworkPlayer.prefab");
+            Assert.IsNotNull(prefab, "NetworkPlayer.prefab not found. Run Generate All.");
+
+            var instance = Object.Instantiate(prefab);
+            try
+            {
+                var animator = instance.GetComponent<Animator>();
+                Assert.IsNotNull(animator, "Animator missing on NetworkPlayer prefab.");
+                Assert.IsNotNull(animator.runtimeAnimatorController, "Animator controller is null on NetworkPlayer prefab (T-pose risk). Run Generate Animator Controller.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
+        }
+
+        [Test]
         public void NetworkPlayerPrefab_HasCameraTarget()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/GeneratedPrefabs/NetworkPlayer.prefab");

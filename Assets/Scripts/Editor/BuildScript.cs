@@ -15,6 +15,14 @@ namespace SurvivalRPG.Editor
             // - Movement/interaction rely on the new Input System.
             InputHandlingUtility.EnsureInputHandlingBoth();
 
+            // Deterministic build inputs:
+            // - If Mixamo FBX exist locally, bake them into the generated prefabs/animator.
+            // - If missing (public repo clone), bake fallbacks.
+            Debug.Log("[BuildScript] Pre-build generation: processing Mixamo (if present), generating animator, generating prefabs...");
+            MixamoProcessor.ProcessAssets();
+            AnimatorGenerator.GenerateAnimatorController();
+            PrefabGenerator.GeneratePrefabs();
+
             string[] scenes = { "Assets/Scenes/TestScene.unity" };
             string buildPath = "Builds/Windows/SurvivalRPG.exe";
 

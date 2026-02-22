@@ -50,6 +50,8 @@ This roadmap outlines the steps required to reach a fully playable, multiplayer 
 - [x] **Camera Pivot Sanity**: Prevent stacked vertical offsets (CameraTarget + pivotHeight). AutoTester validates pivot delta is within a sane band.
 - [x] **Grounding Sanity**: Deterministic CharacterController config + visual grounding. AutoTester validates capsule bottom is within epsilon of sampled terrain.
 - [x] **Action Bar Correctness**: Ability keys only trigger cast animation when a cast request actually executes (no empty-slot cast animation).
+- [x] **Mixamo Visual Proofing**: Generated `NetworkPlayer` stamps visual mode (Mixamo vs fallback). AutoTester asserts stamp matches runtime visuals and logs the proven mode.
+- [x] **Mixamo Animation Proofing**: AutoTester asserts the player has a valid AnimatorController and that a humanoid bone rotates during simulated movement (catches T-pose/retarget regressions).
 - [ ] **Manual Feel Pass**: Confirm camera framing is WoW-default and character feels grounded in Editor play (no obvious hovering).
 
 ## Phase 14: Building System & Persistence

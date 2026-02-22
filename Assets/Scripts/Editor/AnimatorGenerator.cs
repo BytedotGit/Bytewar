@@ -9,6 +9,7 @@ namespace SurvivalRPG.Editor
     public static class AnimatorGenerator
     {
         private const string PlaceholderFolder = "Assets/GeneratedPrefabs/Animations/Placeholders";
+        private const string ResourcesControllerPath = "Assets/Resources/Generated/PlayerAnimatorController.controller";
 
         [MenuItem("SurvivalRPG/Generate Animator Controller")]
         public static void GenerateAnimatorController()
@@ -109,6 +110,19 @@ namespace SurvivalRPG.Editor
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+
+            // Build hardening: ensure the controller is included even if build dependency collection
+            // misses generated assets referenced indirectly by NGO config.
+            EnsureFolder("Assets/Resources/Generated");
+            if (AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(ResourcesControllerPath) != null)
+            {
+                AssetDatabase.DeleteAsset(ResourcesControllerPath);
+            }
+
+            bool copied = AssetDatabase.CopyAsset(controllerPath, ResourcesControllerPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log($"[AnimatorGenerator] Copied controller to Resources: ok={copied} path={ResourcesControllerPath}");
 
             Debug.Log($"[AnimatorGenerator] Created Animator Controller at {controllerPath}");
         }
