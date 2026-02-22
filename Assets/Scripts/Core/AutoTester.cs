@@ -1,6 +1,8 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Net;
+using System.Net.Sockets;
 using SurvivalRPG.Networking;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
@@ -16,6 +18,17 @@ namespace SurvivalRPG.Core
     {
         internal const string AutoTestArg = "-autoTest";
 
+        private const int AutoTestPortMin = 45000;
+        private const int AutoTestPortRange = 10000; // 45000..54999
+        private const int AutoTestPortProbeCount = 12;
+
+        private int _transportFailureCount;
+        private float _lastTransportFailureRealtime;
+
+        private ILogHandler _previousLogHandler;
+        private bool _suppressNetcodeDestroyWarning;
+        private int _suppressedNetcodeDestroyWarnings;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Initialize()
         {
@@ -29,8 +42,39 @@ namespace SurvivalRPG.Core
 
         private void Start()
         {
+            InstallLogFilter();
             Debug.Log("[AutoTester] Auto-test mode enabled. Starting test sequence...");
             StartCoroutine(TestSequence());
+        }
+
+        private void OnDestroy()
+        {
+            RestoreLogFilter();
+            if (NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.OnTransportFailure -= HandleTransportFailure;
+            }
+        }
+
+        private void InstallLogFilter()
+        {
+            if (_previousLogHandler != null) return;
+            _previousLogHandler = Debug.unityLogger.logHandler;
+            Debug.unityLogger.logHandler = new AutoTestLogFilterHandler(_previousLogHandler, this);
+        }
+
+        private void RestoreLogFilter()
+        {
+            if (_previousLogHandler == null) return;
+            if (ReferenceEquals(Debug.unityLogger.logHandler, null)) return;
+
+            // Only restore if we still own the handler.
+            if (Debug.unityLogger.logHandler is AutoTestLogFilterHandler)
+            {
+                Debug.unityLogger.logHandler = _previousLogHandler;
+            }
+
+            _previousLogHandler = null;
         }
 
         private IEnumerator TestSequence()
@@ -53,7 +97,8 @@ namespace SurvivalRPG.Core
             }
 
             // Subscribe once: if the transport fails to start, we want that in Player.log.
-            NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
+            NetworkManager.Singleton.OnTransportFailure -= HandleTransportFailure;
+            NetworkManager.Singleton.OnTransportFailure += HandleTransportFailure;
 
             if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)
             {
@@ -82,6 +127,17 @@ namespace SurvivalRPG.Core
                     if (utp != null)
                     {
                         int port = ChooseAutoTestPort(attempt, seed);
+                        bool probed = TryChooseAvailableAutoTestPort(attempt, seed, AutoTestPortProbeCount, out int availablePort, out int probesTried);
+                        if (probed)
+                        {
+                            port = availablePort;
+                            Debug.Log($"[AutoTester] Port probe: selected available UDP port {port} after {probesTried} probe(s).");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[AutoTester] Port probe: unable to confirm a free UDP port after {AutoTestPortProbeCount} probe(s); proceeding with port {port}.");
+                        }
+
                         utp.SetConnectionData(utp.ConnectionData.Address, (ushort)port, utp.ConnectionData.ServerListenAddress);
                         Debug.Log($"[AutoTester] Starting host (attempt {attempt + 1}/{maxAttempts}) on port {port}...");
                     }
@@ -94,9 +150,48 @@ namespace SurvivalRPG.Core
                     Debug.Log($"[AutoTester] StartHost returned {ok} (attempt {attempt + 1}/{maxAttempts})");
                     if (ok) break;
 
+                    // Diagnostics to help de-flake host start in CI/builds.
+                    string lastFailureAge = _transportFailureCount > 0
+                        ? $"{(Time.realtimeSinceStartup - _lastTransportFailureRealtime):0.000}s"
+                        : "n/a";
+
+                    Debug.LogWarning($"[AutoTester] Host start failed (attempt {attempt + 1}/{maxAttempts}). " +
+                                     $"isListening={NetworkManager.Singleton.IsListening} isServer={NetworkManager.Singleton.IsServer} isClient={NetworkManager.Singleton.IsClient} " +
+                                     $"transportFailures={_transportFailureCount} lastTransportFailureAge={lastFailureAge}");
+
                     // Defensive shutdown before retry.
-                    try { NetworkManager.Singleton.Shutdown(); } catch { /* ignore */ }
-                    yield return null;
+                    // Avoid calling Shutdown() when StartHost() never reached a listening state; this can trigger noisy NGO warnings.
+                    if (NetworkManager.Singleton.IsListening || NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient)
+                    {
+                        try
+                        {
+                            Debug.LogWarning("[AutoTester] Shutting down NetworkManager before retry...");
+                            _suppressNetcodeDestroyWarning = true;
+                            NetworkManager.Singleton.Shutdown();
+                        }
+                        catch
+                        {
+                            // ignore
+                        }
+
+                        // Give NGO a moment to tear down cleanly.
+                        yield return new WaitForSecondsRealtime(0.05f);
+                        _suppressNetcodeDestroyWarning = false;
+                    }
+                    else
+                    {
+                        yield return null;
+                    }
+
+                    if (attempt < (maxAttempts - 1))
+                    {
+                        float delay = ComputeHostRetryDelaySeconds(attempt);
+                        if (delay > 0f)
+                        {
+                            Debug.Log($"[AutoTester] Backoff: waiting {delay:0.00}s before retry...");
+                            yield return new WaitForSecondsRealtime(delay);
+                        }
+                    }
                 }
 
                 if (!ok)
@@ -105,6 +200,11 @@ namespace SurvivalRPG.Core
                     yield return new WaitForSeconds(0.25f);
                     Application.Quit(34);
                     yield break;
+                }
+
+                if (_suppressedNetcodeDestroyWarnings > 0)
+                {
+                    Debug.LogWarning($"[AutoTester] Suppressed NGO destroy warnings during retries: count={_suppressedNetcodeDestroyWarnings}");
                 }
             }
 
@@ -337,9 +437,42 @@ namespace SurvivalRPG.Core
 #endif
         }
 
-        private static void OnTransportFailure()
+        private void HandleTransportFailure()
         {
-            Debug.LogError("[AutoTester] Transport failure reported by NetworkManager.OnTransportFailure.");
+            _transportFailureCount++;
+            _lastTransportFailureRealtime = Time.realtimeSinceStartup;
+            Debug.LogError($"[AutoTester] Transport failure reported by NetworkManager.OnTransportFailure (count={_transportFailureCount}).");
+        }
+
+        private sealed class AutoTestLogFilterHandler : ILogHandler
+        {
+            private readonly ILogHandler _inner;
+            private readonly AutoTester _owner;
+
+            public AutoTestLogFilterHandler(ILogHandler inner, AutoTester owner)
+            {
+                _inner = inner;
+                _owner = owner;
+            }
+
+            public void LogException(Exception exception, UnityEngine.Object context)
+            {
+                _inner.LogException(exception, context);
+            }
+
+            public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args)
+            {
+                // Targeted spam suppression: NGO can emit noisy warnings during rapid Shutdown() after failed starts.
+                // Keep this extremely narrow to avoid hiding real problems.
+                if (_owner._suppressNetcodeDestroyWarning && logType == LogType.Warning &&
+                    !string.IsNullOrEmpty(format) && format.Contains("Trying to destroy object 0"))
+                {
+                    _owner._suppressedNetcodeDestroyWarnings++;
+                    return;
+                }
+
+                _inner.LogFormat(logType, context, format, args);
+            }
         }
 
         internal static bool HasArg(string[] args, string arg)
@@ -364,8 +497,63 @@ namespace SurvivalRPG.Core
                 mix ^= (mix << 13);
                 mix ^= (mix >> 17);
                 mix ^= (mix << 5);
-                int offset = Mathf.Abs(mix) % 10000; // 0..9999
-                return 45000 + offset; // 45000..54999
+                int offset = Mathf.Abs(mix) % AutoTestPortRange; // 0..9999
+                return AutoTestPortMin + offset; // 45000..54999
+            }
+        }
+
+        internal static float ComputeHostRetryDelaySeconds(int attemptIndex)
+        {
+            // attemptIndex is 0-based (0 = after first failure). Keep total delay low.
+            return attemptIndex switch
+            {
+                0 => 0.10f,
+                1 => 0.25f,
+                _ => 0.50f,
+            };
+        }
+
+        internal static bool TryChooseAvailableAutoTestPort(int attemptIndex, int seed, int probeCount, out int port, out int probesTried)
+        {
+            // Probe multiple deterministic candidates to reduce flaky bind failures (and noisy logs).
+            probeCount = Mathf.Clamp(probeCount, 1, 64);
+            probesTried = 0;
+
+            for (int probe = 0; probe < probeCount; probe++)
+            {
+                probesTried++;
+                int candidate = ChooseAutoTestPort((attemptIndex * probeCount) + probe, seed);
+                if (IsUdpPortAvailable(candidate))
+                {
+                    port = candidate;
+                    return true;
+                }
+            }
+
+            port = ChooseAutoTestPort(attemptIndex, seed);
+            return false;
+        }
+
+        internal static bool IsUdpPortAvailable(int port)
+        {
+            if (port <= 0 || port > 65535) return false;
+
+            try
+            {
+                using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                socket.ExclusiveAddressUse = true;
+                socket.Bind(new IPEndPoint(IPAddress.Any, port));
+                return true;
+            }
+            catch (SocketException)
+            {
+                return false;
+            }
+            catch
+            {
+                // In restricted environments, we might not be able to probe; treat as unknown (not available)
+                // so the caller falls back to a deterministic candidate.
+                return false;
             }
         }
     }

@@ -13,16 +13,18 @@ namespace SurvivalRPG.Editor
 {
     public static class PrefabGenerator
     {
+        private const string BuildGenPrefix = "[BuildGen]";
+
         [MenuItem("SurvivalRPG/Generate Prefabs")]
         public static void GeneratePrefabs()
         {
-            Debug.Log("[PrefabGenerator] Starting prefab generation...");
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: start");
 
             string basePath = "Assets/GeneratedPrefabs";
             if (!AssetDatabase.IsValidFolder(basePath))
             {
                 AssetDatabase.CreateFolder("Assets", "GeneratedPrefabs");
-                Debug.Log($"[PrefabGenerator] Created folder: {basePath}");
+                Debug.Log($"{BuildGenPrefix} PrefabGenerator: created folder: {basePath}");
             }
 
             // 1. Generate NetworkPlayer
@@ -59,7 +61,7 @@ namespace SurvivalRPG.Editor
             }
             else
             {
-                Debug.LogError("[PrefabGenerator] AnimatorController missing; NetworkPlayer will T-pose. Run Generate Animator Controller.");
+                Debug.LogError($"{BuildGenPrefix} PrefabGenerator: AnimatorController missing; NetworkPlayer will T-pose. Run Generate Animator Controller.");
             }
 
             // Add a simple visual representation
@@ -91,7 +93,7 @@ namespace SurvivalRPG.Editor
                     Object.DestroyImmediate(childAnimator);
                 }
                 if (networkPlayer != null) networkPlayer.SetGeneratedVisualModeStamp(PlayerVisualMode.Mixamo);
-                Debug.Log($"[PrefabGenerator] Attached Mixamo character: {mixamoPrefab.name}");
+                Debug.Log($"{BuildGenPrefix} PrefabGenerator: attached Mixamo character='{mixamoPrefab.name}'");
             }
             else if (humanoidPrefab != null)
             {
@@ -122,9 +124,10 @@ namespace SurvivalRPG.Editor
             cameraTarget.transform.SetParent(playerObj.transform);
             cameraTarget.transform.localPosition = new Vector3(0, 1.25f, 0); // Default; runtime may adjust based on rig/bounds
 
-            GameObject playerPrefab = PrefabUtility.SaveAsPrefabAsset(playerObj, $"{basePath}/NetworkPlayer.prefab");
+            string networkPlayerPath = $"{basePath}/NetworkPlayer.prefab";
+            GameObject playerPrefab = PrefabUtility.SaveAsPrefabAsset(playerObj, networkPlayerPath);
             Object.DestroyImmediate(playerObj);
-            Debug.Log($"[PrefabGenerator] Created NetworkPlayer prefab.");
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: created NetworkPlayer prefabPath={networkPlayerPath}");
 
             // 2. Generate ResourceNode
             GameObject resourceObj = new GameObject("ResourceNode");
@@ -143,7 +146,7 @@ namespace SurvivalRPG.Editor
 
             GameObject resourcePrefab = PrefabUtility.SaveAsPrefabAsset(resourceObj, $"{basePath}/ResourceNode.prefab");
             Object.DestroyImmediate(resourceObj);
-            Debug.Log($"[PrefabGenerator] Created ResourceNode prefab.");
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: created ResourceNode prefab.");
 
             // 3. Generate EnemyAI — uses procedural orc model
             CharacterGenerator.GenerateEnemyModel(); // saves OrcModel.prefab
@@ -164,7 +167,7 @@ namespace SurvivalRPG.Editor
                 orcVisual.transform.localScale = Vector3.one * 0.90f;
                 PrefabUtility.UnpackPrefabInstance(orcVisual,
                     PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
-                Debug.Log("[PrefabGenerator] Orc model attached to EnemyAI.");
+                Debug.Log($"{BuildGenPrefix} PrefabGenerator: Orc model attached to EnemyAI.");
             }
             else
             {
@@ -175,7 +178,7 @@ namespace SurvivalRPG.Editor
                 var fbMat = new Material(Shader.Find("Standard")) { color = new Color(0.22f, 0.42f, 0.12f) };
                 fb.GetComponent<Renderer>().sharedMaterial = fbMat;
                 Object.DestroyImmediate(fb.GetComponent<Collider>());
-                Debug.LogWarning("[PrefabGenerator] Orc model not found, using fallback capsule.");
+                Debug.LogWarning($"{BuildGenPrefix} PrefabGenerator: Orc model not found, using fallback capsule.");
             }
 
             // Collider
@@ -186,7 +189,7 @@ namespace SurvivalRPG.Editor
 
             GameObject enemyPrefab = PrefabUtility.SaveAsPrefabAsset(enemyObj, $"{basePath}/EnemyAI.prefab");
             Object.DestroyImmediate(enemyObj);
-            Debug.Log($"[PrefabGenerator] Created EnemyAI prefab with orc model.");
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: created EnemyAI prefab with orc model.");
 
             // 4. Generate NetworkManager
             GameObject networkManagerObj = new GameObject("NetworkManager");
@@ -213,12 +216,12 @@ namespace SurvivalRPG.Editor
 
             GameObject networkManagerPrefab = PrefabUtility.SaveAsPrefabAsset(networkManagerObj, $"{basePath}/NetworkManager.prefab");
             Object.DestroyImmediate(networkManagerObj);
-            Debug.Log($"[PrefabGenerator] Created NetworkManager prefab.");
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: created NetworkManager prefab.");
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log("[PrefabGenerator] Prefab generation completed successfully.");
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: prefab generation completed successfully.");
         }
 
         private static GameObject FindMixamoCharacter()

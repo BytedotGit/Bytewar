@@ -10,6 +10,7 @@ namespace SurvivalRPG.Editor
     /// </summary>
     public static class CharacterGenerator
     {
+        private const string BuildGenPrefix = "[BuildGen]";
         private const string ModelsPath = "Assets/GeneratedPrefabs/Models";
 
         // ──────────────────────────────────────────────────────────────────────────
@@ -18,7 +19,7 @@ namespace SurvivalRPG.Editor
         [MenuItem("SurvivalRPG/Generate Humanoid Model")]
         public static void GenerateHumanoidModel()
         {
-            Debug.Log("[CharacterGenerator] Generating armoured knight model...");
+            Debug.Log($"{BuildGenPrefix} CharacterGenerator: generating armoured knight model...");
             EnsureFolder(ModelsPath);
 
             // Materials
@@ -79,7 +80,7 @@ namespace SurvivalRPG.Editor
             P(root, "SwPommel", PrimitiveType.Sphere, new Vector3(0.74f, 0.63f, 0f), V(0.10f, 0.10f, 0.10f), gold);
 
             SavePrefab(root, $"{ModelsPath}/HumanoidModel.prefab");
-            Debug.Log("[CharacterGenerator] Knight model saved.");
+            Debug.Log($"{BuildGenPrefix} CharacterGenerator: knight model saved.");
         }
 
         // ──────────────────────────────────────────────────────────────────────────
@@ -88,7 +89,7 @@ namespace SurvivalRPG.Editor
         public static string GenerateEnemyModel()
         {
             string prefabPath = $"{ModelsPath}/OrcModel.prefab";
-            Debug.Log("[CharacterGenerator] Generating orc enemy model...");
+            Debug.Log($"{BuildGenPrefix} CharacterGenerator: generating orc enemy model...");
             EnsureFolder(ModelsPath);
 
             var orcSkin = Mat("OrcSkin", new Color(0.22f, 0.42f, 0.12f), 0.00f, 0.20f);
@@ -136,7 +137,7 @@ namespace SurvivalRPG.Editor
             P(root, "FootR", PrimitiveType.Cube, new Vector3(0.28f, -0.46f, 0.06f), V(0.30f, 0.14f, 0.36f), orcDark);
 
             SavePrefab(root, prefabPath);
-            Debug.Log($"[CharacterGenerator] Orc model saved to {prefabPath}");
+            Debug.Log($"{BuildGenPrefix} CharacterGenerator: orc model saved path={prefabPath}");
             return prefabPath;
         }
 

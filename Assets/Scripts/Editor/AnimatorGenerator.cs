@@ -8,13 +8,14 @@ namespace SurvivalRPG.Editor
 {
     public static class AnimatorGenerator
     {
+        private const string BuildGenPrefix = "[BuildGen]";
         private const string PlaceholderFolder = "Assets/GeneratedPrefabs/Animations/Placeholders";
         private const string ResourcesControllerPath = "Assets/Resources/Generated/PlayerAnimatorController.controller";
 
         [MenuItem("SurvivalRPG/Generate Animator Controller")]
         public static void GenerateAnimatorController()
         {
-            Debug.Log("[AnimatorGenerator] Generating Animator Controller...");
+            Debug.Log($"{BuildGenPrefix} AnimatorGenerator: start");
 
             string basePath = "Assets/GeneratedPrefabs/Animations";
             if (!AssetDatabase.IsValidFolder(basePath))
@@ -42,7 +43,7 @@ namespace SurvivalRPG.Editor
             bool mixamoEnabled = MixamoLocalAssets.AreAvailable(out string reason);
             if (!mixamoEnabled)
             {
-                Debug.Log($"[AnimatorGenerator] Mixamo not available locally ({reason}). Generating placeholder clips.");
+                Debug.Log($"{BuildGenPrefix} AnimatorGenerator: Mixamo not available locally ({reason}). Using placeholder clips.");
                 EnsureFolder(PlaceholderFolder);
             }
 
@@ -122,9 +123,9 @@ namespace SurvivalRPG.Editor
             bool copied = AssetDatabase.CopyAsset(controllerPath, ResourcesControllerPath);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log($"[AnimatorGenerator] Copied controller to Resources: ok={copied} path={ResourcesControllerPath}");
-
-            Debug.Log($"[AnimatorGenerator] Created Animator Controller at {controllerPath}");
+            Debug.Log($"{BuildGenPrefix} AnimatorGenerator: copiedToResources ok={copied} path={ResourcesControllerPath}");
+            Debug.Log($"{BuildGenPrefix} AnimatorGenerator: created controllerPath={controllerPath}");
+            Debug.Log($"{BuildGenPrefix} AnimatorGenerator: done");
         }
 
         private static void EnsureFolder(string folderPath)

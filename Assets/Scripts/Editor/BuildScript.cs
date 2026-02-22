@@ -5,10 +5,12 @@ namespace SurvivalRPG.Editor
 {
     public class BuildScript
     {
+        private const string BuildGenPrefix = "[BuildGen]";
+
         [MenuItem("SurvivalRPG/Build Windows Client")]
         public static void BuildWindowsClient()
         {
-            Debug.Log("Starting Windows Client Build...");
+            Debug.Log($"{BuildGenPrefix} Starting Windows Client Build...");
 
             // Ensure builds keep both Legacy + New Input System enabled.
             // - IMGUI HUD buttons rely on legacy input.
@@ -18,10 +20,11 @@ namespace SurvivalRPG.Editor
             // Deterministic build inputs:
             // - If Mixamo FBX exist locally, bake them into the generated prefabs/animator.
             // - If missing (public repo clone), bake fallbacks.
-            Debug.Log("[BuildScript] Pre-build generation: processing Mixamo (if present), generating animator, generating prefabs...");
+            Debug.Log($"{BuildGenPrefix} Pre-build generation: processing Mixamo (if present), generating animator, generating prefabs...");
             MixamoProcessor.ProcessAssets();
             AnimatorGenerator.GenerateAnimatorController();
             PrefabGenerator.GeneratePrefabs();
+            Debug.Log($"{BuildGenPrefix} Pre-build generation complete.");
 
             string[] scenes = { "Assets/Scenes/TestScene.unity" };
             string buildPath = "Builds/Windows/SurvivalRPG.exe";
@@ -39,11 +42,11 @@ namespace SurvivalRPG.Editor
 
             if (summary.result == UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
-                Debug.Log($"Build succeeded: {summary.totalSize} bytes");
+                Debug.Log($"{BuildGenPrefix} Build succeeded: {summary.totalSize} bytes");
             }
             else if (summary.result == UnityEditor.Build.Reporting.BuildResult.Failed)
             {
-                Debug.LogError("Build failed");
+                Debug.LogError($"{BuildGenPrefix} Build failed");
             }
         }
     }

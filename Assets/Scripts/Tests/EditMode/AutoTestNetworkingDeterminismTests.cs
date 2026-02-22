@@ -1,6 +1,8 @@
 using NUnit.Framework;
 using SurvivalRPG.Core;
 using SurvivalRPG.Networking;
+using System.Net;
+using System.Net.Sockets;
 
 namespace SurvivalRPG.Tests.EditMode
 {
@@ -62,6 +64,28 @@ namespace SurvivalRPG.Tests.EditMode
 
             Assert.That(p0, Is.InRange(45000, 54999));
             Assert.That(p1, Is.InRange(45000, 54999));
+        }
+
+        [Test]
+        public void AutoTester_IsUdpPortAvailable_ReturnsFalseWhenPortIsBound()
+        {
+            using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.ExclusiveAddressUse = true;
+            socket.Bind(new IPEndPoint(IPAddress.Any, 0));
+
+            int port = ((IPEndPoint)socket.LocalEndPoint).Port;
+            Assert.That(port, Is.InRange(1, 65535));
+
+            Assert.IsFalse(AutoTester.IsUdpPortAvailable(port), "Port should not be available while a UDP socket is bound to it.");
+        }
+
+        [Test]
+        public void AutoTester_ComputeHostRetryDelaySeconds_IsDeterministic()
+        {
+            Assert.AreEqual(0.10f, AutoTester.ComputeHostRetryDelaySeconds(0), 0.0001f);
+            Assert.AreEqual(0.25f, AutoTester.ComputeHostRetryDelaySeconds(1), 0.0001f);
+            Assert.AreEqual(0.50f, AutoTester.ComputeHostRetryDelaySeconds(2), 0.0001f);
+            Assert.AreEqual(0.50f, AutoTester.ComputeHostRetryDelaySeconds(999), 0.0001f);
         }
     }
 }
