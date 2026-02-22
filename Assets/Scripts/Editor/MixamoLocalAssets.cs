@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -45,6 +46,19 @@ namespace SurvivalRPG.Editor
 
             reason = "OK";
             return true;
+        }
+
+        public static string[] GetMissingFiles()
+        {
+            if (!AssetDatabase.IsValidFolder(MixamoFolder))
+            {
+                return new[] { $"Folder missing: {MixamoFolder}" };
+            }
+
+            return RequiredFiles
+                .Select(f => $"{MixamoFolder}/{f}")
+                .Where(p => !File.Exists(p))
+                .ToArray();
         }
     }
 }

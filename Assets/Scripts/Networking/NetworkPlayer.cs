@@ -92,6 +92,13 @@ namespace SurvivalRPG.Networking
             SetChildLayers(transform, gameObject.layer);
 
             SetupCamera();
+
+            // Visual diagnostics (one-time): helps detect Mixamo vs fallback usage quickly.
+            var visualRoot = transform.Find("VisualRoot");
+            int skinnedCount = GetComponentsInChildren<SkinnedMeshRenderer>(includeInactive: true).Length;
+            string visualChild = (visualRoot != null && visualRoot.childCount > 0) ? visualRoot.GetChild(0).name : "(none)";
+            Debug.Log($"[NetworkPlayer] Visual diagnostics: VisualRoot={(visualRoot != null)} child='{visualChild}' SkinnedMeshRenderers={skinnedCount}");
+
             _initialized = true;
         }
 

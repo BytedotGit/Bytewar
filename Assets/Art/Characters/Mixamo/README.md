@@ -14,6 +14,14 @@ The project will **auto-detect** whether the required Mixamo files exist:
 - If present, generators will process and prefer the Mixamo character/animations.
 - If missing, the project uses **procedural fallback** visuals and **placeholder** animation clips.
 
+## Diagnostics
+
+In Unity, you can run:
+
+`SurvivalRPG/Diagnostics/Mixamo/Report Status`
+
+If Mixamo files exist locally but the game is still showing the fallback model, the Editor will automatically regenerate the animator + prefabs on startup (once per Editor session).
+
 ## Expected files (if you import Mixamo)
 
 - `Character.fbx`
