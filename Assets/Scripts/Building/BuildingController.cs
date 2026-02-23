@@ -268,6 +268,26 @@ namespace ByteWar.Building
             }
 
             OnBuildingPlaced?.Invoke(recipe.PieceType, position);
+
+            // Broadcast VFX + audio to all clients
+            PlayBuildingEffectClientRpc(position);
+
+            // Raise event bus channel — AudioManager and VFXManager subscribe to this
+            GameEventBus.BuildingPlaced.Raise(new BuildingPlacedEvent
+            {
+                PieceType = (int)recipe.PieceType,
+                Position  = position
+            });
+        }
+
+        [ClientRpc]
+        private void PlayBuildingEffectClientRpc(Vector3 position)
+        {
+            Debug.Log($"[BuildingController] PlayBuildingEffectClientRpc at {position}");
+            if (Core.VFXManager.Instance != null)
+                Core.VFXManager.Instance.PlayEffectLocal(Core.VFXType.BuildingPlace, position);
+            if (Core.AudioManager.Instance != null)
+                Core.AudioManager.Instance.PlaySFX(Core.SFXType.BuildingPlace, position);
         }
 
         // ── Remove / Repair ───────────────────────────────────────────────────────

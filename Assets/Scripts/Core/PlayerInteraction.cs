@@ -143,12 +143,21 @@ namespace ByteWar.Core
                 {
                     Debug.Log($"[{nameof(PlayerInteraction)}] Server: ClientId {rpcParams.Receive.SenderClientId} melee-attacking '{enemy.gameObject.name}'.");
                     enemy.TakeDamage(GameConstants.GetMeleeDamage());
+                    PlayMeleeHitClientRpc(enemy.transform.position);
                 }
             }
             else
             {
                 Debug.LogWarning($"[{nameof(PlayerInteraction)}] Server: EnemyAI NetworkObjectId {enemyNetworkObjectId} not found.");
             }
+        }
+
+        [ClientRpc]
+        private void PlayMeleeHitClientRpc(Vector3 pos)
+        {
+            Debug.Log($"[PlayerInteraction] PlayMeleeHitClientRpc at {pos}");
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX(SFXType.MeleeHit, pos);
         }
 
         [ServerRpc]

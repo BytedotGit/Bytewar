@@ -74,8 +74,19 @@ namespace ByteWar.Survival
                     Debug.LogWarning("[FireballProjectile] No DamageEffect assigned — used flat 25 damage fallback.");
                 }
 
+                PlayHitEffectClientRpc(transform.position);
                 DespawnSafe();
             }
+        }
+
+        [ClientRpc]
+        private void PlayHitEffectClientRpc(Vector3 pos)
+        {
+            Debug.Log($"[FireballProjectile] PlayHitEffectClientRpc at {pos}");
+            if (Core.VFXManager.Instance != null)
+                Core.VFXManager.Instance.PlayEffectLocal(Core.VFXType.FireballImpact, pos);
+            if (Core.AudioManager.Instance != null)
+                Core.AudioManager.Instance.PlaySFX(Core.SFXType.FireballImpact, pos);
         }
 
         private void DespawnSafe()

@@ -165,8 +165,14 @@ namespace ByteWar.Abilities
             }
             _cooldowns[ability.AbilityName] = actualCooldown;
 
-            // Play visual effects on clients
-            Debug.Log($"Playing VFX for {ability.AbilityName} at {targetPosition}");
+            // Play visual + audio effects on all clients
+            Debug.Log($"[AbilitySystemComponent] Playing VFX/SFX for {ability.AbilityName} at {targetPosition}");
+
+            if (Core.VFXManager.Instance != null)
+                Core.VFXManager.Instance.PlayEffectLocal(Core.VFXType.FireballMuzzle, targetPosition);
+
+            if (Core.AudioManager.Instance != null)
+                Core.AudioManager.Instance.PlaySFX(Core.SFXType.FireballCast, targetPosition);
         }
 
         public float GetRemainingCooldown(string abilityName)

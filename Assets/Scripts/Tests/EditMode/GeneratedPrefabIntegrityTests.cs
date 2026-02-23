@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using ByteWar.Core;
 
 namespace ByteWar.Tests.EditMode
 {
@@ -68,6 +69,42 @@ namespace ByteWar.Tests.EditMode
 
                 float expected = cc.height * 0.5f;
                 Assert.AreEqual(expected, cc.center.y, 0.001f, "CharacterController.center.y should be height/2.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
+        }
+
+        [Test]
+        public void NetworkPlayerPrefab_HasFootstepController()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/GeneratedPrefabs/NetworkPlayer.prefab");
+            Assert.IsNotNull(prefab, "NetworkPlayer.prefab not found. Run Generate All.");
+
+            var instance = Object.Instantiate(prefab);
+            try
+            {
+                var fc = instance.GetComponent<FootstepController>();
+                Assert.IsNotNull(fc, "FootstepController missing on NetworkPlayer prefab. Run Generate Prefabs.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
+        }
+
+        [Test]
+        public void NetworkPlayerPrefab_HasAudioSource()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/GeneratedPrefabs/NetworkPlayer.prefab");
+            Assert.IsNotNull(prefab, "NetworkPlayer.prefab not found. Run Generate All.");
+
+            var instance = Object.Instantiate(prefab);
+            try
+            {
+                var src = instance.GetComponent<AudioSource>();
+                Assert.IsNotNull(src, "AudioSource missing on NetworkPlayer prefab. Run Generate Prefabs.");
             }
             finally
             {

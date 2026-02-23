@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Visuals & Audio Polish (Phase 15)
+
+- **VFXManager**: NetworkBehaviour singleton with 6 typed prefab slots. Server calls `PlayEffect()`, broadcasts `PlayEffectClientRpc` to all clients. Wired into fireball cast/impact, resource gathering, building placement, item pickup.
+- **VFXPrefabGenerator**: Editor tool that procedurally creates particle prefabs for each `VFXType` at build time.
+- **AudioManager**: NetworkBehaviour singleton with `SFXType` enum and synthesized AudioClips via `AudioClipGenerator`. Supports 3D/2D playback.
+- **FootstepController**: MonoBehaviour on `NetworkPlayer` that plays footstep sounds driven by CharacterController velocity. AudioSource wired on the player prefab.
+- **PostProcessingSetup**: Editor-only static class. Creates a `PostProcessProfile` with Bloom + Color Grading, adds a global `PostProcessVolume`, and attaches `PostProcessLayer` with TAA to the Main Camera. Called by `SceneGenerator`.
+- **Asmdef**: `ByteWar.Editor` asmdef now references `Unity.Postprocessing.Runtime` explicitly with `UNITY_POST_PROCESSING_STACK_V2` version define guard.
+- **PrefabGenerator**: `NetworkPlayer` prefab now includes `FootstepController` and a spatialBlend=0 `AudioSource`.
+- **Tests**: 8 new EditMode tests (VFX/Audio type coverage, manager lifecycle, singleton, local playback). 2 new PlayMode smoke tests. 2 new prefab integrity tests. AutoTester extended with 4 new PASS checks.
+- **Results**: EditMode 72/72 ✅ | PlayMode 18/18 ✅ | Build 95 MB ✅ | AutoTest 12/12 PASS ✅
+
 ### Project Rename: SurvivalRPG → ByteWar (Phase 1)
 
 - **Rename**: Project renamed from SurvivalRPG to ByteWar across all code, assets, and documentation.

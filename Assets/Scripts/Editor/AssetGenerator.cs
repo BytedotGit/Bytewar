@@ -102,6 +102,12 @@ namespace ByteWar.Editor
             }
             CreateAsset<GameConstants>($"{resourcesPath}/GameConstants.asset");
 
+            // Generate procedural SFX clips (WAV synthesis)
+            AudioClipGenerator.GenerateAudioClips();
+
+            // Generate VFX prefabs (particle systems)
+            VFXPrefabGenerator.GenerateVFXPrefabs();
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 

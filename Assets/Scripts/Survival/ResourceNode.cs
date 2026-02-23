@@ -71,6 +71,8 @@ namespace ByteWar.Survival
             Health.Value -= amount;
             Debug.Log($"[ResourceNode] {gameObject.name} took {amount} damage. Remaining health: {Health.Value}");
 
+            PlayGatherHitClientRpc(transform.position);
+
             if (Health.Value <= 0)
             {
                 Die(gatherer);
@@ -80,10 +82,27 @@ namespace ByteWar.Survival
         private void Die(InventoryComponent gatherer)
         {
             Debug.Log($"[ResourceNode] {gameObject.name} destroyed. Dropping items.");
+            PlayResourceDeathClientRpc(transform.position);
             DropItems(gatherer);
 
             // Despawn and destroy the network object
             NetworkObject.Despawn(true);
+        }
+
+        [ClientRpc]
+        private void PlayGatherHitClientRpc(Vector3 pos)
+        {
+            Debug.Log($"[ResourceNode] PlayGatherHitClientRpc at {pos}");
+            if (Core.VFXManager.Instance != null)
+                Core.VFXManager.Instance.PlayEffectLocal(Core.VFXType.GatherHit, pos);
+        }
+
+        [ClientRpc]
+        private void PlayResourceDeathClientRpc(Vector3 pos)
+        {
+            Debug.Log($"[ResourceNode] PlayResourceDeathClientRpc at {pos}");
+            if (Core.VFXManager.Instance != null)
+                Core.VFXManager.Instance.PlayEffectLocal(Core.VFXType.ResourceDeath, pos);
         }
 
         private void DropItems(InventoryComponent gatherer)

@@ -6,7 +6,8 @@
         "Unity.Netcode.Runtime",
         "Unity.Netcode.Editor",
         "Unity.Cinemachine",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.Postprocessing.Runtime"
     ],
     "includePlatforms": [
         "Editor"
@@ -17,6 +18,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.postprocessing",
+            "expression": "",
+            "define": "UNITY_POST_PROCESSING_STACK_V2"
+        }
+    ],
     "noEngineReferences": false
 }

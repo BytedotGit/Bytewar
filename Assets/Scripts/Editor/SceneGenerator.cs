@@ -125,7 +125,17 @@ namespace ByteWar.Editor
             GameObject loggerObj = new GameObject("ScreenLogger");
             loggerObj.AddComponent<ByteWar.Core.ScreenLogger>();
             Debug.Log("[SceneGenerator] ScreenLogger added (toggle with F1).");
-            // ── 11. Scatter greybox environment props ────────────────────────────
+
+            // ── 11. VFXManager ──────────────────────────────────────────────────
+            SpawnVFXManager();
+
+            // ── 12. AudioManager ────────────────────────────────────────────────
+            SpawnAudioManager();
+
+            // ── 13. Post-Processing ─────────────────────────────────────────────
+            PostProcessingSetup.SetupPostProcessInternal();
+
+            // ── 14. Scatter greybox environment props ────────────────────────────
             GenerateGreyboxProps();
 
             // ── Save ──────────────────────────────────────────────────────────────
@@ -239,6 +249,31 @@ namespace ByteWar.Editor
             wall.transform.position = pos;
             wall.transform.localScale = scale;
             wall.GetComponent<Renderer>().sharedMaterial = mat;
+        }
+
+        // ── VFXManager instantiation ──────────────────────────────────────────────
+
+        private static void SpawnVFXManager()
+        {
+            GameObject vfxManagerObj = new GameObject("VFXManager");
+            vfxManagerObj.AddComponent<Unity.Netcode.NetworkObject>();
+            var vfxManager = vfxManagerObj.AddComponent<ByteWar.Core.VFXManager>();
+
+            var (muzzle, impact, gather, resDeath, building, pickup) =
+                VFXPrefabGenerator.GetOrGeneratePrefabs();
+
+            vfxManager.SetPrefabs(muzzle, impact, gather, resDeath, building, pickup);
+
+            Debug.Log($"[SceneGenerator] VFXManager added. allPrefabsAssigned={vfxManager.AllPrefabsAssigned}");
+        }
+
+        // ── AudioManager instantiation ────────────────────────────────────────────
+
+        private static void SpawnAudioManager()
+        {
+            GameObject audioManagerObj = new GameObject("AudioManager");
+            audioManagerObj.AddComponent<ByteWar.Core.AudioManager>();
+            Debug.Log("[SceneGenerator] AudioManager added.");
         }
 
         private static void GenerateGreyboxProps()

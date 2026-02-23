@@ -533,6 +533,48 @@ namespace ByteWar.Core
 
             Debug.Log("[AutoTester] PASS: Building system sanity.");
 
+            // --- VFX & Audio system sanity ---
+            var vfxManager = UnityEngine.Object.FindFirstObjectByType<VFXManager>();
+            if (vfxManager == null)
+            {
+                Debug.LogError("[AutoTester] FAIL: VFXManager not found in scene. Run Generate Scene.");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(41);
+                yield break;
+            }
+            Debug.Log($"[AutoTester] VFX sanity: VFXManager present. allPrefabsAssigned={vfxManager.AllPrefabsAssigned}");
+            Debug.Log("[AutoTester] PASS: VFXManager present in scene.");
+
+            var audioManager = UnityEngine.Object.FindFirstObjectByType<AudioManager>();
+            if (audioManager == null)
+            {
+                Debug.LogError("[AutoTester] FAIL: AudioManager not found in scene. Run Generate Scene.");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(42);
+                yield break;
+            }
+            Debug.Log("[AutoTester] PASS: AudioManager present in scene.");
+
+            var footstep = localPlayer.GetComponent<FootstepController>();
+            if (footstep == null)
+            {
+                Debug.LogError("[AutoTester] FAIL: FootstepController missing on local player. Run Generate Prefabs.");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(43);
+                yield break;
+            }
+            Debug.Log("[AutoTester] PASS: Player has FootstepController.");
+
+            var playerAudioSource = localPlayer.GetComponent<AudioSource>();
+            if (playerAudioSource == null)
+            {
+                Debug.LogError("[AutoTester] FAIL: AudioSource missing on local player. Run Generate Prefabs.");
+                yield return new WaitForSeconds(0.25f);
+                Application.Quit(44);
+                yield break;
+            }
+            Debug.Log("[AutoTester] PASS: Player has AudioSource.");
+
             // Verify real input subsystem is alive (this catches the common regression where simulated input passes).
             inputHandler.EnsureActionsEnabled("AutoTester preflight");
             bool hasKeyboard = Keyboard.current != null;

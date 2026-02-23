@@ -41,6 +41,11 @@ namespace ByteWar.Editor
             playerObj.AddComponent<PlayerMovement>();
             playerObj.AddComponent<PlayerVisualSetup>();
             playerObj.AddComponent<NetworkPlayer>();
+            playerObj.AddComponent<FootstepController>();
+            // AudioSource needed for FootstepController and local 2D sounds
+            var playerAudioSource = playerObj.AddComponent<AudioSource>();
+            playerAudioSource.spatialBlend = 0f;
+            playerAudioSource.playOnAwake = false;
             Animator animator = playerObj.AddComponent<Animator>();
             ClientNetworkAnimator netAnimator = playerObj.AddComponent<ClientNetworkAnimator>();
             netAnimator.Animator = animator;
