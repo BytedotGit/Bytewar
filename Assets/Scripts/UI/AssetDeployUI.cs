@@ -46,7 +46,6 @@ namespace ByteWar.UI
         private bool _prevCursorVisible;
 
         private bool _inputSuppressed;
-        private bool _prevInputSuppressed;
         private PlayerInputHandler _cachedInputHandler;
         private float _nextInputHandlerSearchTime;
 
@@ -122,9 +121,12 @@ namespace ByteWar.UI
             float w = Mathf.Min(720f, Screen.width - (pad * 2f));
             float h = Mathf.Min(520f, Screen.height - (pad * 2f));
 
-            GUI.Box(new Rect(pad, pad, w, h), string.Empty);
+            float x = Mathf.Max(pad, (Screen.width - w) * 0.5f);
+            float y = Mathf.Max(pad, (Screen.height - h) * 0.5f);
 
-            GUILayout.BeginArea(new Rect(pad + 10f, pad + 10f, w - 20f, h - 20f));
+            GUI.Box(new Rect(x, y, w, h), string.Empty);
+
+            GUILayout.BeginArea(new Rect(x + 10f, y + 10f, w - 20f, h - 20f));
             GUILayout.Label("Asset Deploy (hold Shift+Tab)", _headerStyle);
 
             GUILayout.Space(6f);
@@ -786,8 +788,7 @@ namespace ByteWar.UI
             if (_cachedInputHandler == null)
                 return;
 
-            _prevInputSuppressed = _cachedInputHandler.InputSuppressed;
-            _cachedInputHandler.InputSuppressed = true;
+            _cachedInputHandler.SetInputSuppressed(this, true);
             _inputSuppressed = true;
         }
 
@@ -797,7 +798,7 @@ namespace ByteWar.UI
             _inputSuppressed = false;
 
             if (_cachedInputHandler != null)
-                _cachedInputHandler.InputSuppressed = _prevInputSuppressed;
+                _cachedInputHandler.SetInputSuppressed(this, false);
         }
 
         private sealed class FolderNode

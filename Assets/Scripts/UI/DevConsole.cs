@@ -207,7 +207,7 @@ namespace ByteWar.UI
 
             if (_cachedInputHandler != null)
             {
-                _cachedInputHandler.InputSuppressed = _isOpen;
+                _cachedInputHandler.SetInputSuppressed(this, _isOpen);
             }
         }
 
@@ -216,7 +216,7 @@ namespace ByteWar.UI
             // Ensure input is restored when console is destroyed
             if (_cachedInputHandler != null)
             {
-                _cachedInputHandler.InputSuppressed = false;
+                _cachedInputHandler.SetInputSuppressed(this, false);
             }
         }
 

@@ -20,12 +20,18 @@ All notable changes to this project are documented here.
 
 - `AssetDeployUI` now shows a folder/subfolder browser (mirrors `Resources` paths) with preview thumbnails loaded from `Resources`.
 - Keybind changed to **hold Shift+Tab** to open; releasing either key hides the UI.
+- Shift+Tab deploy UI panel is now centered on screen.
 
 ### Controls + Blender Solidity Fix
 
 - Camera controls updated: LMB hold+drag orbits camera without changing character facing; RMB hold+drag orbits camera and drives character facing (WoW-style).
 - Movement updated: without RMB, A/D turns (no strafe) and movement is relative to facing; with RMB, movement is camera-relative with strafe.
+- Fixed gameplay input getting stuck suppressed when multiple overlays are involved (e.g., DevConsole + AssetDeployUI), restoring WASD/Space and other keybindings.
 - Blender E2E prop collider generation hardened (baked transforms + bounds validation) to prevent players standing inside solid props.
+
+### DevConsole
+
+- Hardened `/dev` DevMode toggle by making `GameConstants.Instance` fall back to transient defaults when the `Resources` asset is missing (prevents AutoTester regressions).
 
 ### Valheim-Style Pure Nearest-Pair Snap Algorithm
 

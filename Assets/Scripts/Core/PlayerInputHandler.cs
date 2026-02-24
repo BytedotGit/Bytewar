@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 namespace ByteWar.Core
 {
@@ -21,11 +22,62 @@ namespace ByteWar.Core
         public bool JumpTriggered { get; private set; }
 
         /// <summary>When true, all gameplay input is suppressed (e.g., console is open).</summary>
-        public bool InputSuppressed { get; set; }
+        public bool InputSuppressed
+        {
+            get
+            {
+                PruneSuppressionOwnersIfNeeded();
+                return _legacySuppressed || _suppressionOwners.Count > 0;
+            }
+            set
+            {
+                // Legacy path (tests or older code). Prefer SetInputSuppressed(owner, ...).
+                _legacySuppressed = value;
+            }
+        }
+
+        private bool _legacySuppressed;
+        private readonly HashSet<object> _suppressionOwners = new();
+        private readonly List<object> _suppressionPruneBuffer = new();
+        private float _nextSuppressionPruneTime;
 
         private float _nextMoveLogTime;
         private Vector2 _lastLoggedMove;
         private bool _isSimulated;
+
+        /// <summary>
+        /// Reference-counted gameplay input suppression.
+        /// Use a stable owner token (typically <c>this</c>) so multiple overlays can
+        /// suppress input without stomping each other.
+        /// </summary>
+        public void SetInputSuppressed(object owner, bool suppressed)
+        {
+            if (owner == null)
+                return;
+
+            if (suppressed)
+                _suppressionOwners.Add(owner);
+            else
+                _suppressionOwners.Remove(owner);
+        }
+
+        private void PruneSuppressionOwnersIfNeeded()
+        {
+            if (Time.unscaledTime < _nextSuppressionPruneTime)
+                return;
+
+            _nextSuppressionPruneTime = Time.unscaledTime + 1f;
+
+            _suppressionPruneBuffer.Clear();
+            foreach (var owner in _suppressionOwners)
+            {
+                if (owner is Object uo && uo == null)
+                    _suppressionPruneBuffer.Add(owner);
+            }
+
+            for (int i = 0; i < _suppressionPruneBuffer.Count; i++)
+                _suppressionOwners.Remove(_suppressionPruneBuffer[i]);
+        }
 
         private void Awake()
         {

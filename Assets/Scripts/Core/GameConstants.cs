@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace ByteWar.Core
@@ -45,6 +46,7 @@ namespace ByteWar.Core
 
         // ── Runtime singleton accessor ────────────────────────────────────────
         private static GameConstants _instance;
+        private static Func<GameConstants> _resourcesLoaderOverride;
 
         public static GameConstants Instance
         {
@@ -52,9 +54,21 @@ namespace ByteWar.Core
             {
                 if (_instance == null)
                 {
-                    _instance = Resources.Load<GameConstants>("GameConstants");
-                    if (_instance == null)
-                        Debug.LogWarning("[GameConstants] GameConstants asset not found in Resources/. Using defaults.");
+                    var loaded = _resourcesLoaderOverride != null
+                        ? _resourcesLoaderOverride()
+                        : Resources.Load<GameConstants>("GameConstants");
+
+                    if (loaded != null)
+                    {
+                        _instance = loaded;
+                    }
+                    else
+                    {
+                        // If the asset is missing from Resources in a build, fall back to a transient instance
+                        // so runtime toggles (e.g., /dev) can still function deterministically.
+                        _instance = CreateInstance<GameConstants>();
+                        Debug.LogWarning("[GameConstants] GameConstants asset not found in Resources/. Using transient defaults.");
+                    }
                 }
                 return _instance;
             }
@@ -91,6 +105,15 @@ namespace ByteWar.Core
         internal static void SetInstanceForTesting(GameConstants instance)
         {
             _instance = instance;
+        }
+
+        /// <summary>
+        /// Override the Resources loader for deterministic tests. Pass null to restore default loader.
+        /// </summary>
+        internal static void SetResourcesLoaderForTesting(Func<GameConstants> loader)
+        {
+            _resourcesLoaderOverride = loader;
+            _instance = null;
         }
     }
 }

@@ -22,6 +22,7 @@ namespace ByteWar.Tests.EditMode
         [TearDown]
         public void TearDown()
         {
+            GameConstants.SetResourcesLoaderForTesting(null);
             GameConstants.SetInstanceForTesting(_savedInstance);
         }
 
@@ -72,6 +73,21 @@ namespace ByteWar.Tests.EditMode
             Assert.IsFalse(GameConstants.IsDevMode(), "DevMode should be false after SetDevMode(false).");
 
             Object.DestroyImmediate(gc);
+        }
+
+        [Test]
+        public void GameConstants_SetDevMode_Works_WhenResourcesAssetMissing()
+        {
+            // Force Instance loader to behave as-if the Resources asset is missing.
+            GameConstants.SetResourcesLoaderForTesting(() => null);
+
+            Assert.IsFalse(GameConstants.IsDevMode(), "DevMode should start false with transient defaults.");
+
+            GameConstants.SetDevMode(true);
+            Assert.IsTrue(GameConstants.IsDevMode(), "DevMode should be true after SetDevMode(true) even if asset is missing.");
+
+            GameConstants.SetDevMode(false);
+            Assert.IsFalse(GameConstants.IsDevMode(), "DevMode should be false after SetDevMode(false) even if asset is missing.");
         }
 
         // ── DevConsole ───────────────────────────────────────────────────────
