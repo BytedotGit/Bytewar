@@ -30,6 +30,7 @@ namespace ByteWar.Editor
             GameObject resDeath  = CreateVFXPrefab("ResourceDeath",         25, new Color(0.45f, 0.40f, 0.35f), new Color(0.35f, 0.30f, 0.25f), 0.8f, 3f,  8f,  burst: true);
             GameObject building  = CreateVFXPrefab("BuildingPlace",         18, new Color(0.75f, 0.65f, 0.50f), new Color(0.85f, 0.75f, 0.60f), 0.6f, 2.5f, 4f, burst: true);
             GameObject pickup    = CreateVFXPrefab("ItemPickup",             8, new Color(1.0f, 0.85f, 0.0f),  new Color(1.0f, 1.0f, 0.50f),  0.5f, 1.2f, 6f,  burst: true);
+            GameObject cleave    = CreateVFXPrefab("CleaveHit",             20, new Color(0.80f, 0.80f, 0.85f), new Color(0.60f, 0.60f, 0.70f), 0.4f, 3f,  12f, burst: true);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -40,7 +41,8 @@ namespace ByteWar.Editor
         // ── Returns the 6 generated prefabs for wiring into VFXManager ────────────
 
         public static (GameObject muzzle, GameObject impact, GameObject gather,
-                       GameObject resDeath, GameObject building, GameObject pickup)
+                       GameObject resDeath, GameObject building, GameObject pickup,
+                       GameObject cleave)
         GetOrGeneratePrefabs()
         {
             if (!AssetDatabase.IsValidFolder(VFXFolder)) GenerateVFXPrefabs();
@@ -50,7 +52,8 @@ namespace ByteWar.Editor
                 Load("GatherHit"),
                 Load("ResourceDeath"),
                 Load("BuildingPlace"),
-                Load("ItemPickup")
+                Load("ItemPickup"),
+                Load("CleaveHit")
             );
         }
 

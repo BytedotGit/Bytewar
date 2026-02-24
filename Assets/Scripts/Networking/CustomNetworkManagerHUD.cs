@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Unity.Netcode;
+using ByteWar.Core;
 
 namespace ByteWar.Networking
 {
@@ -144,19 +145,22 @@ namespace ByteWar.Networking
             bool hasTransport = config.NetworkTransport != null;
             bool hasPrefab = config.PlayerPrefab != null;
 
-            // Diagnostics
-            GUI.color = hasTransport ? Color.green : Color.red;
-            GUILayout.Label($"Transport: {(hasTransport ? config.NetworkTransport.GetType().Name : "MISSING")}", _labelStyle);
-            GUI.color = hasPrefab ? Color.green : Color.red;
-            GUILayout.Label($"PlayerPrefab: {(hasPrefab ? config.PlayerPrefab.name : "MISSING")}", _labelStyle);
-            GUI.color = Color.white;
-
-            // Status message
-            if (_statusMsg.Length > 0)
+            // Diagnostics (DevMode only)
+            if (GameConstants.IsDevMode())
             {
-                GUI.color = _statusColor;
-                GUILayout.Label(_statusMsg, _statusMsg.Contains("ERROR") ? _errorStyle : _labelStyle);
+                GUI.color = hasTransport ? Color.green : Color.red;
+                GUILayout.Label($"Transport: {(hasTransport ? config.NetworkTransport.GetType().Name : "MISSING")}", _labelStyle);
+                GUI.color = hasPrefab ? Color.green : Color.red;
+                GUILayout.Label($"PlayerPrefab: {(hasPrefab ? config.PlayerPrefab.name : "MISSING")}", _labelStyle);
                 GUI.color = Color.white;
+
+                // Status message
+                if (_statusMsg.Length > 0)
+                {
+                    GUI.color = _statusColor;
+                    GUILayout.Label(_statusMsg, _statusMsg.Contains("ERROR") ? _errorStyle : _labelStyle);
+                    GUI.color = Color.white;
+                }
             }
 
             GUILayout.Space(10);
@@ -212,11 +216,14 @@ namespace ByteWar.Networking
                 }
             }
 
-            GUILayout.Space(10);
-            GUI.color = new Color(1, 1, 1, 0.6f);
-            GUILayout.Label("RMB drag = orbit  |  Scroll = zoom", _labelStyle);
-            GUILayout.Label("WASD = move  |  ESC = show cursor", _labelStyle);
-            GUI.color = Color.white;
+            if (GameConstants.IsDevMode())
+            {
+                GUILayout.Space(10);
+                GUI.color = new Color(1, 1, 1, 0.6f);
+                GUILayout.Label("RMB drag = orbit  |  Scroll = zoom", _labelStyle);
+                GUILayout.Label("WASD = move  |  ESC = show cursor", _labelStyle);
+                GUI.color = Color.white;
+            }
         }
 
         private void DrawStatusLabels()
@@ -237,11 +244,14 @@ namespace ByteWar.Networking
                 SetStatus("Disconnected.", Color.yellow);
             }
 
-            GUILayout.Space(10);
-            GUI.color = new Color(1, 1, 1, 0.6f);
-            GUILayout.Label("RMB drag = orbit  |  Scroll = zoom", _labelStyle);
-            GUILayout.Label("WASD = move  |  ESC = show cursor", _labelStyle);
-            GUI.color = Color.white;
+            if (GameConstants.IsDevMode())
+            {
+                GUILayout.Space(10);
+                GUI.color = new Color(1, 1, 1, 0.6f);
+                GUILayout.Label("RMB drag = orbit  |  Scroll = zoom", _labelStyle);
+                GUILayout.Label("WASD = move  |  ESC = show cursor", _labelStyle);
+                GUI.color = Color.white;
+            }
         }
     }
 }

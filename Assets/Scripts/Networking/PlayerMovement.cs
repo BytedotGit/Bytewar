@@ -27,6 +27,8 @@ namespace ByteWar.Networking
         private float _verticalVelocity;
         private float _nextMoveLogTime;
         private bool _initialized;
+        private bool _groundedAtMoveStart;
+        private bool _wasGroundedLastFrame;
 
         // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -68,11 +70,25 @@ namespace ByteWar.Networking
             HandleAbilities();
         }
 
+        private void LateUpdate()
+        {
+            if (!IsSpawned || !IsOwner || !_initialized) return;
+            if (_cc == null || _inputHandler == null) return;
+
+            // If the frame began airborne, discard any jump press that happened later
+            // in the same frame. This prevents a mid-air Space press from being buffered
+            // into a jump on the first grounded frame due to script execution order.
+            if (!_groundedAtMoveStart)
+                _inputHandler.ConsumeJump();
+        }
+
         // ── Movement ──────────────────────────────────────────────────────────────
 
         private void HandleMovement()
         {
             Vector2 input = _inputHandler.MovementInput;
+
+            _groundedAtMoveStart = _cc.isGrounded;
 
             if (input.sqrMagnitude > 0.01f && Time.unscaledTime >= _nextMoveLogTime)
             {
@@ -87,24 +103,57 @@ namespace ByteWar.Networking
                 input.y = Mathf.Max(input.y, 1f);
             }
 
-            // Camera-relative move direction (flat)
+            bool rmbHeld = _camController != null && _camController.IsRightMouseHeld;
+
+            // WoW-style movement semantics:
+            // - Without RMB: A/D turns (no strafe). Movement is relative to current facing.
+            // - With RMB: A/D strafes. Movement is camera-relative, and facing follows camera yaw.
             float camYaw = _camController != null ? _camController.CameraYaw : transform.eulerAngles.y;
-            Quaternion camRot = Quaternion.Euler(0f, camYaw, 0f);
-            Vector3 moveDir = camRot * new Vector3(input.x, 0f, input.y);
+
+            if (!rmbHeld)
+            {
+                float yawDelta = input.x * GameConstants.GetKeyboardTurnSpeedDegPerSec() * Time.deltaTime;
+                if (Mathf.Abs(yawDelta) > 0.0001f)
+                {
+                    Vector3 e = transform.eulerAngles;
+                    transform.rotation = Quaternion.Euler(0f, e.y + yawDelta, 0f);
+                }
+
+                // No strafing when RMB is not held.
+                input.x = 0f;
+            }
+
+            float basisYaw = rmbHeld ? camYaw : transform.eulerAngles.y;
+            Quaternion basisRot = Quaternion.Euler(0f, basisYaw, 0f);
+            Vector3 moveDir = basisRot * new Vector3(input.x, 0f, input.y);
             bool isMoving = moveDir.magnitude > 0.05f;
 
             // Gravity and Jumping
             if (_cc.isGrounded)
             {
                 _verticalVelocity = -1f;
-                if (_inputHandler.ConsumeJump())
+
+                // Do not allow a jump on the very first grounded frame after being airborne.
+                // This prevents mid-air Space presses from being buffered into an auto-jump on landing.
+                if (_wasGroundedLastFrame)
                 {
-                    _verticalVelocity = GameConstants.GetJumpForce();
-                    if (_netAnimator != null) _netAnimator.SetTrigger("Jump");
+                    if (_inputHandler.ConsumeJump())
+                    {
+                        _verticalVelocity = GameConstants.GetJumpForce();
+                        if (_netAnimator != null) _netAnimator.SetTrigger("Jump");
+                    }
+                }
+                else
+                {
+                    // Clear any queued jump input on landing.
+                    _inputHandler.ConsumeJump();
                 }
             }
             else
             {
+                // Discard mid-air jump presses so they don't get buffered and trigger
+                // an automatic jump on the next grounded frame.
+                _inputHandler.ConsumeJump();
                 _verticalVelocity += GameConstants.GetGravity() * Time.deltaTime;
             }
 
@@ -112,18 +161,31 @@ namespace ByteWar.Networking
             velocity.y = _verticalVelocity;
             _cc.Move(velocity * Time.deltaTime);
 
+            // CharacterController.isGrounded is updated by Move(); store for next frame.
+            _wasGroundedLastFrame = _cc.isGrounded;
+
             // Rotation
-            if (isMoving)
+            if (rmbHeld)
+            {
+                // RMB held: face travel direction when moving diagonally forward (W+A / W+D),
+                // otherwise keep classic camera-yaw facing (strafing/backpedal).
+                if (ShouldFaceMoveDirectionWhenRmbHeld(input, isMoving))
+                {
+                    Quaternion targetRot = Quaternion.LookRotation(moveDir.normalized);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
+                                                          Time.deltaTime * GameConstants.GetTurnSpeed());
+                }
+                else
+                {
+                    Quaternion faceCam = Quaternion.Euler(0f, camYaw, 0f);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, faceCam,
+                                                          Time.deltaTime * GameConstants.GetTurnSpeed());
+                }
+            }
+            else if (isMoving)
             {
                 Quaternion targetRot = Quaternion.LookRotation(moveDir.normalized);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
-                                                        Time.deltaTime * GameConstants.GetTurnSpeed());
-            }
-            else if (_camController != null && _camController.IsRightMouseHeld)
-            {
-                // Standing + RMB: face camera yaw (WoW behaviour)
-                Quaternion faceCam = Quaternion.Euler(0f, camYaw, 0f);
-                transform.rotation = Quaternion.Slerp(transform.rotation, faceCam,
                                                       Time.deltaTime * GameConstants.GetTurnSpeed());
             }
 
@@ -132,6 +194,13 @@ namespace ByteWar.Networking
                 _animator.SetFloat("Speed", isMoving ? moveDir.magnitude * GameConstants.GetMoveSpeed() : 0f);
                 _animator.SetBool("IsGrounded", _cc.isGrounded);
             }
+        }
+
+        internal static bool ShouldFaceMoveDirectionWhenRmbHeld(Vector2 input, bool isMoving)
+        {
+            // Requested behavior: W+A / W+D should turn to face the actual diagonal travel direction.
+            // Preserve classic WoW: pure strafing and backpedal do not rotate to movement direction.
+            return isMoving && input.y > 0.01f && Mathf.Abs(input.x) > 0.01f;
         }
 
         // ── Abilities ─────────────────────────────────────────────────────────────

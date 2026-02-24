@@ -21,12 +21,20 @@ applyTo: "Assets/Scripts/**/*.cs"
 - You MUST include extensive logging (`Debug.Log`, `Debug.LogWarning`, `Debug.LogError`) in all implemented logic.
 - Logs must provide full visibility into the state and flow, especially for networked events (e.g., include `NetworkObjectId`, `ClientId`, and GameObject names).
 
-## 4. File Size Limits (800 LOC)
+## 4. Zero-Failure Enforcement
 
-- No single file should ever exceed 800 lines of code.
-- If your implementation pushes a file near or over this limit, you MUST refactor and split the class into smaller, modular components.
+- **Any failing test (EditMode or PlayMode) is a blocking failure.** You MUST NOT proceed to the next task, report completion, or ask the user to test until ALL tests pass — zero failures, zero unhandled log errors.
+- If a test starts failing because of your changes, fix it immediately before moving on.
+- If a pre-existing test is failing, fix it as part of your current session — do not ignore it.
 
-## 5. AI Self-Testing Loop
+## 5. Feature-Specific AutoTester Scenarios
+
+- **Every user-facing feature change MUST have a corresponding AutoTester scenario** that emits a PASS marker. Core sanity (movement, camera, grounding) is not sufficient.
+- When implementing a new feature, add or extend an AutoTester scenario that validates the feature at runtime (e.g., building prefab counts, ability effects, UI presence).
+- AutoTester uses `-autoTestScenario <name>` arguments. If `-autoTest` is present but no scenarios are specified, AutoTester runs ALL registered scenarios.
+- When verifying your work, always run the autoTest with the scenario relevant to your feature and confirm its PASS marker in Player.log.
+
+## 6. AI Self-Testing Loop
 
 - You MUST NOT ask the user to test a build or verify a fix until you have tested it yourself.
 - To test a build, use the terminal to run the Unity batchmode build command.
@@ -36,9 +44,4 @@ applyTo: "Assets/Scripts/**/*.cs"
 - **CRITICAL**: Keep iterating on the code and self-testing until you have achieved the task or resolved the issue.
 - For example, if movement isn't working, identify the issue, resolve it, test the movement in-game (via logs or automated input) to confirm it's working as intended, and ONLY THEN ask the user to test. Apply this logic to everything.
 
-## 6. Defect Tracking (Error Log)
 
-- If a user-visible defect is reported and not fully resolved in the same session, you MUST add/update an entry in `.github/ERROR_LOG.md` with:
-  - exact repro steps
-  - expected vs actual
-  - the most relevant log lines (e.g., from `Player.log`)

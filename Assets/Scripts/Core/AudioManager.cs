@@ -31,6 +31,7 @@ namespace ByteWar.Core
         [SerializeField] private AudioClip _itemPickupClip;
         [SerializeField] private AudioClip _buildingPlaceClip;
         [SerializeField] private AudioClip _uiClickClip;
+        [SerializeField] private AudioClip _cleaveHitClip;
 
         [Header("Audio Sources")]
         [SerializeField] private AudioSource _2DSource;
@@ -85,10 +86,12 @@ namespace ByteWar.Core
             _itemPickupClip    ??= Resources.Load<AudioClip>("SFX/ItemPickup");
             _buildingPlaceClip ??= Resources.Load<AudioClip>("SFX/BuildingPlace");
             _uiClickClip       ??= Resources.Load<AudioClip>("SFX/UIClick");
+            _cleaveHitClip     ??= Resources.Load<AudioClip>("SFX/CleaveHit");
 
             Debug.Log($"[AudioManager] Clips loaded: footstep={_footstepClip != null} melee={_meleeHitClip != null} " +
                       $"fbCast={_fireballCastClip != null} fbImpact={_fireballImpactClip != null} " +
-                      $"pickup={_itemPickupClip != null} building={_buildingPlaceClip != null} ui={_uiClickClip != null}");
+                      $"pickup={_itemPickupClip != null} building={_buildingPlaceClip != null} ui={_uiClickClip != null} " +
+                      $"cleave={_cleaveHitClip != null}");
         }
 
         // ── AudioSource pool ─────────────────────────────────────────────────────
@@ -171,7 +174,7 @@ namespace ByteWar.Core
 
             if (type == SFXType.Footstep || type == SFXType.UIClick)
             {
-                _2DSource.PlayOneShot(clip, type == SFXType.Footstep ? 0.55f : 0.8f);
+                _2DSource.PlayOneShot(clip, type == SFXType.Footstep ? 0.30f : 0.8f);
                 if (type == SFXType.Footstep) FootstepCount++;
                 Debug.Log($"[AudioManager] 2D SFX: {type}");
             }
@@ -196,6 +199,7 @@ namespace ByteWar.Core
             SFXType.ItemPickup     => _itemPickupClip,
             SFXType.BuildingPlace  => _buildingPlaceClip,
             SFXType.UIClick        => _uiClickClip,
+            SFXType.CleaveHit      => _cleaveHitClip,
             _                      => null,
         };
 

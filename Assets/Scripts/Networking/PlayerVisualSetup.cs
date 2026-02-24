@@ -80,13 +80,17 @@ namespace ByteWar.Networking
                 yield break;
 
             const int maxAttempts = 4;
+            const float maxTotalCorrection = 1.0f;
             float totalApplied = 0f;
             string lastDiag = "";
             bool anyApplied = false;
 
             for (int attempt = 0; attempt < maxAttempts; attempt++)
             {
-                bool applied = TryApplyVisualGroundingNow(desiredDelta: -0.035f, maxOffset: 0.60f, out float appliedOffset, out string diagnostics);
+                float remainingBudget = maxTotalCorrection - totalApplied;
+                if (remainingBudget <= 0.001f) break;
+
+                bool applied = TryApplyVisualGroundingNow(desiredDelta: -0.035f, maxOffset: Mathf.Min(0.60f, remainingBudget), out float appliedOffset, out string diagnostics);
                 lastDiag = diagnostics;
                 if (applied)
                 {

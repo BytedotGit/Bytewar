@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Netcode;
 using ByteWar.Building;
+using ByteWar.Core;
 using ByteWar.Survival;
 using System.Collections.Generic;
 
@@ -15,10 +16,16 @@ namespace ByteWar.Tests.PlayMode
         private NetworkManager _networkManager;
         private GameObject _foundationPrefab;
         private GameObject _wallPrefab;
+        private GameConstants _devOffConstants;
 
         [UnitySetUp]
         public IEnumerator Setup()
         {
+            // Force DevMode off so resource costs are meaningful in these tests
+            _devOffConstants = ScriptableObject.CreateInstance<GameConstants>();
+            // DevMode defaults to false in the field declaration, so no reflection needed
+            GameConstants.SetInstanceForTesting(_devOffConstants);
+
             _networkManager = NGOTestHelper.CreateNetworkManager();
 
             // Register building prefabs as spawnable so ServerRpc can instantiate + spawn them.
@@ -45,6 +52,12 @@ namespace ByteWar.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator Teardown()
         {
+            GameConstants.SetInstanceForTesting(null);
+            if (_devOffConstants != null)
+            {
+                Object.DestroyImmediate(_devOffConstants);
+                _devOffConstants = null;
+            }
             NGOTestHelper.CleanUp();
             yield return null;
         }
@@ -127,10 +140,10 @@ namespace ByteWar.Tests.PlayMode
             var piece = go.GetComponent<BuildingPiece>();
             Assert.IsNotNull(piece, "BuildingPiece component should exist.");
 
-            // Verify snap points exist
-            var points = piece.GetSnapPoints();
-            Assert.IsNotNull(points);
-            Assert.Greater(points.Length, 0, "Should have at least one snap point.");
+            // Verify snap point markers exist on the prefab
+            var markers = go.GetComponentsInChildren<SnapPointMarker>();
+            Assert.IsNotNull(markers);
+            Assert.Greater(markers.Length, 0, "Should have at least one SnapPointMarker child.");
 
             netObj.Despawn(true);
             Debug.Log("[Test] BuildingPiece spawn test passed.");
@@ -153,6 +166,12 @@ namespace ByteWar.Tests.PlayMode
             var col = go.AddComponent<BoxCollider>();
             col.center = Vector3.up;
             col.size = Vector3.one * 2f;
+
+            // Add snap point markers (all building pieces require at least one)
+            var snap = new GameObject("Snap_Bottom");
+            snap.transform.SetParent(go.transform);
+            snap.transform.localPosition = Vector3.zero;
+            snap.AddComponent<SnapPointMarker>();
 
             return go;
         }

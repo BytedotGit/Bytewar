@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using ByteWar.Core;
 using ByteWar.Survival;
 
 namespace ByteWar.Building
@@ -27,6 +28,7 @@ namespace ByteWar.Building
         /// </summary>
         public bool CanAfford(InventoryComponent inventory)
         {
+            if (GameConstants.IsDevMode()) return true;
             if (inventory == null) return false;
             foreach (var ingredient in Cost)
             {
@@ -42,6 +44,12 @@ namespace ByteWar.Building
         /// </summary>
         public bool ConsumeResources(InventoryComponent inventory)
         {
+            if (GameConstants.IsDevMode())
+            {
+                Debug.Log($"[BuildingRecipe] DevMode: skipping resource consumption for '{RecipeName}'.");
+                return true;
+            }
+
             if (!CanAfford(inventory))
             {
                 Debug.LogWarning($"[BuildingRecipe] Cannot afford '{RecipeName}'.");

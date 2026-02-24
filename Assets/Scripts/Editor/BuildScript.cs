@@ -24,6 +24,11 @@ namespace ByteWar.Editor
             MixamoProcessor.ProcessAssets();
             AnimatorGenerator.GenerateAnimatorController();
             PrefabGenerator.GeneratePrefabs();
+
+            // Optional: include Blender E2E prop prefab in builds when the FBX exists.
+            // Safe no-op if the FBX hasn't been generated yet.
+            BlenderE2EPropPrefabGenerator.Generate();
+
             Debug.Log($"{BuildGenPrefix} Pre-build generation complete.");
 
             string[] scenes = { "Assets/Scenes/TestScene.unity" };
@@ -43,10 +48,22 @@ namespace ByteWar.Editor
             if (summary.result == UnityEditor.Build.Reporting.BuildResult.Succeeded)
             {
                 Debug.Log($"{BuildGenPrefix} Build succeeded: {summary.totalSize} bytes");
+
+                if (Application.isBatchMode)
+                {
+                    Debug.Log($"{BuildGenPrefix} Exiting editor with code 0 (batchmode).");
+                    EditorApplication.Exit(0);
+                }
             }
             else if (summary.result == UnityEditor.Build.Reporting.BuildResult.Failed)
             {
                 Debug.LogError($"{BuildGenPrefix} Build failed");
+
+                if (Application.isBatchMode)
+                {
+                    Debug.LogError($"{BuildGenPrefix} Exiting editor with code 1 (batchmode).");
+                    EditorApplication.Exit(1);
+                }
             }
         }
     }

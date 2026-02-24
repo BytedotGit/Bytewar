@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using ByteWar.Core;
 using ByteWar.Survival;
 using ByteWar.Building;
 using ByteWar.Abilities.Mage;
@@ -94,19 +93,88 @@ namespace ByteWar.Editor
                 new RecipeIngredient { Item = stone, Amount = 1 }
             });
 
-            // Generate GameConstants (placed in Resources/ for Resources.Load)
-            string resourcesPath = "Assets/Resources";
-            if (!AssetDatabase.IsValidFolder(resourcesPath))
+            BuildingRecipe floorRecipe = CreateAsset<BuildingRecipe>($"{basePath}/FloorRecipe.asset");
+            floorRecipe.RecipeName = "Floor";
+            floorRecipe.PieceType = BuildingPieceType.Floor;
+            floorRecipe.SetCost(new List<RecipeIngredient>
             {
-                AssetDatabase.CreateFolder("Assets", "Resources");
-            }
-            CreateAsset<GameConstants>($"{resourcesPath}/GameConstants.asset");
+                new RecipeIngredient { Item = wood, Amount = 3 }
+            });
 
-            // Generate procedural SFX clips (WAV synthesis)
-            AudioClipGenerator.GenerateAudioClips();
+            BuildingRecipe rampRecipe = CreateAsset<BuildingRecipe>($"{basePath}/RampRecipe.asset");
+            rampRecipe.RecipeName = "Ramp";
+            rampRecipe.PieceType = BuildingPieceType.Ramp;
+            rampRecipe.SetCost(new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 4 }
+            });
 
-            // Generate VFX prefabs (particle systems)
-            VFXPrefabGenerator.GenerateVFXPrefabs();
+            BuildingRecipe roof26Recipe = CreateAsset<BuildingRecipe>($"{basePath}/Roof26Recipe.asset");
+            roof26Recipe.RecipeName = "Roof (26°)";
+            roof26Recipe.PieceType = BuildingPieceType.Roof26;
+            roof26Recipe.SetCost(new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 3 },
+                new RecipeIngredient { Item = stone, Amount = 1 }
+            });
+
+            BuildingRecipe stairsRecipe = CreateAsset<BuildingRecipe>($"{basePath}/StairsRecipe.asset");
+            stairsRecipe.RecipeName = "Stairs";
+            stairsRecipe.PieceType = BuildingPieceType.Stairs;
+            stairsRecipe.SetCost(new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 4 },
+                new RecipeIngredient { Item = stone, Amount = 2 }
+            });
+
+            BuildingRecipe poleRecipe = CreateAsset<BuildingRecipe>($"{basePath}/PoleRecipe.asset");
+            poleRecipe.RecipeName = "Pole";
+            poleRecipe.PieceType = BuildingPieceType.Pole;
+            poleRecipe.SetCost(new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 2 }
+            });
+
+            BuildingRecipe beamRecipe = CreateAsset<BuildingRecipe>($"{basePath}/BeamRecipe.asset");
+            beamRecipe.RecipeName = "Beam";
+            beamRecipe.PieceType = BuildingPieceType.Beam;
+            beamRecipe.SetCost(new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 2 }
+            });
+
+            BuildingRecipe angledWallRecipe = CreateAsset<BuildingRecipe>($"{basePath}/AngledWallRecipe.asset");
+            angledWallRecipe.RecipeName = "Angled Wall";
+            angledWallRecipe.PieceType = BuildingPieceType.AngledWall;
+            angledWallRecipe.SetCost(new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 2 },
+                new RecipeIngredient { Item = stone, Amount = 1 }
+            });
+
+            BuildingRecipe doorFrameRecipe = CreateAsset<BuildingRecipe>($"{basePath}/DoorFrameRecipe.asset");
+            doorFrameRecipe.RecipeName = "Door Frame";
+            doorFrameRecipe.PieceType = BuildingPieceType.DoorFrame;
+            doorFrameRecipe.SetCost(new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 4 }
+            });
+
+            BuildingRecipe windowRecipe = CreateAsset<BuildingRecipe>($"{basePath}/WindowRecipe.asset");
+            windowRecipe.RecipeName = "Window";
+            windowRecipe.PieceType = BuildingPieceType.Window;
+            windowRecipe.SetCost(new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 3 }
+            });
+
+            BuildingRecipe halfWallRecipe = CreateAsset<BuildingRecipe>($"{basePath}/HalfWallRecipe.asset");
+            halfWallRecipe.RecipeName = "Half Wall";
+            halfWallRecipe.PieceType = BuildingPieceType.HalfWall;
+            halfWallRecipe.SetCost(new List<RecipeIngredient>
+            {
+                new RecipeIngredient { Item = wood, Amount = 2 }
+            });
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

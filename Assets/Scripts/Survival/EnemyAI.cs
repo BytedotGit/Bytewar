@@ -9,6 +9,7 @@ namespace ByteWar.Survival
     /// <summary>
     /// Server-authoritative enemy AI.  Pursues the nearest player, attacks on cooldown,
     /// and dies when its AttributeSet Health reaches zero.
+    /// Uses CharacterController for physics-based movement so buildings block pathing.
     /// </summary>
     [RequireComponent(typeof(AttributeSet))]
     public class EnemyAI : NetworkBehaviour, IDamageable, ICombatTarget
@@ -20,9 +21,11 @@ namespace ByteWar.Survival
 
         private Transform _targetPlayer;
         private AttributeSet _attributes;
+        private CharacterController _characterController;
         private float _lastAttackTime;
         private float _lastLogTime;
         private bool _isDead;
+        private float _verticalVelocity;
 
         // ── Interface implementations ─────────────────────────────────────────
         /// <inheritdoc/>
@@ -43,6 +46,7 @@ namespace ByteWar.Survival
         public override void OnNetworkSpawn()
         {
             _attributes = GetComponent<AttributeSet>();
+            _characterController = GetComponent<CharacterController>();
 
             if (IsServer)
             {
@@ -193,17 +197,38 @@ namespace ByteWar.Survival
             }
 
             Vector3 direction = (_targetPlayer.position - transform.position).normalized;
-            Vector3 newPos = transform.position + direction * _moveSpeed * Time.deltaTime;
+            direction.y = 0f; // Keep movement horizontal
 
-            // Snap to terrain surface each step so the enemy doesn't float or sink
-            if (Terrain.activeTerrain != null)
+            // Apply gravity
+            if (_characterController != null && _characterController.isGrounded)
             {
-                float terrainY = Terrain.activeTerrain.SampleHeight(newPos)
-                               + Terrain.activeTerrain.transform.position.y + 0.5f;
-                newPos.y = terrainY;
+                _verticalVelocity = -0.5f; // Small downward force to keep grounded
+            }
+            else
+            {
+                _verticalVelocity += -18f * Time.deltaTime; // Gravity
             }
 
-            transform.position = newPos;
+            Vector3 move = direction * _moveSpeed * Time.deltaTime;
+            move.y = _verticalVelocity * Time.deltaTime;
+
+            if (_characterController != null)
+            {
+                // CharacterController.Move respects colliders — buildings will block movement
+                _characterController.Move(move);
+            }
+            else
+            {
+                // Fallback for enemies without CharacterController (e.g. tests)
+                Vector3 newPos = transform.position + move;
+                if (Terrain.activeTerrain != null)
+                {
+                    float terrainY = Terrain.activeTerrain.SampleHeight(newPos)
+                                   + Terrain.activeTerrain.transform.position.y + 0.5f;
+                    newPos.y = terrainY;
+                }
+                transform.position = newPos;
+            }
 
             if (direction != Vector3.zero)
             {
@@ -217,6 +242,26 @@ namespace ByteWar.Survival
 
             if (Time.time - _lastAttackTime >= _attackCooldown)
             {
+                // Line-of-sight check: don't attack through walls/buildings
+                Vector3 eyePos = transform.position + Vector3.up * 1.5f;
+                Vector3 targetPos = _targetPlayer.position + Vector3.up * 1.0f;
+                Vector3 toTarget = targetPos - eyePos;
+                float dist = toTarget.magnitude;
+
+                if (Physics.Raycast(eyePos, toTarget.normalized, out RaycastHit losHit, dist))
+                {
+                    // If the ray hit something other than the target player, LOS is blocked
+                    if (!losHit.transform.IsChildOf(_targetPlayer) && losHit.transform != _targetPlayer)
+                    {
+                        if (Time.time - _lastLogTime > 3f)
+                        {
+                            Debug.Log($"[EnemyAI] '{gameObject.name}' attack blocked by '{losHit.collider.name}' — no line of sight to '{_targetPlayer.name}'.");
+                            _lastLogTime = Time.time;
+                        }
+                        return;
+                    }
+                }
+
                 Debug.Log($"[EnemyAI] '{gameObject.name}' attacking '{_targetPlayer.name}' for {_attackDamage} damage.");
 
                 AttributeSet targetAttributes = _targetPlayer.GetComponent<AttributeSet>();

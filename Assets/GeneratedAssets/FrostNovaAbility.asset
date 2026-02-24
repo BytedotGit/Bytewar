@@ -15,6 +15,8 @@ MonoBehaviour:
   _abilityName: Frost Nova
   _manaCost: 25
   _cooldown: 8
+  _castVFXType: 0
+  _castSFXType: 2
   Radius: 5
   RootEffect: {fileID: 0}
   DamageEffect: {fileID: 0}

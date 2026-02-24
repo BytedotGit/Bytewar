@@ -104,5 +104,105 @@ namespace ByteWar.Tests.EditMode
                 Object.DestroyImmediate(playerRoot);
             }
         }
+
+        [Test]
+        public void MouseButtons_DefaultToFalse()
+        {
+            // In EditMode (no mouse device), both buttons should default to false
+            var camGo = new GameObject("Test_ThirdPersonCamera");
+            try
+            {
+                var camera = camGo.AddComponent<ThirdPersonCamera>();
+                Assert.IsFalse(camera.IsLeftMouseHeld, "IsLeftMouseHeld should default to false.");
+                Assert.IsFalse(camera.IsRightMouseHeld, "IsRightMouseHeld should default to false.");
+                Assert.IsFalse(camera.IsLeftMouseDragging, "IsLeftMouseDragging should default to false.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(camGo);
+            }
+        }
+
+        [Test]
+        public void AutoTest_LmbClick_DoesNotOrbitYaw()
+        {
+            var camGo = new GameObject("Test_ThirdPersonCamera");
+            var target = new GameObject("CameraTarget");
+
+            try
+            {
+                var camera = camGo.AddComponent<ThirdPersonCamera>();
+                camera.SetTarget(target.transform, pivotHeight: 0f);
+
+                camera.AutoTest_SetOrbitAngles(0f, 0f, immediate: true);
+                camera.AutoTest_SetMouseState(leftHeld: true, rightHeld: false, leftDragging: false);
+                camera.AutoTest_OrbitTick(new Vector2(50f, 0f));
+
+                Assert.That(camera.CameraYaw, Is.EqualTo(0f).Within(0.01f), "LMB click (no drag) should not orbit camera.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(camGo);
+                Object.DestroyImmediate(target);
+            }
+        }
+
+        [Test]
+        public void AutoTest_LmbDrag_DoesOrbitYaw()
+        {
+            var camGo = new GameObject("Test_ThirdPersonCamera");
+            var target = new GameObject("CameraTarget");
+
+            try
+            {
+                var camera = camGo.AddComponent<ThirdPersonCamera>();
+                camera.SetTarget(target.transform, pivotHeight: 0f);
+
+                camera.AutoTest_SetOrbitAngles(0f, 0f, immediate: true);
+                camera.AutoTest_SetMouseState(leftHeld: true, rightHeld: false, leftDragging: true);
+                camera.AutoTest_OrbitTick(new Vector2(50f, 0f));
+
+                Assert.That(camera.CameraYaw, Is.GreaterThan(0.1f), "LMB drag should orbit camera.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(camGo);
+                Object.DestroyImmediate(target);
+            }
+        }
+
+        [Test]
+        public void AutoTest_FirstPerson_ExpandsPitchClamp_ToLookStraightUpDown()
+        {
+            var camGo = new GameObject("Test_ThirdPersonCamera");
+            var target = new GameObject("CameraTarget");
+
+            try
+            {
+                var camera = camGo.AddComponent<ThirdPersonCamera>();
+                camera.SetTarget(target.transform, pivotHeight: 0f);
+
+                // First-person (distance=0): allow near ±90°.
+                camera.AutoTest_SetTargetDistance(0f, immediate: true);
+                camera.AutoTest_SetOrbitAngles(0f, 999f, immediate: true);
+                camera.AutoTest_ClampPitchOnce();
+                Assert.That(camera.AutoTest_GetPitch(), Is.EqualTo(89.9f).Within(0.05f));
+
+                camera.AutoTest_SetOrbitAngles(0f, -999f, immediate: true);
+                camera.AutoTest_ClampPitchOnce();
+                Assert.That(camera.AutoTest_GetPitch(), Is.EqualTo(-89.9f).Within(0.05f));
+
+                // Third-person (distance=8): keep configured clamp (maxPitch=85 by default).
+                camera.AutoTest_SetTargetDistance(8f, immediate: true);
+                camera.AutoTest_SetOrbitAngles(0f, 999f, immediate: true);
+                camera.AutoTest_ClampPitchOnce();
+                Assert.That(camera.AutoTest_GetPitch(), Is.EqualTo(85f).Within(0.1f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(camGo);
+                Object.DestroyImmediate(target);
+            }
+        }
     }
 }

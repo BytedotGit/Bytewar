@@ -25,8 +25,6 @@ When creating new abilities or talents, adhere to the following rules:
 - `GameplayEffect`s should handle duration (instant, duration, infinite) and modifiers (add, multiply, override).
 - Ensure effects are properly synchronized across the network if they have visual components.
 
-## Testing & Debugging
+## Testing
 
-- **100% Coverage**: Write unit tests for every new Ability, Talent, and GameplayEffect.
-- **Logging**: Add detailed `Debug.Log` statements in `Execute` and `ApplyTalent` methods to track execution flow, mana consumption, and cooldown triggers.
-- **File Size**: Keep ability scripts focused. Do not exceed 800 LOC per file.
+- Add detailed `Debug.Log` statements in `Execute` and `ApplyTalent` methods to track execution flow, mana consumption, and cooldown triggers.

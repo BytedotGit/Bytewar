@@ -52,6 +52,11 @@ namespace ByteWar.Networking
 
         public PlayerVisualMode GeneratedVisualModeStamp => _generatedVisualModeStamp;
 
+        public override void OnNetworkDespawn()
+        {
+            PlayerRegistry.Unregister(transform);
+        }
+
         public void SetGeneratedVisualModeStamp(PlayerVisualMode mode)
         {
             _generatedVisualModeStamp = mode;
@@ -71,7 +76,7 @@ namespace ByteWar.Networking
 
         public override void OnNetworkSpawn()
         {
-            // Register in player registry for all instances (server tracks all players)
+            // Register ALL players (owner and remote) so EnemyAI can find targets
             PlayerRegistry.Register(transform);
 
             if (!IsOwner)
@@ -91,6 +96,9 @@ namespace ByteWar.Networking
                 }
                 _inputHandler.EnsureActionsEnabled("NetworkPlayer OnNetworkSpawn (owner)");
             }
+
+            // Disable CharacterController before spawn raycast so we don't hit our own capsule.
+            if (_cc != null) _cc.enabled = false;
 
             // Spawn on ground surface at world origin. Prefer raycast (greybox/any collider);
             // fall back to Terrain if present; otherwise stay at origin.
@@ -114,8 +122,6 @@ namespace ByteWar.Networking
                 Debug.LogWarning("[NetworkPlayer] No ground collider or terrain found! Spawning at default position.");
             }
 
-            // Disable CharacterController during teleport — otherwise it blocks position changes
-            if (_cc != null) _cc.enabled = false;
             transform.position = spawnPos;
             if (_cc != null) _cc.enabled = true;
 
@@ -143,11 +149,6 @@ namespace ByteWar.Networking
             {
                 Debug.LogWarning($"[NetworkPlayer] VisualMode mismatch: stamp={_generatedVisualModeStamp} actual={actual}");
             }
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            PlayerRegistry.Unregister(transform);
         }
 
         // ── Camera Setup ──────────────────────────────────────────────────────────
@@ -229,7 +230,7 @@ namespace ByteWar.Networking
 
         public PlayerVisualMode DetectActualVisualMode(out VisualDiagnostics diagnostics)
         {
-            // Lazy-acquire in case called before Awake (e.g. EditMode tests)
+            // Lazy init: Awake() may not have run yet (e.g. EditMode tests).
             if (_visualSetup == null)
                 _visualSetup = GetComponent<PlayerVisualSetup>();
 

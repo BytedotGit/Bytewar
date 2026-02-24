@@ -13,5 +13,6 @@ namespace ByteWar.Core
         ItemPickup     = 4,
         BuildingPlace  = 5,
         UIClick        = 6,
+        CleaveHit      = 7,
     }
 }

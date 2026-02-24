@@ -1,6 +1,17 @@
-# Survival — Agent Guidance
+﻿# Survival - Agent Guidance
 
-Includes gathering, enemy AI, combat loop.
+## Key classes (auto-generated)
+
+| Class | Base | Interfaces | Network | RPCs |
+|-------|------|-----------|---------|------|
+| `EnemyAI` | `NetworkBehaviour` | IDamageable, ICombatTarget | Yes | - |
+| `EnemySpawner` | `NetworkBehaviour` | - | Yes | - |
+| `EquipmentComponent` | `NetworkBehaviour` | - | Yes | - |
+| `FireballProjectile` | `NetworkBehaviour` | - | Yes | PlayHitEffectClientRpc |
+| `InventoryComponent` | `NetworkBehaviour` | IInventoryHolder | Yes | NotifyItemAddedClientRpc, NotifyItemRemovedClientRpc |
+| `Item` | `ScriptableObject` | - | - | - |
+| `ResourceNode` | `NetworkBehaviour` | IDamageable, IInteractable | Yes | PlayGatherHitClientRpc, PlayResourceDeathClientRpc |
+| `SurvivalStats` | `NetworkBehaviour` | - | Yes | - |
 
 ## Invariants
 

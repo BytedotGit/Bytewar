@@ -111,5 +111,76 @@ namespace ByteWar.Tests.PlayMode
             inputHandler.ClearSimulatedMovement();
             Object.Destroy(camObj);
         }
+
+        [UnityTest]
+        public IEnumerator JumpPressedMidAir_DoesNotQueueJumpOnLanding()
+        {
+            // Arrange — ground so CharacterController can become grounded during the test.
+            var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ground.name = "TestGround";
+            ground.transform.position = new Vector3(0f, -0.5f, 0f);
+            ground.transform.localScale = new Vector3(200f, 1f, 200f);
+
+            // Arrange — camera needed for some runtime code paths.
+            GameObject camObj = new GameObject("Main Camera");
+            camObj.tag = "MainCamera";
+            camObj.AddComponent<Camera>();
+            camObj.transform.position = new Vector3(0, 5, -10);
+            camObj.transform.rotation = Quaternion.identity;
+
+            _networkManager.StartHost();
+            yield return NGOTestHelper.WaitForLocalPlayerReady(_networkManager);
+
+            var playerObj = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+            var inputHandler = playerObj.GetComponent<PlayerInputHandler>();
+            var cc = playerObj.GetComponent<CharacterController>();
+            Assert.IsNotNull(inputHandler, "PlayerInputHandler should be attached to the player.");
+            Assert.IsNotNull(cc, "CharacterController should be attached to the player.");
+
+            // Make test deterministic: disable real keyboard polling.
+            inputHandler.SetSimulatedMovement(Vector2.zero);
+
+            // Ensure we start grounded.
+            float start = Time.realtimeSinceStartup;
+            while (!cc.isGrounded && Time.realtimeSinceStartup - start < 2f)
+                yield return null;
+            Assert.IsTrue(cc.isGrounded, "Player should start grounded for this test.");
+
+            // Act 1: jump from ground.
+            inputHandler.SimulateJumpPress();
+
+            // Wait until we're airborne.
+            start = Time.realtimeSinceStartup;
+            while (cc.isGrounded && Time.realtimeSinceStartup - start < 1.5f)
+                yield return null;
+            Assert.IsFalse(cc.isGrounded, "Player should become airborne after jump.");
+
+            // Act 2: press jump while mid-air (this should be discarded, not buffered).
+            inputHandler.SimulateJumpPress();
+
+            // Wait until we land.
+            start = Time.realtimeSinceStartup;
+            while (!cc.isGrounded && Time.realtimeSinceStartup - start < 3f)
+                yield return null;
+            Assert.IsTrue(cc.isGrounded, "Player should land within timeout.");
+
+            // Assert: we do NOT immediately jump again after landing.
+            float landedY = playerObj.transform.position.y;
+
+            // CharacterController.isGrounded can flicker for a frame; use upward displacement to detect a real jump.
+            float maxY = landedY;
+            float t0 = Time.realtimeSinceStartup;
+            while (Time.realtimeSinceStartup - t0 < 0.6f)
+            {
+                maxY = Mathf.Max(maxY, playerObj.transform.position.y);
+                yield return null;
+            }
+
+            Assert.LessOrEqual(maxY, landedY + 0.15f,
+                $"Mid-air jump press should not queue a second jump on landing. landedY={landedY:0.###} maxY={maxY:0.###}");
+
+            Object.Destroy(camObj);
+            Object.Destroy(ground);
+        }
     }
 }

@@ -8,8 +8,8 @@ namespace ByteWar.Core
     /// Uses the new Input System API exclusively for full compatibility.
     ///
     /// Controls:
-    ///   RMB drag      → orbit camera (character does NOT rotate)
-    ///   LMB drag      → orbit camera (character rotates to match yaw on next move)
+    ///   LMB drag      → orbit camera (does NOT affect character facing)
+    ///   RMB drag      → orbit camera (character faces camera yaw while RMB is held; see PlayerMovement)
     ///   Both buttons  → move character forward
     ///   Scroll wheel  → zoom in / out
     ///   Camera-collision pushes the camera toward the player
@@ -20,6 +20,7 @@ namespace ByteWar.Core
         public float CameraYaw => _yaw;
         public bool IsRightMouseHeld { get; private set; }
         public bool IsLeftMouseHeld { get; private set; }
+        public bool IsLeftMouseDragging { get; private set; }
 
         public float PivotHeight => _pivotHeight;
         public Transform Target => _target;
@@ -36,8 +37,10 @@ namespace ByteWar.Core
         [SerializeField] private float _yaw = 0f;
         [SerializeField] private float _pitch = 22f;
         [SerializeField] private float _minPitch = -15f;
-        [SerializeField] private float _maxPitch = 72f;
+        [SerializeField] private float _maxPitch = 85f;
         [SerializeField] private float _mouseSensitivity = 0.15f;
+        [Tooltip("Minimum cursor movement (in pixels) before LMB is treated as a camera orbit drag.")]
+        [SerializeField] private float _leftMouseDragThresholdPx = 3f;
 
         [Header("Zoom")]
         [SerializeField] private float _distance = 8f;
@@ -71,10 +74,14 @@ namespace ByteWar.Core
         private float _smoothPitch;
         private bool _initialized;
         private Vector2 _lastMousePos;
+        private Vector2 _leftMouseDragOrigin;
         private Renderer[] _cachedRenderers;
         private bool _renderersVisible = true;
         private bool _cursorLockEnabled = true;
         private bool _isFirstPerson;
+
+        private const float FirstPersonMinPitch = -89.9f;
+        private const float FirstPersonMaxPitch = 89.9f;
 
         private void Awake()
         {
@@ -133,12 +140,34 @@ namespace ByteWar.Core
         {
             IsRightMouseHeld = mouse.rightButton.isPressed;
             IsLeftMouseHeld = mouse.leftButton.isPressed;
+
+            // LMB drag should orbit, but a simple click should not. Detect drag using mouse.position
+            // while the cursor is still unlocked; once orbiting begins, we may lock the cursor.
+            if (mouse.leftButton.wasPressedThisFrame)
+            {
+                _leftMouseDragOrigin = mouse.position.ReadValue();
+                IsLeftMouseDragging = false;
+            }
+
+            if (!IsLeftMouseHeld)
+            {
+                IsLeftMouseDragging = false;
+                return;
+            }
+
+            if (!IsLeftMouseDragging)
+            {
+                Vector2 delta = mouse.position.ReadValue() - _leftMouseDragOrigin;
+                float threshold = Mathf.Max(0.1f, _leftMouseDragThresholdPx);
+                if (delta.sqrMagnitude >= threshold * threshold)
+                    IsLeftMouseDragging = true;
+            }
         }
 
         private void ReadOrbitInput(Mouse mouse)
         {
-            // Allow either mouse button to orbit so trackpads / single-button mice still work.
-            bool orbiting = (IsRightMouseHeld || IsLeftMouseHeld);
+            // WoW-style: RMB orbits the camera (and drives facing). LMB drag orbits camera only.
+            bool orbiting = IsRightMouseHeld || IsLeftMouseDragging;
 
             if (orbiting)
             {
@@ -157,7 +186,7 @@ namespace ByteWar.Core
                 Vector2 mouseDelta = mouse.delta.ReadValue();
                 _yaw += mouseDelta.x * _mouseSensitivity;
                 _pitch -= mouseDelta.y * _mouseSensitivity;
-                _pitch = Mathf.Clamp(_pitch, _minPitch, _maxPitch);
+                _pitch = ClampPitchForCurrentDistance(_pitch);
             }
             else
             {
@@ -170,6 +199,16 @@ namespace ByteWar.Core
 
             _smoothYaw = Mathf.LerpAngle(_smoothYaw, _yaw, Time.deltaTime * _orbitSmoothing);
             _smoothPitch = Mathf.Lerp(_smoothPitch, _pitch, Time.deltaTime * _orbitSmoothing);
+        }
+
+        private float ClampPitchForCurrentDistance(float pitch)
+        {
+            // When zoomed fully in (first-person), allow looking straight up/down.
+            // Use the exit threshold so we keep a stable clamp across the hysteresis band.
+            if (_distance <= _firstPersonExitDistance)
+                return Mathf.Clamp(pitch, FirstPersonMinPitch, FirstPersonMaxPitch);
+
+            return Mathf.Clamp(pitch, _minPitch, _maxPitch);
         }
 
         private void ReadZoomInput(Mouse mouse)
@@ -192,6 +231,49 @@ namespace ByteWar.Core
             {
                 _distance = _targetDistance;
             }
+        }
+
+        internal void AutoTest_SetOrbitAngles(float yaw, float pitch, bool immediate)
+        {
+            _yaw = yaw;
+            _pitch = pitch;
+            if (immediate)
+            {
+                _smoothYaw = yaw;
+                _smoothPitch = pitch;
+            }
+        }
+
+        internal void AutoTest_SetMouseState(bool leftHeld, bool rightHeld, bool leftDragging)
+        {
+            IsLeftMouseHeld = leftHeld;
+            IsRightMouseHeld = rightHeld;
+            IsLeftMouseDragging = leftDragging;
+        }
+
+        internal void AutoTest_OrbitTick(Vector2 mouseDelta)
+        {
+            bool orbiting = IsRightMouseHeld || IsLeftMouseDragging;
+            if (!orbiting)
+                return;
+
+            _yaw += mouseDelta.x * _mouseSensitivity;
+            _pitch -= mouseDelta.y * _mouseSensitivity;
+            _pitch = ClampPitchForCurrentDistance(_pitch);
+
+            _smoothYaw = _yaw;
+            _smoothPitch = _pitch;
+        }
+
+        internal void AutoTest_ClampPitchOnce()
+        {
+            _pitch = ClampPitchForCurrentDistance(_pitch);
+            _smoothPitch = ClampPitchForCurrentDistance(_smoothPitch);
+        }
+
+        internal float AutoTest_GetPitch()
+        {
+            return _pitch;
         }
 
         internal void AutoTest_TickCameraTransformOnce()

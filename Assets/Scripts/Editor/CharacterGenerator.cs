@@ -163,12 +163,32 @@ namespace ByteWar.Editor
             Color emissive = default)
         {
             string path = $"{ModelsPath}/{name}.mat";
-            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null)
+
+            // If the material already exists with a valid shader, reuse it.
+            // This prevents -nographics builds from overwriting good Standard materials
+            // with a Diffuse/error fallback (root cause of pink enemies).
+            Material existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing != null && existing.shader != null && existing.shader.name == "Standard")
+            {
+                existing.color = color;
+                if (existing.HasProperty("_Metallic")) existing.SetFloat("_Metallic", metallic);
+                if (existing.HasProperty("_Glossiness")) existing.SetFloat("_Glossiness", smoothness);
+                if (emissive != default)
+                {
+                    existing.EnableKeyword("_EMISSION");
+                    if (existing.HasProperty("_EmissionColor"))
+                        existing.SetColor("_EmissionColor", emissive);
+                }
+                EditorUtility.SetDirty(existing);
+                return existing;
+            }
+
+            if (existing != null)
                 AssetDatabase.DeleteAsset(path);
 
-            // Try URP/Lit first, fall back to BIRP Standard
-            Shader shader = Shader.Find("Universal Render Pipeline/Lit")
-                         ?? Shader.Find("Standard");
+            // Use Standard shader (BIRP) directly — URP/Lit resolves to a pink stub in BIRP builds.
+            // In batchmode with -nographics, Shader.Find can return null. Try multiple fallbacks.
+            Shader shader = FindStandardShader();
             var mat = new Material(shader) { color = color };
 
             if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", metallic);
@@ -201,6 +221,29 @@ namespace ByteWar.Editor
             string child = System.IO.Path.GetFileName(path);
             EnsureFolder(parent);
             AssetDatabase.CreateFolder(parent, child);
+        }
+
+        /// <summary>
+        /// Robustly finds the Standard shader. Shader.Find() can return null in
+        /// batchmode with -nographics, so we try multiple fallbacks.
+        /// </summary>
+        private static Shader FindStandardShader()
+        {
+            Shader shader = Shader.Find("Standard");
+            if (shader != null) return shader;
+
+            // Fallback: try loading from built-in resources
+            shader = Shader.Find("Diffuse");
+            if (shader != null)
+            {
+                Debug.LogWarning($"{BuildGenPrefix} CharacterGenerator: 'Standard' shader not found (likely -nographics). Using 'Diffuse' fallback.");
+                return shader;
+            }
+
+            // Last resort: create with whatever Unity gives us
+            var tempMat = new Material(Shader.Find("Hidden/InternalErrorShader"));
+            Debug.LogError($"{BuildGenPrefix} CharacterGenerator: No suitable shader found! Materials will be pink. Avoid building with -nographics.");
+            return tempMat.shader;
         }
     }
 }

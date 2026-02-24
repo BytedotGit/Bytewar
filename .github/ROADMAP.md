@@ -1,6 +1,23 @@
-# ByteWar Roadmap to Playable Build
+# ByteWar Roadmap
 
-This roadmap outlines the steps required to reach a fully playable, multiplayer proof-of-concept (PoC) build. All AI agents must consult this roadmap to understand the current project state and next steps.
+This roadmap tracks all project progress. It is divided into two tracks:
+
+- **Gameplay Track** (Phases 1–15): Feature implementation for the playable build. See completed phases below.
+- **Infrastructure Track** (Phases I–IX): Architecture, tooling, CI/CD, and agent-autonomy overhaul. See [MASTER_PLAN.md](MASTER_PLAN.md) for the full breakdown and current status.
+
+All AI agents must consult this roadmap AND the MASTER_PLAN to understand project state and next steps.
+
+---
+
+## Current Focus
+
+**Infrastructure**: MASTER_PLAN Phase 2 (Core Abstractions & Interfaces) — interfaces defined, classes extracted; encapsulation + tests remaining. Phases 6/7/8 partially complete (spec files, validation tools, agent definitions created).
+
+**Gameplay**: Phase 15 (Visuals & Audio Polish) — not started.
+
+**Tooling**: Blender MCP server for headless asset export into `Assets/Art/` (in progress).
+
+---
 
 ## Phase 1-11: Core Systems, Generation & Testing (COMPLETED)
 
@@ -69,43 +86,56 @@ This roadmap outlines the steps required to reach a fully playable, multiplayer 
   - **Left-Click Place**, **Middle-Click Remove** (with resource refund), **Right-Click Repair**.
   - **Support/Stability**: Foundations place freely; Walls require adjacency to a Foundation.
   - **Preview**: `MaterialPropertyBlock` tinting (green valid, red invalid); stripped NetworkObject/physics from preview.
-- [x] **Building Pieces**: `BuildingPiece` NetworkBehaviour with type enum (Foundation/Wall), snap point metadata, health (damage/repair/destroy), `PlacedByClientId` ownership, `IsSupported` flag.
-- [x] **Building Recipes**: `BuildingRecipe` ScriptableObject with `CanAfford()`/`ConsumeResources()`. Foundation costs 4 Wood + 2 Stone; Wall costs 3 Wood + 1 Stone.
-- [x] **Prefab Generation**: `PrefabGenerator` creates Foundation/Wall prefabs (box primitives with materials), registers as NetworkPrefabs, and wires `BuildingController` with prefabs + recipes.
-- [x] **World Persistence**: `WorldPersistence` server-side JSON save/load at `Application.persistentDataPath/world_save.json`.
-- [x] **Tests**: `BuildingSystemTests` (EditMode) — grid snapping, snap points, rotation, stability, recipe cost, JSON round-trip. `BuildingPlacementSmokeTests` (PlayMode) — placement with/without resources, piece spawn. AutoTester validates BuildingController + WorldPersistence + grounding on greybox surfaces. Build: Exit 0. AutoTest: PASS (all 8 checks). No exceptions.
+- [x] **Building Pieces**: `BuildingPiece` NetworkBehaviour with 9-type enum (Foundation, Wall, Floor, Ramp, Roof26, Stairs, Pole, Beam, AngledWall), health (damage/repair/destroy), `PlacedByClientId` ownership, `IsSupported` flag.
+- [x] **Valheim-Style Snap Points**: `SnapPointMarker` child GameObjects on every building prefab define authored snap positions. Nearest-pair matching in `BuildingSnap.TryAdjacencySnap` aligns any snap point to any other, enabling multi-story, roof, and complex structural connections.
+- [x] **Expanded Support Rules**: Foundations place freely. Walls supported by Foundation/Floor/Wall (multi-story stacking). Floor by Foundation/Wall/Floor. Ramp/Stairs by Foundation/Floor/Wall. Roof by Wall/Floor/Foundation. Pole/Beam/AngledWall by any adjacent piece.
+- [x] **Building Recipes**: `BuildingRecipe` ScriptableObject with `CanAfford()`/`ConsumeResources()`. 9 recipes covering all piece types.
+- [x] **Prefab Generation**: `PrefabGenerator` creates 9 building piece prefabs with authored `SnapPointMarker` children, registers as NetworkPrefabs, and wires `BuildingController` + `WorldPersistence` with all prefabs + recipes.
+- [x] **World Persistence**: `WorldPersistence` server-side JSON save/load with full 3-axis rotation (RotX, RotY, RotZ) for all 9 piece types.
+- [x] **Tests**: 40+ tests covering snap point counts per type, `SnapPointMarker` world/local positions, grid snapping, `TryAdjacencySnap` nearest-pair, `CheckSupport` per type, recipe cost, pitch clamping, JSON serialization. AutoTester validates BuildingController (9 recipes) + WorldPersistence + grounding. Build: Exit 0. AutoTest: PASS (all 8 checks). No exceptions.
+- [x] **Type-Specific Building Visuals**: `BuildingMeshBuilder` generates procedural meshes for Ramp (wedge), Roof26 (gable), and AngledWall (triangular prism). Stairs use 4 stacked cube steps. Foundation/Wall/Floor/Pole/Beam retain cube visuals. `PrefabGenerator` dispatches visual creation by piece type. Collider bounding boxes updated to match actual geometry. 7 new EditMode tests verify mesh geometry, bounds, and normals.
+- [x] **Zero-Failure Test Enforcement & Scenario AutoTester**: All tests (EditMode + PlayMode) enforced to pass with zero failures. DevMode defaults to false everywhere (code + asset); tests explicitly inject DevMode state. Visual mode stamp made truthful via runtime detection. AutoTester refactored into scenario-driven architecture (`IAutoTestScenario`, `AutoTestScenarioCore`, `AutoTestScenarioBuildingVisuals`); each feature change requires its own scenario with PASS markers. `BuildingVisuals` scenario validates 9 prefab registrations, stairs steps, ramp/roof/angled-wall mesh geometry, and collider dimensions. EditMode: 142/142 pass. PlayMode: 34/34 pass. AutoTest: Core (10 PASS) + BuildingVisuals (2 PASS), exit 0.
 
-## Phase 14.1: Core Abstractions & Architecture (COMPLETED)
+## Phase 14.3: In-Game Console, Camera & Enemy Fixes (COMPLETED)
 
-**Goal**: Establish interface-first design, encapsulation, and centralized infrastructure for maintainable, testable code.
+**Goal**: Add dev tooling accessible at runtime, fix visual regressions, and restore WoW-style camera controls.
 
-- [x] **Interfaces**: Created 7 core interfaces (`IDamageable`, `IInteractable`, `IInventoryHolder`, `ICombatTarget`, `IPersistable`, `IGameState`, `IAbilityExecutor`) and implemented on EnemyAI, ResourceNode, InventoryComponent, AbilitySystemComponent, BuildingPiece, WorldPersistence.
-- [x] **Encapsulation**: Converted public fields to `[SerializeField]` private + read-only properties across InventoryComponent, AbilitySystemComponent, EquipmentComponent, ScriptableObjects, CraftingStation, SurvivalStats. Added `internal` setters with `InternalsVisibleTo` for test assemblies.
-- [x] **PlayerInteraction Refactor**: Rewrote to use `IDamageable`/`IInteractable` interfaces instead of concrete `GetComponent<EnemyAI>()` and `GetComponent<ResourceNode>()` casts.
-- [x] **Architectural Extraction**: Extracted `PlayerMovement` (movement/gravity/jumping/abilities), `PlayerVisualSetup` (animator repair/visual grounding/visual mode detection), `BuildingPreview` (preview ghost management/tinting), `BuildingSnap` (grid snap/adjacency snap/support checks) from their parent classes.
-- [x] **GameConstants ScriptableObject**: Centralized magic numbers (move speed 6, turn speed 14, gravity -18, jump force 6, melee/gather damage 10, fireball fallback 25, interaction range 100, target frame rate 60) into a runtime-loadable `Resources/GameConstants` asset with static fallback accessors.
-- [x] **GameStateMachine**: Lightweight state machine (Initializing → MainMenu → Connecting → Loading → Playing → Paused → Disconnected) hosted by `GameManager` with `OnStateChanged` events.
-- [x] **GameEventBus**: Type-safe event channels (`GameEvent<T>`) with auto-cleanup on scene unload. 6 channels: EnemyDied, EnemyTargeted, ItemAdded, ItemRemoved, BuildingPlaced, GameStateChanged. Migrated EnemyAI and EnemyTargetTracker from static events.
-- [x] **PlayerRegistry**: Static registry replacing `FindGameObjectsWithTag("Player")`. Maintained by `NetworkPlayer.OnNetworkSpawn/Despawn`. Provides `GetNearest()` utility. Integrated into EnemyAI targeting.
-- [x] **Tests**: All 62 EditMode + 18 PlayMode tests pass. Build: Exit 0. AutoTest: 8/8 PASS. No exceptions.
+- [x] **In-Game DevConsole**: IMGUI overlay toggled with backtick (\`). Supports `/dev` command to toggle DevMode at runtime (free resources, no build costs). `/help` lists available commands. Input to game is suppressed while console is open (`PlayerInputHandler.InputSuppressed`).
+- [x] **DevMode Runtime Toggle**: `GameConstants.SetDevMode(bool)` allows runtime toggling. Default remains `false`.
+- [x] **Pink Enemy Fix**: `CharacterGenerator` and `EnvironmentGenerator` enforce `Standard` shader on all procedural materials (was using URP Lit which produces pink on BIRP). `Standard` shader added to `Always Included Shaders` in GraphicsSettings.
+- [x] **WoW-Style Camera Restoration**: `ThirdPersonCamera` orbit now requires RMB hold (was always-on). Added `IsLeftMouseHeld`/`IsRightMouseHeld` properties. `PlayerMovement` updated to face camera direction only when RMB is held. Cursor lock managed per-frame based on RMB state.
+- [x] **AutoTester Scenario**: `AutoTestScenarioConsole` validates DevConsole presence, `/dev` toggle, `/help` output, enemy shader correctness, and camera RMB properties.
+- [x] **Tests**: EditMode tests for DevConsole commands, DevMode toggle, camera RMB-only orbit, and input suppression. All pass.
+- [x] **Results**: EditMode 149/149 pass. PlayMode 34/34 pass. AutoTest: Core (10 PASS) + BuildingVisuals (2 PASS) + ConsoleAndFixes (5 PASS), exit code 0, no exceptions.
 
-## Phase 15: Visuals & Audio Polish (COMPLETED)
+## Phase 14.4: Gameplay Bug Fixes — Walkability, LOS, Shader Robustness (COMPLETED)
+
+**Goal**: Fix stairs/ramp walkability, prevent enemies attacking through walls, and permanently fix pink enemy materials.
+
+- [x] **Proportionate Stairs**: Redesigned from 4 giant steps (0.75 unit rise) to 12 realistic steps (0.25 unit rise each). Each step is ankle-height relative to the 2-unit character model. Both visual cubes and per-step BoxColliders updated.
+- [x] **Pink Enemy Root Cause Fix**: `CharacterGenerator.Mat()` and `EnvironmentGenerator.Mat()` skip material re-creation when the existing `.mat` file already has a valid Standard shader. This prevents `-nographics` builds from overwriting correct materials with Diffuse/error fallback.
+- [x] **LOS for Enemy Attacks**: `EnemyAI.AttackTarget()` performs `Physics.Raycast` from eye position; walls/buildings block damage.
+- [x] **Ramp/Roof Colliders**: MeshCollider (convex) for Ramp, Roof26, AngledWall. Player `stepOffset=0.4`, `slopeLimit=50`.
+- [x] **Tests**: 4 new EditMode tests (LOS, MeshCollider, compound colliders). Total: EditMode 156/156 pass.
+- [x] **AutoTester**: Validates 12-step stairs, collider shapes, stepOffset/slopeLimit, enemy shaders. All PASS, exit code 0.
+
+## Phase 14.5: Valheim-Style Building Enhancements (COMPLETED)
+
+**Goal**: Replicate Valheim's building mechanics — pure nearest-pair snap points, structural integrity, comfort system, new piece types, and fine-grained placement.
+
+- [x] **Pure Nearest-Pair Snap Algorithm**: Rewrote `BuildingSnap.TryAdjacencySnap` to match Valheim's actual snap behavior — finds the globally closest snap-point pair with no type filtering or priority tiers. Fixes wall-on-wall centering and cross-piece connectivity bugs. `SnapPointMarker.AreCompatible()` deprecated.
+- [x] **Structural Integrity System**: `StructuralIntegrity` component with BFS support propagation. `StructuralMaterial` enum (Wood/Stone/Iron/Thatch) controls max support distance. Unsupported pieces collapse. `OnSupportChanged` event for visual feedback.
+- [x] **Comfort System**: `ComfortSystem` calculates area comfort from nearby building pieces within configurable radius. `ComfortGroup` enum prevents same-group stacking. `OnComfortChanged` event.
+- [x] **New Piece Types**: Added DoorFrame, Window, HalfWall to `BuildingPieceType` (12 total). Full support rules, snap points, visuals, colliders, and recipes for each.
+- [x] **22.5° Rotation**: `BuildingController` rotation step halved from 45° to 22.5° for finer placement.
+- [x] **Placement Restrictions**: `BuildingPiece` extended with `PlacementRestriction` flags (RequireFlat, RequireFoundation, RequireRoof, RequireFireplace, OutdoorOnly, IndoorOnly).
+- [x] **Prefab & Persistence**: `PrefabGenerator` and `WorldPersistence` updated for all 12 types. `AssetGenerator` creates new recipes.
+- [x] **Tests & Validation**: 183+ EditMode tests pass (incl. wall-on-wall stacking test). AutoTester validates 12 registered prefabs. Build: 95 MB, exit 0. AutoTest: Core + BuildingVisuals + ConsoleAndFixes all PASS, no exceptions.
+
+## Phase 15: Visuals & Audio Polish
 
 **Goal**: Upgrade the game from a prototype to a polished vertical slice.
 
-- [x] **VFX System**: `VFXManager` (NetworkBehaviour singleton) with 6 prefab slots (FireballMuzzle, FireballImpact, GatherHit, ResourceDeath, BuildingPlace, ItemPickup). Server calls `PlayEffect()`, all clients receive `PlayEffectClientRpc`. `VFXPrefabGenerator` builds procedural particle prefabs at build time. Wired into FireballProjectile, AbilitySystemComponent, ResourceNode, BuildingController, PlayerInteraction.
-- [x] **Audio System**: `AudioManager` (NetworkBehaviour singleton) with typed `SFXType` enum, synthesized AudioClips generated by `AudioClipGenerator`. `FootstepController` attached to NetworkPlayer drives footstep sounds at runtime, driven by CharacterController velocity. `AudioSource` wired on NetworkPlayer prefab.
-- [x] **Post-Processing**: Editor-only `PostProcessingSetup` (static class with `ByteWar/Setup Post-Processing` menu item) creates a `PostProcessProfile` with Bloom (intensity 0.6, threshold 0.9) and Color Grading (temperature -5, saturation +10, contrast +15). Adds a global `PostProcessVolume` and `PostProcessLayer` with TAA on the Main Camera. `SceneGenerator` calls this on every regeneration.
-- [x] **Tests**: `VFXAudioSystemTests` (EditMode, 8 tests) — VFXType/SFXType enum coverage, VFXManager/AudioManager lifecycle, singleton pattern, client-only `PlayEffectLocal`. `VFXSmokeTests` (PlayMode, 2 tests) — VFXManager instantiation in scene. `GeneratedPrefabIntegrityTests` extended with `NetworkPlayerPrefab_HasAudioSource` and `NetworkPlayerPrefab_HasFootstepController`.
-- [x] **AutoTester**: 4 new PASS checks — VFXManager present, AudioManager present, Player has FootstepController, Player has AudioSource.
-- [x] **Verification**: EditMode 72/72 PASS. PlayMode 18/18 PASS. Build: 95 MB, Exit 0. AutoTest: 12/12 PASS. No exceptions.
-
-## Phase 16: Multiplayer Hardening & Network Polish (NEXT)
-
-**Goal**: Ensure the game is rock-solid in a real 2-player networked session.
-
-- [ ] **Lag Compensation**: Client-side prediction for player movement.
-- [ ] **Network Diagnostics**: Real-time ping/latency display, packet loss indicator.
-- [ ] **Server Browser**: Simple lobby system with host/join UI.
-- [ ] **Disconnect Handling**: Graceful reconnect flow, state cleanup on player leave.
-- [ ] **Load Testing**: AutoTester extended with 2-client simulation.
+- [ ] **VFX**: Add particle effects for spells, gathering, and building.
+- [ ] **SFX**: Add sound effects for footsteps, UI clicks, combat, and ambient environment sounds.
+- [ ] **Lighting & Post-Processing**: Refine the procedural skybox, fog, and add post-processing volumes (Bloom, Color Grading).

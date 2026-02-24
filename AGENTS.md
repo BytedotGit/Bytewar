@@ -1,71 +1,28 @@
 # Bytewar — Agent Execution Contract
 
-This repository is designed to be developed with GitHub Copilot Chat using **Plan mode** and **Agent mode**.
+This repository is designed to be developed with GitHub Copilot Chat.
 
-**ROADMAP**: Always consult `.github/ROADMAP.md` to understand the current project state and the next steps required to reach a playable build. You MUST automatically update it whenever a significant feature, phase, or bugfix is completed.
+**Rules & Quality Gates**: See `.github/copilot-instructions.md` — the single source of truth for critical rules, Definition of Done, and build commands.
 
-**Testing & Debugging**: See `.github/instructions/testing.instructions.md` for strict enforcement rules on test coverage, smoke tests, logging, file size limits, and the self-testing loop.
+**ROADMAP**: Consult `.github/ROADMAP.md` for current project state. Update it when a significant feature, phase, or bugfix is completed.
 
-## Mode responsibilities
+**GAME_DESIGN**: Consult `.github/GAME_DESIGN.md` before implementing any gameplay feature.
 
-### Plan mode (Phase 1)
-
-- No code/asset changes.
-- Must output, in order:
-  1. **System Snapshot** (what exists + where)
-  2. **Performance Budget** (feature-specific)
-  3. **Chosen Scope** (exactly one primary goal)
-  4. **FMEA** (5+ failure modes)
-  5. **Acceptance Criteria** (testable, includes automated + manual)
-  6. **Asset & Bloat Review**
-  7. **To-do list** (dependency ordered)
-
-### Agent mode (Phase 2)
-
-- Implement only what Phase 1 approved.
-- Must include:
-  - extensive logs (but avoid per-frame spam)
-  - tests and smoke tests
-  - batch build + `-autoTest` run + Player.log verification
-- Must update `.github/ROADMAP.md` when a meaningful milestone is completed.
-
-## Non-negotiables
-
-1. **Warnings are defects**
-
-- Compiler warnings, missing references, or build warnings that imply runtime risk are treated as failures.
-
-2. **Dynamic tests for what changed**
-
-- Every user-facing behavior change must be backed by:
-  - at least one automated test (EditMode and/or PlayMode)
-  - an `AutoTester` scenario step or assertion when the change affects a playable build flow
-
-3. **Anti-refactor drift**
-
-- Only touch files required for the chosen scope.
-- If you spot unrelated issues, add an entry to `TECH_DEBT.md`.
-
-3b. **Defect tracking**
-
-- If a user-visible defect is reported and not fully resolved in the same session, add/update an entry in `.github/ERROR_LOG.md` with repro steps and the most relevant logs.
-
-4. **Atomic state sync**
-
-- Code + docs + tracking must not drift.
-- If behavior changes, update:
-  - `.github/ROADMAP.md`
-  - `CHANGELOG.md`
-  - relevant folder `AGENTS.md` invariants
+**Testing**: See `.github/instructions/testing.instructions.md` for test coverage, smoke tests, logging, and self-testing loop details.
 
 ## Build/self-test loop (mandatory)
 
-1. Build the game (batchmode).
+1. Build the game (batchmode) — see build commands in `copilot-instructions.md`.
 2. Launch the executable with `-autoTest` (e.g., `Start-Process -FilePath "Builds\Windows\ByteWar.exe" -ArgumentList "-autoTest" -NoNewWindow`). DO NOT use OS-level input simulation that steals focus.
 3. Wait for `AutoTester` to finish and close the game, then inspect Player.log for:
    - no exceptions
    - PASS markers for the feature being changed
 4. Keep iterating until the fix/feature is verified. ONLY THEN let the user know to test.
+
+## MCP tooling
+
+- Unity automation: `Tools/UnityMCP/`
+- Blender asset automation (headless): `Tools/BlenderMCP/`
 
 ## General Unity C# Conventions
 

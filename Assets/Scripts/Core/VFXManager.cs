@@ -25,6 +25,7 @@ namespace ByteWar.Core
         [SerializeField] private GameObject _resourceDeathPrefab;
         [SerializeField] private GameObject _buildingPlacePrefab;
         [SerializeField] private GameObject _itemPickupPrefab;
+        [SerializeField] private GameObject _cleaveHitPrefab;
 
         // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -100,6 +101,7 @@ namespace ByteWar.Core
             VFXType.ResourceDeath   => _resourceDeathPrefab,
             VFXType.BuildingPlace   => _buildingPlacePrefab,
             VFXType.ItemPickup      => _itemPickupPrefab,
+            VFXType.CleaveHit       => _cleaveHitPrefab,
             _                       => null,
         };
 
@@ -110,7 +112,8 @@ namespace ByteWar.Core
             _gatherHitPrefab       != null &&
             _resourceDeathPrefab   != null &&
             _buildingPlacePrefab   != null &&
-            _itemPickupPrefab      != null;
+            _itemPickupPrefab      != null &&
+            _cleaveHitPrefab       != null;
 
         // ── Editor helpers (called by VFXPrefabGenerator) ─────────────────────────
 
@@ -118,7 +121,8 @@ namespace ByteWar.Core
         public void SetPrefabs(
             GameObject muzzle, GameObject impact,
             GameObject gather, GameObject resDeath,
-            GameObject building, GameObject pickup)
+            GameObject building, GameObject pickup,
+            GameObject cleave = null)
         {
             _fireballMuzzlePrefab  = muzzle;
             _fireballImpactPrefab  = impact;
@@ -126,6 +130,7 @@ namespace ByteWar.Core
             _resourceDeathPrefab   = resDeath;
             _buildingPlacePrefab   = building;
             _itemPickupPrefab      = pickup;
+            _cleaveHitPrefab       = cleave;
         }
 #endif
     }

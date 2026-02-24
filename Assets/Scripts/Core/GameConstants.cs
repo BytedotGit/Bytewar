@@ -12,6 +12,8 @@ namespace ByteWar.Core
         [Header("Player Movement")]
         [SerializeField] private float _moveSpeed = 6f;
         [SerializeField] private float _turnSpeed = 14f;
+        [Tooltip("Degrees per second when turning via A/D while RMB is NOT held (classic WoW-style turning).")]
+        [SerializeField] private float _keyboardTurnSpeedDegPerSec = 180f;
         [SerializeField] private float _gravity = -18f;
         [SerializeField] private float _jumpForce = 6f;
 
@@ -24,9 +26,14 @@ namespace ByteWar.Core
         [Header("Application")]
         [SerializeField] private int _targetFrameRate = 60;
 
+        [Header("Dev Mode")]
+        [Tooltip("When true, building costs are bypassed for testing.")]
+        [SerializeField] private bool _devMode = false;
+
         // ── Read-only accessors ───────────────────────────────────────────────
         public float MoveSpeed => _moveSpeed;
         public float TurnSpeed => _turnSpeed;
+        public float KeyboardTurnSpeedDegPerSec => _keyboardTurnSpeedDegPerSec;
         public float Gravity => _gravity;
         public float JumpForce => _jumpForce;
         public float MeleeDamage => _meleeDamage;
@@ -34,6 +41,7 @@ namespace ByteWar.Core
         public float FireballFallbackDamage => _fireballFallbackDamage;
         public float InteractionRange => _interactionRange;
         public int TargetFrameRate => _targetFrameRate;
+        public bool DevMode => _devMode;
 
         // ── Runtime singleton accessor ────────────────────────────────────────
         private static GameConstants _instance;
@@ -55,6 +63,7 @@ namespace ByteWar.Core
         /// <summary>Returns the value, or a fallback default if the asset is missing.</summary>
         public static float GetMoveSpeed() => Instance != null ? Instance.MoveSpeed : 6f;
         public static float GetTurnSpeed() => Instance != null ? Instance.TurnSpeed : 14f;
+        public static float GetKeyboardTurnSpeedDegPerSec() => Instance != null ? Instance.KeyboardTurnSpeedDegPerSec : 180f;
         public static float GetGravity() => Instance != null ? Instance.Gravity : -18f;
         public static float GetJumpForce() => Instance != null ? Instance.JumpForce : 6f;
         public static float GetMeleeDamage() => Instance != null ? Instance.MeleeDamage : 10f;
@@ -62,5 +71,26 @@ namespace ByteWar.Core
         public static float GetFireballFallbackDamage() => Instance != null ? Instance.FireballFallbackDamage : 25f;
         public static float GetInteractionRange() => Instance != null ? Instance.InteractionRange : 100f;
         public static int GetTargetFrameRate() => Instance != null ? Instance.TargetFrameRate : 60;
+        public static bool IsDevMode() => Instance != null && Instance.DevMode;
+
+        /// <summary>Toggles DevMode at runtime. Resets on restart (does not persist to asset).</summary>
+        public static void SetDevMode(bool enabled)
+        {
+            if (Instance != null)
+            {
+                Instance._devMode = enabled;
+                Debug.Log($"[GameConstants] DevMode set to {enabled}");
+            }
+            else
+            {
+                Debug.LogWarning("[GameConstants] Cannot set DevMode: Instance is null.");
+            }
+        }
+
+        /// <summary>Override the singleton instance for testing. Pass null to reset.</summary>
+        internal static void SetInstanceForTesting(GameConstants instance)
+        {
+            _instance = instance;
+        }
     }
 }

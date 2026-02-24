@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.Netcode;
-using System.Collections.Generic;
 using ByteWar.Core;
 
 namespace ByteWar.Building
@@ -9,12 +8,22 @@ namespace ByteWar.Building
     {
         Foundation = 0,
         Wall = 1,
+        Floor = 2,
+        Ramp = 3,
+        Roof26 = 4,
+        Stairs = 5,
+        Pole = 6,
+        Beam = 7,
+        AngledWall = 8,
+        DoorFrame = 9,
+        Window = 10,
+        HalfWall = 11,
     }
 
     /// <summary>
     /// Attached to every placed building NetworkObject.
-    /// Stores the piece type, health, support flag, and snap metadata.
-    /// Snap points return *target pivot positions* for neighbours (Valheim-like edge-to-edge placement).
+    /// Stores the piece type, health, and support flag.
+    /// Snap points are defined by <see cref="SnapPointMarker"/> children on the prefab.
     /// </summary>
     public class BuildingPiece : NetworkBehaviour, IDamageable, IPersistable
     {
@@ -30,6 +39,36 @@ namespace ByteWar.Building
         [Tooltip("Height of a single wall segment (world units).")]
         [SerializeField] private float _wallHeight = 3f;
         public float WallHeight => _wallHeight;
+
+        [Header("Structural")]
+        [SerializeField] private StructuralMaterial _material = StructuralMaterial.Wood;
+        /// <summary>Structural material type for support propagation falloff.</summary>
+        public StructuralMaterial Material => _material;
+
+        [Header("Comfort")]
+        [SerializeField] private float _comfortValue;
+        [SerializeField] private ComfortGroup _comfortGroup = ComfortGroup.None;
+        /// <summary>Comfort contribution of this piece when placed in a shelter.</summary>
+        public float ComfortValue => _comfortValue;
+        /// <summary>Comfort group for stacking rules (only one per group counts).</summary>
+        public ComfortGroup ComfortGroup => _comfortGroup;
+
+        [Header("Placement Restrictions")]
+        [SerializeField] private bool _groundPiece;
+        [SerializeField] private bool _noInWater;
+        [SerializeField] private bool _notOnFloor;
+        [SerializeField] private bool _notOnWall;
+        [SerializeField] private bool _onlyOnFlat;
+        /// <summary>Requires terrain/ground beneath for placement.</summary>
+        public bool GroundPiece => _groundPiece;
+        /// <summary>Cannot be placed in water.</summary>
+        public bool NoInWater => _noInWater;
+        /// <summary>Cannot be placed on a floor piece.</summary>
+        public bool NotOnFloor => _notOnFloor;
+        /// <summary>Cannot be placed on a wall piece.</summary>
+        public bool NotOnWall => _notOnWall;
+        /// <summary>Requires flat surface for placement.</summary>
+        public bool OnlyOnFlat => _onlyOnFlat;
 
         [Header("Health")]
         [SerializeField] private float _maxHealth = 100f;
@@ -48,13 +87,16 @@ namespace ByteWar.Building
         /// <inheritdoc/>
         public string Serialize()
         {
+            Vector3 euler = transform.eulerAngles;
             var entry = new BuildingSaveEntry
             {
                 PieceType = (int)_pieceType,
                 PosX = transform.position.x,
                 PosY = transform.position.y,
                 PosZ = transform.position.z,
-                RotY = transform.eulerAngles.y,
+                RotX = euler.x,
+                RotY = euler.y,
+                RotZ = euler.z,
                 PlacedByClientId = PlacedByClientId.Value,
             };
             return UnityEngine.JsonUtility.ToJson(entry);
@@ -64,7 +106,7 @@ namespace ByteWar.Building
         {
             var entry = UnityEngine.JsonUtility.FromJson<BuildingSaveEntry>(data);
             transform.position = new UnityEngine.Vector3(entry.PosX, entry.PosY, entry.PosZ);
-            transform.rotation = UnityEngine.Quaternion.Euler(0f, entry.RotY, 0f);
+            transform.rotation = UnityEngine.Quaternion.Euler(entry.RotX, entry.RotY, entry.RotZ);
         }
 
         /// <summary>Owner client ID that placed this piece (set server-side on spawn).</summary>
@@ -79,55 +121,6 @@ namespace ByteWar.Building
                 Health.Value = _maxHealth;
 
             Debug.Log($"[BuildingPiece] Spawned {_pieceType} at {transform.position} by client {PlacedByClientId.Value} netObj={NetworkObjectId}");
-        }
-
-        /// <summary>
-        /// Returns snap point entries: each entry is the *target pivot position* where a
-        /// neighbour of the given type should be placed for edge-to-edge alignment.
-        /// This is the Valheim-like approach: snap points = adjacent piece centers.
-        /// </summary>
-        public SnapPoint[] GetSnapPoints()
-        {
-            float gs = _gridSize;
-            Vector3 pos = transform.position;
-            var points = new List<SnapPoint>();
-
-            if (_pieceType == BuildingPieceType.Foundation)
-            {
-                // Four cardinal neighbours: full grid-size offsets → edge-to-edge
-                points.Add(new SnapPoint(pos + transform.forward * gs, transform.rotation, BuildingPieceType.Foundation));
-                points.Add(new SnapPoint(pos - transform.forward * gs, transform.rotation, BuildingPieceType.Foundation));
-                points.Add(new SnapPoint(pos + transform.right * gs, transform.rotation, BuildingPieceType.Foundation));
-                points.Add(new SnapPoint(pos - transform.right * gs, transform.rotation, BuildingPieceType.Foundation));
-
-                // Wall snap points: four edge centers, walls auto-orient perpendicular
-                float halfGs = gs * 0.5f;
-                points.Add(new SnapPoint(
-                    pos + transform.forward * halfGs,
-                    Quaternion.LookRotation(transform.forward, Vector3.up),
-                    BuildingPieceType.Wall));
-                points.Add(new SnapPoint(
-                    pos - transform.forward * halfGs,
-                    Quaternion.LookRotation(-transform.forward, Vector3.up),
-                    BuildingPieceType.Wall));
-                points.Add(new SnapPoint(
-                    pos + transform.right * halfGs,
-                    Quaternion.LookRotation(transform.right, Vector3.up),
-                    BuildingPieceType.Wall));
-                points.Add(new SnapPoint(
-                    pos - transform.right * halfGs,
-                    Quaternion.LookRotation(-transform.right, Vector3.up),
-                    BuildingPieceType.Wall));
-            }
-            else if (_pieceType == BuildingPieceType.Wall)
-            {
-                // Walls snap to other walls at their left/right edges
-                float halfGs = gs * 0.5f;
-                points.Add(new SnapPoint(pos + transform.right * gs, transform.rotation, BuildingPieceType.Wall));
-                points.Add(new SnapPoint(pos - transform.right * gs, transform.rotation, BuildingPieceType.Wall));
-            }
-
-            return points.ToArray();
         }
 
         /// <summary>Server: apply damage. Destroys the piece if health reaches zero.</summary>
@@ -150,24 +143,6 @@ namespace ByteWar.Building
             float before = Health.Value;
             Health.Value = _maxHealth;
             Debug.Log($"[BuildingPiece] {_pieceType} netObj={NetworkObjectId} repaired {before:0} → {_maxHealth}");
-        }
-    }
-
-    /// <summary>
-    /// A snap point representing where a new piece should be placed.
-    /// Position = target piece pivot, Rotation = suggested orientation, TargetType = which piece type this snap is for.
-    /// </summary>
-    public struct SnapPoint
-    {
-        public Vector3 Position;
-        public Quaternion Rotation;
-        public BuildingPieceType TargetType;
-
-        public SnapPoint(Vector3 position, Quaternion rotation, BuildingPieceType targetType)
-        {
-            Position = position;
-            Rotation = rotation;
-            TargetType = targetType;
         }
     }
 }

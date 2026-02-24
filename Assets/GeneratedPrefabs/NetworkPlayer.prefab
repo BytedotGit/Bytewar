@@ -1294,11 +1294,12 @@ GameObject:
   - component: {fileID: 4958754132722571638}
   - component: {fileID: 6369500306320351318}
   - component: {fileID: 8274630057137456099}
-  - component: {fileID: 3105881896946120755}
-  - component: {fileID: 4569547733702641510}
   - component: {fileID: 3330233741951287639}
   - component: {fileID: 8154845273091435660}
   - component: {fileID: 1630240832376271120}
+  - component: {fileID: 296941942117153287}
+  - component: {fileID: 8881720552607512852}
+  - component: {fileID: 200749245316994546}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Untagged
@@ -1465,8 +1466,8 @@ CharacterController:
   serializedVersion: 3
   m_Height: 2
   m_Radius: 0.35
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
+  m_SlopeLimit: 50
+  m_StepOffset: 0.4
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
@@ -1510,7 +1511,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: ByteWar::ByteWar.Networking.NetworkPlayer
   ShowTopMostFoldoutHeaderGroup: 1
   _generatedVisualModeStamp: 1
---- !u!114 &3105881896946120755
+--- !u!95 &3330233741951287639
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5174049880952391945}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 420482b791f1c7346a392005930902b1, type: 3}
+  m_Controller: {fileID: 9100000, guid: e3575e758178f9c41b0b4296a676f468, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8154845273091435660
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1519,11 +1542,95 @@ MonoBehaviour:
   m_GameObject: {fileID: 5174049880952391945}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c58caaa06bb66641b4c28198bc2e444, type: 3}
+  m_Script: {fileID: 11500000, guid: 84ca46513a33dc54683fa8df97efbcad, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ByteWar::ByteWar.Core.FootstepController
-  _stepInterval: 0.45
---- !u!82 &4569547733702641510
+  m_EditorClassIdentifier: ByteWar::ByteWar.Networking.ClientNetworkAnimator
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 0
+  m_Animator: {fileID: 3330233741951287639}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries:
+    - name: Speed
+      NameHash: -823668238
+      Synchronize: 1
+      ParameterType: 1
+    - name: IsGrounded
+      NameHash: 507951781
+      Synchronize: 1
+      ParameterType: 4
+    - name: Jump
+      NameHash: 125937960
+      Synchronize: 1
+      ParameterType: 9
+    - name: Attack
+      NameHash: 1080829965
+      Synchronize: 1
+      ParameterType: 9
+  AnimatorParametersExpanded: 0
+--- !u!114 &1630240832376271120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5174049880952391945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90db0a9806991414aa82dd10c32a7591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ByteWar::ByteWar.Building.BuildingController
+  ShowTopMostFoldoutHeaderGroup: 1
+  _recipes:
+  - {fileID: 11400000, guid: e9e3d905fb68e36489cf00062572e681, type: 2}
+  - {fileID: 11400000, guid: 8cf3b2e59e7486048b57e5a3f3d7a75e, type: 2}
+  - {fileID: 11400000, guid: 6f1946bdfdf9e7640a75810e25f65735, type: 2}
+  - {fileID: 11400000, guid: 37b6e27f20b94d341856bf809eea7b14, type: 2}
+  - {fileID: 11400000, guid: 709dccf04a75b624ba20c3db3dd9d9c1, type: 2}
+  - {fileID: 11400000, guid: 92d598fa43e4078458646638df770d93, type: 2}
+  - {fileID: 11400000, guid: 7c79c4356f4da1e48b2b30d0c117997a, type: 2}
+  - {fileID: 11400000, guid: aeeb4128b2499c543bd8eef97e0f29f1, type: 2}
+  - {fileID: 11400000, guid: d51c9209a2e50394b9c47a8207c0a7a6, type: 2}
+  - {fileID: 11400000, guid: 39c0813cc5ea52b4f989c189341ae842, type: 2}
+  - {fileID: 11400000, guid: 3a0e701e58ac6f54ebda653595c53a69, type: 2}
+  - {fileID: 11400000, guid: 62e23878e42e8a0439d6c7331fb3cf1d, type: 2}
+  _placementLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _maxPlacementDistance: 20
+  _gridSize: 4
+  _adjacencySnapRadius: 5
+  _rotationStep: 22.5
+  _removeCooldown: 0.3
+  _foundationPrefab: {fileID: 129791130063525223, guid: 61c8eb9b2fca07445963b45d3bbcbb08, type: 3}
+  _wallPrefab: {fileID: 4314267179206263010, guid: 67580faf99687144cab8a47f2212f3c1, type: 3}
+  _floorPrefab: {fileID: 7506025572282258394, guid: 5ad201f3d9652f142a96ed2a8c5cc040, type: 3}
+  _rampPrefab: {fileID: 7279633542809392370, guid: b952b3dff71969243a0462e41b3c26f4, type: 3}
+  _roof26Prefab: {fileID: 170500698229961880, guid: d2ce4392955f11a489c233a183ff2fae, type: 3}
+  _stairsPrefab: {fileID: 5938458071253171721, guid: b4afdeb0595ecc442a04ba9af8c972ad, type: 3}
+  _polePrefab: {fileID: 8644457247249249755, guid: 4d1bf8c2b36b5af4ca1109fd728a4151, type: 3}
+  _beamPrefab: {fileID: 7427044877546917918, guid: d436499fe654f1e4c82659b31580fdbd, type: 3}
+  _angledWallPrefab: {fileID: 7312136321885214603, guid: 05c1a390163b0e14d9959c41dff73adf, type: 3}
+  _doorFramePrefab: {fileID: 5996197297827466016, guid: 49800b8ec79df6245ba8f643433160bb, type: 3}
+  _windowPrefab: {fileID: 1392056589245027758, guid: 1b57664ecf54d48438308fcf78fd9067, type: 3}
+  _halfWallPrefab: {fileID: 3659730573884600177, guid: d20abbab7b94dd949bcfd40e96afe96a, type: 3}
+--- !u!114 &296941942117153287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5174049880952391945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc4067ca1e54ba046a537b4ec8293f62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ByteWar::ByteWar.Building.ComfortSystem
+  _comfortRadius: 10
+  _updateInterval: 2
+  _baseComfort: 1
+--- !u!82 &8881720552607512852
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1535,7 +1642,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 0
+  m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1620,29 +1727,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!95 &3330233741951287639
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5174049880952391945}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 420482b791f1c7346a392005930902b1, type: 3}
-  m_Controller: {fileID: 9100000, guid: d62b8b8888c47aa43a7efc46aeb56e36, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8154845273091435660
+--- !u!114 &200749245316994546
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1651,59 +1736,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5174049880952391945}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84ca46513a33dc54683fa8df97efbcad, type: 3}
+  m_Script: {fileID: 11500000, guid: 9c58caaa06bb66641b4c28198bc2e444, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ByteWar::ByteWar.Networking.ClientNetworkAnimator
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkAnimatorExpanded: 0
-  AuthorityMode: 0
-  m_Animator: {fileID: 3330233741951287639}
-  TransitionStateInfoList: []
-  AnimatorParameterEntries:
-    ParameterEntries:
-    - name: Speed
-      NameHash: -823668238
-      Synchronize: 1
-      ParameterType: 1
-    - name: IsGrounded
-      NameHash: 507951781
-      Synchronize: 1
-      ParameterType: 4
-    - name: Jump
-      NameHash: 125937960
-      Synchronize: 1
-      ParameterType: 9
-    - name: Attack
-      NameHash: 1080829965
-      Synchronize: 1
-      ParameterType: 9
-  AnimatorParametersExpanded: 0
---- !u!114 &1630240832376271120
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5174049880952391945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90db0a9806991414aa82dd10c32a7591, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ByteWar::ByteWar.Building.BuildingController
-  ShowTopMostFoldoutHeaderGroup: 1
-  _recipes:
-  - {fileID: 11400000, guid: e9e3d905fb68e36489cf00062572e681, type: 2}
-  - {fileID: 11400000, guid: 8cf3b2e59e7486048b57e5a3f3d7a75e, type: 2}
-  _placementLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  _maxPlacementDistance: 20
-  _gridSize: 4
-  _adjacencySnapRadius: 3
-  _rotationStep: 45
-  _removeCooldown: 0.3
-  _foundationPrefab: {fileID: 129791130063525223, guid: 61c8eb9b2fca07445963b45d3bbcbb08, type: 3}
-  _wallPrefab: {fileID: 4314267179206263010, guid: 67580faf99687144cab8a47f2212f3c1, type: 3}
+  m_EditorClassIdentifier: ByteWar::ByteWar.Core.FootstepController
+  _stepInterval: 2.5
 --- !u!1 &5178042719677505337
 GameObject:
   m_ObjectHideFlags: 0

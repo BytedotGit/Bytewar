@@ -2,7 +2,23 @@
 
 ## TL;DR
 
-Rename the project from SurvivalRPG → ByteWar, then overhaul the workspace to production-grade standards: ECS (DOTS) for simulation, dedicated server build, architectural abstractions (interfaces, state machines, event bus, config system), robust agent-autonomy infrastructure (CI/CD, guardrails, conventions, specialized agents), and comprehensive instruction files with worked ECS templates — all designed so AI agents build the game autonomously with minimal human input.
+Overhaul the ByteWar workspace to production-grade standards: ECS (DOTS) for simulation, dedicated server build, architectural abstractions (interfaces, state machines, event bus, config system), robust agent-autonomy infrastructure (CI/CD, guardrails, conventions, specialized agents), and comprehensive instruction files with worked ECS templates — all designed so AI agents build the game autonomously with minimal human input.
+
+---
+
+## Current Status
+
+| Phase | Status |
+|-------|--------|
+| Phase 1: Project Rename | ✅ Complete |
+| Phase 2: Core Abstractions | 🟡 Partial (interfaces defined, classes extracted; encapsulation + tests remaining) |
+| Phase 3: ECS / DOTS | ⚪ Not started |
+| Phase 4: Dedicated Server | ⚪ Not started |
+| Phase 5: Performance | ⚪ Not started |
+| Phase 6: Instructions & Conventions | 🟡 Partial (architecture, agent-workflow, copilot-instructions, Building AGENTS.md done) |
+| Phase 7: CI/CD | 🟡 Partial (validate-pr.ps1 created; full CI/CD pending) |
+| Phase 8: Agent Guardrails | 🟡 Partial (architect, debugger, reviewer agents created; designer updated) |
+| Phase 9: Test Hardening | ⚪ Not started |
 
 ---
 
@@ -12,64 +28,24 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 
 ---
 
-### PHASE 1: Project Rename (SurvivalRPG → ByteWar)
+### PHASE 1: Project Rename (SurvivalRPG → ByteWar) — ✅ COMPLETE
 
-> **Precondition**: None. Do this first — everything else references the project name.
-> **Risk mitigation**: This touches nearly every file. Run full test suite before AND after. Commit the rename as a single atomic commit.
-
-- [ ] **1.1** Update `ProjectSettings/ProjectSettings.asset`:
-  - `productName: SurvivalRPG` → `productName: ByteWar`
-  - `companyName: DefaultCompany` → `companyName: BytedotGit`
-  - `metroPackageName` and `metroApplicationDescription` → `ByteWar`
-- [ ] **1.2** Rename assembly definition files (+ their `.meta` files):
-  - `SurvivalRPG.asmdef` → `ByteWar.asmdef` (update `name`, `rootNamespace`)
-  - `SurvivalRPG.Editor.asmdef` → `ByteWar.Editor.asmdef` (update `name`, `rootNamespace`, refs)
-  - `SurvivalRPG.Tests.EditMode.asmdef` → `ByteWar.Tests.EditMode.asmdef` (update `name`, `rootNamespace`, refs)
-  - `SurvivalRPG.Tests.PlayMode.asmdef` → `ByteWar.Tests.PlayMode.asmdef` (update `name`, `rootNamespace`, refs)
-- [ ] **1.3** Global find-replace in all `.cs` files:
-  - `namespace SurvivalRPG` → `namespace ByteWar`
-  - `using SurvivalRPG` → `using ByteWar`
-  - `SurvivalRPG.` (FQN refs) → `ByteWar.`
-  - `InternalsVisibleTo("SurvivalRPG.` → `InternalsVisibleTo("ByteWar.`
-- [ ] **1.4** Update `CreateAssetMenu` `menuName` strings in 7 ScriptableObjects:
-  - `"SurvivalRPG/..."` → `"ByteWar/..."`
-- [ ] **1.5** Update `MenuItem` strings in 10+ editor scripts:
-  - `"SurvivalRPG/..."` → `"ByteWar/..."`
-- [ ] **1.6** Update build output path in `BuildScript.cs`:
-  - `"Builds/Windows/SurvivalRPG.exe"` → `"Builds/Windows/ByteWar.exe"`
-- [ ] **1.7** Update `Tools/UnityMCP/index.js`:
-  - All assembly-qualified names: `SurvivalRPG.Editor.MCPCommands, SurvivalRPG.Editor` → `ByteWar.Editor.MCPCommands, ByteWar.Editor`
-- [ ] **1.8** Rename root project files (+ update content):
-  - `SurvivalRPG.slnx` → `ByteWar.slnx` (update all project refs inside)
-  - `SurvivalRPG.csproj` → `ByteWar.csproj` (update RootNamespace, AssemblyName, asmdef path)
-  - `SurvivalRPG.Editor.csproj` → `ByteWar.Editor.csproj` (same + ProjectReference)
-  - `SurvivalRPG.Tests.EditMode.csproj` → `ByteWar.Tests.EditMode.csproj`
-  - `SurvivalRPG.Tests.PlayMode.csproj` → `ByteWar.Tests.PlayMode.csproj`
-- [ ] **1.9** Update all documentation references:
-  - `AGENTS.md`: `SurvivalRPG.exe` → `ByteWar.exe`
-  - `.github/ROADMAP.md`: title and any refs
-  - `.github/instructions/testing.instructions.md`: exe path + Player.log path (`DefaultCompany\SurvivalRPG` → `BytedotGit\ByteWar`)
-  - `Tools/UnityMCP/README.md`: project name + paths
-  - `Assets/Art/Characters/Mixamo/README.md`: menu name ref
-- [ ] **1.10** Delete stale build artifacts: `Builds/Windows/`, `build_log.txt`, `TestResults_EditMode.xml`, `dotnet_build.txt`
-- [ ] **1.11** Update `CHANGELOG.md` with rename entry
-- [ ] **1.12** Verification: compile (zero warnings) → EditMode tests → PlayMode tests → build client → AutoTest → Player.log check (new company/product path)
-- [ ] **1.13** Single atomic git commit for the rename
+All 13 sub-tasks completed. Global namespace rename, docs, build artifacts, and verification all done in a single atomic commit.
 
 ---
 
-### PHASE 2: Core Abstractions & Interfaces
+### PHASE 2: Core Abstractions & Interfaces — [CURRENT]
 
 > **Precondition**: Phase 1 complete (all refs are ByteWar).
 > **Risk mitigation (from Further Considerations)**: Splitting `NetworkPlayer` touches the most critical runtime class. Run all existing tests before AND after the split. If any test breaks, the split is wrong — revert and re-approach.
 
-- [ ] **2.1** Create `Assets/Scripts/Core/Interfaces/` folder
-- [ ] **2.2** Define `IDamageable.cs` — `void TakeDamage(float amount, ulong instigatorClientId)`
-- [ ] **2.3** Define `IInteractable.cs` — `bool CanInteract(ulong clientId)`, `void Interact(ulong clientId)`
-- [ ] **2.4** Define `IInventoryHolder.cs` — `HasItem()`, `AddItem()`, `RemoveItem()`
-- [ ] **2.5** Define `ICombatTarget.cs` — `AttributeSet Attributes`, `bool IsAlive`
-- [ ] **2.6** Define `IPersistable.cs` — `string Serialize()`, `void Deserialize(string)`
-- [ ] **2.7** Define `IGameState.cs` — `void Enter()`, `void Exit()`, `void Tick()`
+- [x] **2.1** Create `Assets/Scripts/Core/Interfaces/` folder
+- [x] **2.2** Define `IDamageable.cs`
+- [x] **2.3** Define `IInteractable.cs`
+- [x] **2.4** Define `IInventoryHolder.cs`
+- [x] **2.5** Define `ICombatTarget.cs`
+- [x] **2.6** Define `IPersistable.cs`
+- [x] **2.7** Define `IGameState.cs`
 - [ ] **2.8** Implement interfaces on existing classes:
   - `EnemyAI` → `IDamageable`, `ICombatTarget`
   - `ResourceNode` → `IDamageable`, `IInteractable`
@@ -84,16 +60,11 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
   - `AbilitySystemComponent.CooldownReductions/ManaCostReductions` → read-only accessor methods
   - `EquipmentComponent.EquippedWeapon/Armor` → properties with server-only setters
   - All UI public fields → `[SerializeField] private`
-- [ ] **2.11** Extract `PlayerMovement.cs` from `NetworkPlayer.cs`:
-  - Move: movement constants, `HandleMovement()`, gravity, jump, velocity
-  - NetworkPlayer keeps: lifecycle, camera, spawn, OnNetworkSpawn coordination
-- [ ] **2.12** Extract `PlayerVisualSetup.cs` from `NetworkPlayer.cs`:
-  - Move: visual grounding, animator repair, visual mode detection, VisualDiagnostics
-- [ ] **2.13** Extract `BuildingPreview.cs` from `BuildingController.cs`:
-  - Move: preview rendering, validity tinting, rotation
-- [ ] **2.14** Extract `BuildingSnap.cs` from `BuildingController.cs`:
-  - Move: grid snapping, adjacency snapping logic
-- [ ] **2.15** Create `GameConstants.cs` ScriptableObject:
+- [x] **2.11** Extract `PlayerMovement.cs` from `NetworkPlayer.cs`
+- [x] **2.12** Extract `PlayerVisualSetup.cs` from `NetworkPlayer.cs`
+- [x] **2.13** Extract `BuildingPreview.cs` from `BuildingController.cs`
+- [x] **2.14** Extract `BuildingSnap.cs` from `BuildingController.cs`
+- [x] **2.15** Create `GameConstants.cs` ScriptableObject:
   - Absorb: MoveSpeed, Gravity, JumpForce, TurnSpeed (from NetworkPlayer)
   - Absorb: melee damage `10f` (from PlayerInteraction)
   - Absorb: fireball fallback damage `25f` (from FireballProjectile)
@@ -101,16 +72,12 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
   - Absorb: frame rate cap (from GameManager)
   - Absorb: all AutoTester thresholds
 - [ ] **2.16** Update `AssetGenerator` to generate `GameConstants` ScriptableObject
-- [ ] **2.17** Create `GameStateMachine.cs`:
-  - States: Initializing → MainMenu → Connecting → Loading → Playing → Paused → Disconnected
-  - Host in `GameManager` (replace bare singleton with state machine host)
-- [ ] **2.18** Create `GameEventBus.cs` with `GameEvent<T>`:
-  - Channels: `EnemyDied`, `EnemyTargeted`, `ItemAdded`, `ItemRemoved`, `BuildingPlaced`, `GameStateChanged`
-  - Auto-cleanup on scene unload
+- [x] **2.17** Create `GameStateMachine.cs`
+- [x] **2.18** Create `GameEventBus.cs` with `GameEvent<T>`
 - [ ] **2.19** Migrate static events to GameEventBus:
   - `EnemyAI.OnEnemyDied` → `GameEventBus.EnemyDied`
   - `EnemyTargetTracker.OnEnemyTargeted` → `GameEventBus.EnemyTargeted`
-- [ ] **2.20** Create `PlayerRegistry.cs` (static `HashSet<Transform>`):
+- [x] **2.20** Create `PlayerRegistry.cs` (static `HashSet<Transform>`):
   - Maintained by `NetworkPlayer.OnNetworkSpawn/Despawn`
   - Replace `EnemyAI.FindGameObjectsWithTag("Player")` with `PlayerRegistry.GetNearest()`
 - [ ] **2.21** Fix per-frame anti-patterns:
@@ -235,7 +202,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 > **Precondition**: Phases 2-4 complete (conventions must match implemented architecture).
 > **Note**: Step 6.2 (agent-workflow) has no code dependency and CAN be done earlier / in parallel with Phase 2.
 
-- [ ] **6.1** Create `.github/instructions/architecture.instructions.md`:
+- [x] **6.1** Create `.github/instructions/architecture.instructions.md`:
   - Hybrid MB/ECS architecture rules
   - Interface-first design mandate
   - Encapsulation rules (no public mutable fields)
@@ -243,7 +210,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
   - Magic number prohibition (GameConstants or per-system SO)
   - State management (GameStateMachine)
   - Event communication (GameEventBus for cross-system, instance events for parent-child)
-- [ ] **6.2** Create `.github/instructions/agent-workflow.instructions.md`:
+- [x] **6.2** Create `.github/instructions/agent-workflow.instructions.md`:
   - Agent decision tree: "Given a task, how do I decide what to do?"
   - When to escalate to user (aesthetic/taste choices ONLY)
   - Ambiguity protocol: implement simpler option + log alternative to TECH_DEBT.md
@@ -252,12 +219,12 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
   - How to use Designer agent for balance decisions
   - Convention: agents MUST read instruction files before modifying any folder
   - Error recovery: max 3 retries, then ERROR_LOG.md + escalate
-- [ ] **6.3** Create `.github/copilot-instructions.md` (global Copilot context):
+- [x] **6.3** Create `.github/copilot-instructions.md` (global Copilot context):
   - Architecture summary (hybrid MB/ECS, NGO networking, data-driven SOs)
   - Links to all instruction files
   - Quality gates: zero warnings, 100% test coverage, AutoTester validation
   - Project name: ByteWar
-- [ ] **6.4** Update existing AGENTS.md files:
+- [x] **6.4** Update existing AGENTS.md files (auto-generated via `Tools/generate-agents-md.ps1`):
   - Root `AGENTS.md`: ECS refs, dedicated server refs, new instruction file links, ByteWar name, exe path
   - `Assets/Scripts/AGENTS.md`: interface-first rule, encapsulation rule
   - `Assets/Scripts/Core/AGENTS.md`: state machine, event bus, constants rules
@@ -268,7 +235,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
   - `Assets/Scripts/Tests/AGENTS.md`: link to testing + architecture instructions
   - `Assets/Scripts/Editor/AGENTS.md`: link to architecture instructions
   - `Assets/Art/AGENTS.md`: no change needed
-- [ ] **6.5** Create `Assets/Scripts/Building/AGENTS.md`:
+- [x] **6.5** Create `Assets/Scripts/Building/AGENTS.md`:
   - Building system conventions, persistence rules
 - [ ] **6.6** Create `Assets/Scripts/ECS/AGENTS.md` (if not done in 3.4):
   - ECS-specific conventions
@@ -290,7 +257,7 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 
 > **Precondition**: Phase 4 step 4.3 (server build method exists). Phase 6.2 can be in parallel.
 
-- [ ] **7.1** Create `Tools/verify.ps1`:
+- [ ] **7.1** Create `Tools/verify.ps1` (full verification loop):
   - Single-command local verification loop:
     1. EditMode tests (batchmode)
     2. PlayMode tests (batchmode)
@@ -299,7 +266,9 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
     5. Launch client with `-autoTest`
     6. Parse Player.log for PASS/FAIL + exceptions
     7. Summary report with exit code 0/1
-- [ ] **7.2** Create `Tools/validate-conventions.ps1`:
+- [x] **7.2** Create `Tools/validate-pr.ps1` (replaces validate-conventions.ps1):
+  - Checks governance files exist, AGENTS.md freshness, 800 LOC, public fields, CHANGELOG
+- [ ] **7.2b** Create `Tools/validate-conventions.ps1` (detailed convention checks):
   - Check: no `public List<>` / `public Dictionary<>` fields in non-test runtime scripts
   - Check: no `FindObjectOfType`/`FindObjectsByType` in `Update()`/`FixedUpdate()`
   - Check: no unthrottled `Debug.Log` in Update/FixedUpdate
@@ -341,18 +310,18 @@ Legend: `[ ]` = not started, `[~]` = in progress, `[x]` = done
 
 > **Precondition**: Phase 6 complete (conventions exist to enforce).
 
-- [ ] **8.1** Create `.github/agents/architect.agent.md`:
+- [x] **8.1** Create `.github/agents/architect.agent.md`:
   - Specializes in system design, interface design, ECS vs MB decisions
   - References architecture.instructions.md and ecs.instructions.md
-- [ ] **8.2** Create `.github/agents/debugger.agent.md`:
+- [x] **8.2** Create `.github/agents/debugger.agent.md`:
   - Specializes in Player.log analysis, test failure diagnosis
   - Methodical root-cause approach: read error → identify file:line → propose fix → test
   - References AutoTester exit code table
-- [ ] **8.3** Create `.github/agents/reviewer.agent.md`:
+- [x] **8.3** Create `.github/agents/reviewer.agent.md`:
   - Convention enforcement agent
   - Runs `validate-conventions.ps1` mentally on proposed changes
   - Checks: encapsulation, interfaces, 800 LOC, test coverage, naming
-- [ ] **8.4** Update `.github/agents/designer.agent.md`:
+- [x] **8.4** Update `.github/agents/designer.agent.md`:
   - Add reference to GameConstants ScriptableObject for balance values
   - Add ECS performance considerations for large entity counts
 - [ ] **8.5** Define structured agent logging format:

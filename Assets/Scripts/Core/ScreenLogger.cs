@@ -50,6 +50,8 @@ namespace ByteWar.Core
 
         private void OnGUI()
         {
+            // Only show in DevMode
+            if (!GameConstants.IsDevMode()) return;
             if (!_visible || _entries.Count == 0) return;
 
             if (_logStyle == null)

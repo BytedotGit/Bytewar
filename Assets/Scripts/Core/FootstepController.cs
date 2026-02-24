@@ -12,7 +12,7 @@ namespace ByteWar.Core
     [RequireComponent(typeof(CharacterController))]
     public class FootstepController : MonoBehaviour
     {
-        [SerializeField] private float _stepInterval = 0.45f;   // metres per step
+        [SerializeField] private float _stepInterval = 2.5f;   // metres per step
 
         private CharacterController _cc;
         private Vector3 _lastPosition;

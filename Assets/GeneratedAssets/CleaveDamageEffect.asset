@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03436a00b55b49241a24d0a74e31e6a0, type: 3}
+  m_Name: CleaveDamageEffect
+  m_EditorClassIdentifier: ByteWar::ByteWar.Abilities.GameplayEffect
+  _effectName: Cleave Damage
+  _type: 0
+  _durationType: 0
+  _duration: 0
+  _magnitude: 25

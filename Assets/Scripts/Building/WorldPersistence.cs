@@ -14,7 +14,7 @@ namespace ByteWar.Building
     {
         public int PieceType;
         public float PosX, PosY, PosZ;
-        public float RotY;
+        public float RotX, RotY, RotZ;
         public ulong PlacedByClientId;
     }
 
@@ -40,6 +40,16 @@ namespace ByteWar.Building
         [Header("Building Prefab Registry")]
         [SerializeField] private GameObject _foundationPrefab;
         [SerializeField] private GameObject _wallPrefab;
+        [SerializeField] private GameObject _floorPrefab;
+        [SerializeField] private GameObject _rampPrefab;
+        [SerializeField] private GameObject _roof26Prefab;
+        [SerializeField] private GameObject _stairsPrefab;
+        [SerializeField] private GameObject _polePrefab;
+        [SerializeField] private GameObject _beamPrefab;
+        [SerializeField] private GameObject _angledWallPrefab;
+        [SerializeField] private GameObject _doorFramePrefab;
+        [SerializeField] private GameObject _windowPrefab;
+        [SerializeField] private GameObject _halfWallPrefab;
 
         /// <summary>Full path to the save file (platform-specific).</summary>
         public string SaveFilePath => Path.Combine(Application.persistentDataPath, _saveFileName);
@@ -61,13 +71,16 @@ namespace ByteWar.Building
             {
                 if (piece == null || !piece.IsSpawned) continue;
                 Vector3 pos = piece.transform.position;
+                Vector3 euler = piece.transform.eulerAngles;
                 data.Buildings.Add(new BuildingSaveEntry
                 {
                     PieceType = (int)piece.PieceType,
                     PosX = pos.x,
                     PosY = pos.y,
                     PosZ = pos.z,
-                    RotY = piece.transform.eulerAngles.y,
+                    RotX = euler.x,
+                    RotY = euler.y,
+                    RotZ = euler.z,
                     PlacedByClientId = piece.PlacedByClientId.Value,
                 });
             }
@@ -107,13 +120,16 @@ namespace ByteWar.Building
             {
                 if (piece == null || !piece.IsSpawned) continue;
                 Vector3 pos = piece.transform.position;
+                Vector3 euler = piece.transform.eulerAngles;
                 data.Buildings.Add(new BuildingSaveEntry
                 {
                     PieceType = (int)piece.PieceType,
                     PosX = pos.x,
                     PosY = pos.y,
                     PosZ = pos.z,
-                    RotY = piece.transform.eulerAngles.y,
+                    RotX = euler.x,
+                    RotY = euler.y,
+                    RotZ = euler.z,
                     PlacedByClientId = piece.PlacedByClientId.Value,
                 });
             }
@@ -174,7 +190,7 @@ namespace ByteWar.Building
                 }
 
                 Vector3 pos = new(entry.PosX, entry.PosY, entry.PosZ);
-                Quaternion rot = Quaternion.Euler(0f, entry.RotY, 0f);
+                Quaternion rot = Quaternion.Euler(entry.RotX, entry.RotY, entry.RotZ);
                 GameObject go = Instantiate(prefab, pos, rot);
 
                 var piece = go.GetComponent<BuildingPiece>();
@@ -218,14 +234,34 @@ namespace ByteWar.Building
             {
                 BuildingPieceType.Foundation => _foundationPrefab,
                 BuildingPieceType.Wall => _wallPrefab,
+                BuildingPieceType.Floor => _floorPrefab,
+                BuildingPieceType.Ramp => _rampPrefab,
+                BuildingPieceType.Roof26 => _roof26Prefab,
+                BuildingPieceType.Stairs => _stairsPrefab,
+                BuildingPieceType.Pole => _polePrefab,
+                BuildingPieceType.Beam => _beamPrefab,
+                BuildingPieceType.AngledWall => _angledWallPrefab,
+                BuildingPieceType.DoorFrame => _doorFramePrefab,
+                BuildingPieceType.Window => _windowPrefab,
+                BuildingPieceType.HalfWall => _halfWallPrefab,
                 _ => null,
             };
         }
 
-        public void SetBuildingPrefabs(GameObject foundation, GameObject wall)
+        public void SetBuildingPrefabs(GameObject foundation, GameObject wall, GameObject floor = null, GameObject ramp = null, GameObject roof26 = null, GameObject stairs = null, GameObject pole = null, GameObject beam = null, GameObject angledWall = null, GameObject doorFrame = null, GameObject window = null, GameObject halfWall = null)
         {
             _foundationPrefab = foundation;
             _wallPrefab = wall;
+            _floorPrefab = floor;
+            _rampPrefab = ramp;
+            _roof26Prefab = roof26;
+            _stairsPrefab = stairs;
+            _polePrefab = pole;
+            _beamPrefab = beam;
+            _angledWallPrefab = angledWall;
+            _doorFramePrefab = doorFrame;
+            _windowPrefab = window;
+            _halfWallPrefab = halfWall;
         }
     }
 }

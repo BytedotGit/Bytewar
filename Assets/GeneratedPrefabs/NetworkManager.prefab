@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3709166521400111535}
   - component: {fileID: 8955972160915199897}
   - component: {fileID: 8204268291771892974}
+  - component: {fileID: 7976204155353038819}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -150,3 +151,25 @@ MonoBehaviour:
   _saveFileName: world_save.json
   _foundationPrefab: {fileID: 129791130063525223, guid: 61c8eb9b2fca07445963b45d3bbcbb08, type: 3}
   _wallPrefab: {fileID: 4314267179206263010, guid: 67580faf99687144cab8a47f2212f3c1, type: 3}
+  _floorPrefab: {fileID: 7506025572282258394, guid: 5ad201f3d9652f142a96ed2a8c5cc040, type: 3}
+  _rampPrefab: {fileID: 7279633542809392370, guid: b952b3dff71969243a0462e41b3c26f4, type: 3}
+  _roof26Prefab: {fileID: 170500698229961880, guid: d2ce4392955f11a489c233a183ff2fae, type: 3}
+  _stairsPrefab: {fileID: 5938458071253171721, guid: b4afdeb0595ecc442a04ba9af8c972ad, type: 3}
+  _polePrefab: {fileID: 8644457247249249755, guid: 4d1bf8c2b36b5af4ca1109fd728a4151, type: 3}
+  _beamPrefab: {fileID: 7427044877546917918, guid: d436499fe654f1e4c82659b31580fdbd, type: 3}
+  _angledWallPrefab: {fileID: 7312136321885214603, guid: 05c1a390163b0e14d9959c41dff73adf, type: 3}
+  _doorFramePrefab: {fileID: 5996197297827466016, guid: 49800b8ec79df6245ba8f643433160bb, type: 3}
+  _windowPrefab: {fileID: 1392056589245027758, guid: 1b57664ecf54d48438308fcf78fd9067, type: 3}
+  _halfWallPrefab: {fileID: 3659730573884600177, guid: d20abbab7b94dd949bcfd40e96afe96a, type: 3}
+--- !u!114 &7976204155353038819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5057010086326421689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e651d975a0847e947a3667b306c64cb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ByteWar::ByteWar.UI.DevConsole

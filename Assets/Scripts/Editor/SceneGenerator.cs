@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
+using ByteWar.UI;
 
 namespace ByteWar.Editor
 {
@@ -125,22 +126,50 @@ namespace ByteWar.Editor
             GameObject loggerObj = new GameObject("ScreenLogger");
             loggerObj.AddComponent<ByteWar.Core.ScreenLogger>();
             Debug.Log("[SceneGenerator] ScreenLogger added (toggle with F1).");
+            // ── 10c. Keybinding HUD overlay ──────────────────────────────────────
+            GameObject keybindingHudObj = new GameObject("KeybindingHUD");
+            keybindingHudObj.AddComponent<ByteWar.UI.KeybindingHUD>();
+            Debug.Log("[SceneGenerator] KeybindingHUD added (toggle with F2).");
 
-            // ── 11. VFXManager ──────────────────────────────────────────────────
-            SpawnVFXManager();
+            // ── 10d. Asset Deploy UI (for viewing/spawning test assets) ─────────
+            // Visible only while holding Shift+Tab.
+            GameObject assetDeployUiObj = new GameObject("AssetDeployUI");
+            assetDeployUiObj.AddComponent<AssetDeployUI>();
+            Debug.Log("[SceneGenerator] AssetDeployUI added (hold Shift+Tab).");
 
-            // ── 12. AudioManager ────────────────────────────────────────────────
-            SpawnAudioManager();
-
-            // ── 13. Post-Processing ─────────────────────────────────────────────
-            PostProcessingSetup.SetupPostProcessInternal();
-
-            // ── 14. Scatter greybox environment props ────────────────────────────
+            // ── 11. Scatter greybox environment props ────────────────────────────
             GenerateGreyboxProps();
+
+            // ── 12. Place Blender E2E prop near spawn ───────────────────────────
+            TryPlaceBlenderE2EPropNearSpawn();
 
             // ── Save ──────────────────────────────────────────────────────────────
             EditorSceneManager.SaveScene(newScene, scenePath);
             Debug.Log($"[SceneGenerator] Scene saved to {scenePath}");
+        }
+
+        private static void TryPlaceBlenderE2EPropNearSpawn()
+        {
+            const string prefabPath = "Assets/Resources/Generated/BlenderE2EProp/BlenderE2EProp.prefab";
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[SceneGenerator] Blender E2E prop prefab not found at {prefabPath}. Run Generate Blender E2E Prop Prefab first.");
+                return;
+            }
+
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            go.name = "Placed_BlenderE2EProp";
+
+            Vector3 desired = new Vector3(4f, 2f, 4f);
+            float y = 0f;
+            if (Physics.Raycast(desired + Vector3.up * 50f, Vector3.down, out var hit, 200f, ~0, QueryTriggerInteraction.Ignore))
+                y = hit.point.y;
+
+            go.transform.position = new Vector3(desired.x, y + 0.1f, desired.z);
+            go.transform.rotation = Quaternion.Euler(0f, 25f, 0f);
+
+            Debug.Log($"[SceneGenerator] Placed BlenderE2EProp near spawn at {go.transform.position}.");
         }
 
         // ──────────────────────────────────────────────────────────────────────────
@@ -251,31 +280,6 @@ namespace ByteWar.Editor
             wall.GetComponent<Renderer>().sharedMaterial = mat;
         }
 
-        // ── VFXManager instantiation ──────────────────────────────────────────────
-
-        private static void SpawnVFXManager()
-        {
-            GameObject vfxManagerObj = new GameObject("VFXManager");
-            vfxManagerObj.AddComponent<Unity.Netcode.NetworkObject>();
-            var vfxManager = vfxManagerObj.AddComponent<ByteWar.Core.VFXManager>();
-
-            var (muzzle, impact, gather, resDeath, building, pickup) =
-                VFXPrefabGenerator.GetOrGeneratePrefabs();
-
-            vfxManager.SetPrefabs(muzzle, impact, gather, resDeath, building, pickup);
-
-            Debug.Log($"[SceneGenerator] VFXManager added. allPrefabsAssigned={vfxManager.AllPrefabsAssigned}");
-        }
-
-        // ── AudioManager instantiation ────────────────────────────────────────────
-
-        private static void SpawnAudioManager()
-        {
-            GameObject audioManagerObj = new GameObject("AudioManager");
-            audioManagerObj.AddComponent<ByteWar.Core.AudioManager>();
-            Debug.Log("[SceneGenerator] AudioManager added.");
-        }
-
         private static void GenerateGreyboxProps()
         {
             const string basePath = "Assets/GeneratedPrefabs";
@@ -299,6 +303,28 @@ namespace ByteWar.Editor
             }
 
             Debug.Log("[SceneGenerator] Greybox props scattered (20 rocks).");
+        }
+
+        private static void PlaceBlenderE2EPropNearSpawn()
+        {
+            const string prefabPath = "Assets/Resources/Generated/BlenderE2EProp/BlenderE2EProp.prefab";
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[SceneGenerator] BlenderE2EProp prefab not found at '{prefabPath}'. Run Generate Blender E2E Prop Prefab first.");
+                return;
+            }
+
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            go.name = "Placed_BlenderE2EProp";
+
+            Vector3 pos = new Vector3(4f, 0f, 2f);
+            if (Physics.Raycast(new Vector3(pos.x, 10f, pos.z), Vector3.down, out RaycastHit hit, 50f, ~0, QueryTriggerInteraction.Ignore))
+                pos.y = hit.point.y;
+
+            go.transform.position = pos;
+            go.transform.rotation = Quaternion.identity;
+            Debug.Log($"[SceneGenerator] Placed BlenderE2EProp at {pos}.");
         }
     }
 }

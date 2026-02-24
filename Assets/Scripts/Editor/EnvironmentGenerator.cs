@@ -213,11 +213,33 @@ namespace ByteWar.Editor
         private static Material Mat(string name, Color color, float metallic, float smoothness)
         {
             string path = $"{BasePath}/{name}.mat";
-            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null)
+
+            // If the material already exists with a valid Standard shader, reuse it.
+            // Prevents -nographics builds from overwriting good materials with fallback.
+            Material existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing != null && existing.shader != null && existing.shader.name == "Standard")
+            {
+                existing.color = color;
+                if (existing.HasProperty("_Metallic")) existing.SetFloat("_Metallic", metallic);
+                if (existing.HasProperty("_Glossiness")) existing.SetFloat("_Glossiness", smoothness);
+                EditorUtility.SetDirty(existing);
+                return existing;
+            }
+
+            if (existing != null)
                 AssetDatabase.DeleteAsset(path);
 
-            Shader shader = Shader.Find("Universal Render Pipeline/Lit")
-                         ?? Shader.Find("Standard");
+            // Use Standard shader (BIRP) directly — URP/Lit resolves to a pink stub in BIRP builds.
+            // In batchmode with -nographics, Shader.Find can return null. Try fallback.
+            Shader shader = Shader.Find("Standard");
+            if (shader == null)
+            {
+                shader = Shader.Find("Diffuse");
+                if (shader == null)
+                    Debug.LogError("[BuildGen] EnvironmentGenerator: No suitable shader found! Materials will be pink. Avoid -nographics.");
+                else
+                    Debug.LogWarning("[BuildGen] EnvironmentGenerator: 'Standard' shader not found, using 'Diffuse' fallback.");
+            }
             var mat = new Material(shader) { color = color };
             if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", metallic);
             if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", smoothness);

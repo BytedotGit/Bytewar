@@ -64,6 +64,12 @@ namespace ByteWar.Tests.EditMode
                 {
                     var np = instance.GetComponent<NetworkPlayer>();
                     needsRegen = (np == null) || (np.GeneratedVisualModeStamp == PlayerVisualMode.Unknown);
+                    // Also re-generate if stamp doesn't match actual visuals (e.g. Mixamo FBX removed)
+                    if (!needsRegen && np != null)
+                    {
+                        var actual = np.DetectActualVisualMode(out _);
+                        needsRegen = actual != np.GeneratedVisualModeStamp;
+                    }
                 }
                 finally
                 {

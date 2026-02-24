@@ -52,11 +52,30 @@ namespace ByteWar.Editor
             Debug.Log("[MCP] Step 6/7 — Generating runtime prefabs...");
             PrefabGenerator.GeneratePrefabs();
 
+            // 6b. Blender E2E prop prefab (optional, safe no-op if FBX missing)
+            Debug.Log("[MCP] Step 6b/7 — Generating Blender E2E prop prefab...");
+            BlenderE2EPropPrefabGenerator.Generate();
+
             // 7. Scene (terrain + env objects + lighting + all prefabs)
             Debug.Log("[MCP] Step 7/7 — Generating test scene...");
             SceneGenerator.GenerateTestScene(); // also calls EnvironmentGenerator internally
 
             Debug.Log("[MCP] Full generation pipeline complete.");
+        }
+
+        [MenuItem("Tools/MCP/Generate Blender E2E Prop Prefab")]
+        public static void GenerateBlenderE2EProp()
+        {
+            Debug.Log("[MCP] Generating Blender E2E prop prefab...");
+            bool ok = BlenderE2EPropPrefabGenerator.Generate();
+            Debug.Log("[MCP] Blender E2E prop prefab generation complete.");
+
+            if (Application.isBatchMode)
+            {
+                int exitCode = ok ? 0 : 1;
+                Debug.Log($"[MCP] Exiting editor with code {exitCode} (batchmode). ok={ok}");
+                EditorApplication.Exit(exitCode);
+            }
         }
 
         public static void GenerateTerrain()

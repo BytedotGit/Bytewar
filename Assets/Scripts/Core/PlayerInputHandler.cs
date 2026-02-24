@@ -5,6 +5,7 @@ namespace ByteWar.Core
 {
     public class PlayerInputHandler : MonoBehaviour
     {
+        // InputAction instances retained for rebinding support / test access.
         public InputAction MovementAction { get; private set; }
         public InputAction CastSpell1Action { get; private set; }
         public InputAction CastSpell2Action { get; private set; }
@@ -19,12 +20,16 @@ namespace ByteWar.Core
         public bool BuildTriggered { get; private set; }
         public bool JumpTriggered { get; private set; }
 
+        /// <summary>When true, all gameplay input is suppressed (e.g., console is open).</summary>
+        public bool InputSuppressed { get; set; }
+
         private float _nextMoveLogTime;
         private Vector2 _lastLoggedMove;
+        private bool _isSimulated;
 
         private void Awake()
         {
-            Debug.Log($"[{nameof(PlayerInputHandler)}] Initializing Input Actions.");
+            Debug.Log($"[{nameof(PlayerInputHandler)}] Initializing input (direct keyboard polling).");
 
 #if !ENABLE_INPUT_SYSTEM
             Debug.LogError($"[{nameof(PlayerInputHandler)}] ENABLE_INPUT_SYSTEM is NOT defined. " +
@@ -32,45 +37,18 @@ namespace ByteWar.Core
                            "Fix: ProjectSettings -> Active Input Handling = Both (or New). Movement/camera will not work otherwise.");
 #endif
 
-            // Development-friendly defaults: keep input alive even if focus changes.
-            // This reduces "can't move" reports when the game window isn't focused.
-            // (Standalone builds only care about responsiveness; this can be revisited later.)
             Application.runInBackground = true;
-            try
-            {
-                if (InputSystem.settings != null)
-                {
-                    InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogWarning($"[{nameof(PlayerInputHandler)}] Failed to set InputSystem backgroundBehavior: {ex.Message}");
-            }
 
-            // Define actions in code
+            // Create InputAction instances (for test access / future rebinding).
+            // These are NOT used for runtime polling — we read Keyboard.current directly
+            // because standalone InputAction instances can silently fail binding resolution
+            // in builds, while Keyboard.current always works (matches BuildingController,
+            // ThirdPersonCamera, ScreenLogger, and KeybindingHUD patterns).
             MovementAction = new InputAction("Movement", type: InputActionType.Value, expectedControlType: "Vector2");
-            MovementAction.AddBinding("<Gamepad>/leftStick");
-
-            // Primary: WASD
             MovementAction.AddCompositeBinding("2DVector")
                 .With("Up", "<Keyboard>/w")
                 .With("Down", "<Keyboard>/s")
                 .With("Left", "<Keyboard>/a")
-                .With("Right", "<Keyboard>/d");
-
-            // Fallback: Arrow keys
-            MovementAction.AddCompositeBinding("2DVector")
-                .With("Up", "<Keyboard>/upArrow")
-                .With("Down", "<Keyboard>/downArrow")
-                .With("Left", "<Keyboard>/leftArrow")
-                .With("Right", "<Keyboard>/rightArrow");
-
-            // Fallback: AZERTY-style movement (ZQSD)
-            MovementAction.AddCompositeBinding("2DVector")
-                .With("Up", "<Keyboard>/z")
-                .With("Down", "<Keyboard>/s")
-                .With("Left", "<Keyboard>/q")
                 .With("Right", "<Keyboard>/d");
 
             CastSpell1Action = new InputAction("CastSpell1", type: InputActionType.Button, binding: "<Keyboard>/1");
@@ -78,25 +56,6 @@ namespace ByteWar.Core
             InteractAction = new InputAction("Interact", type: InputActionType.Button, binding: "<Keyboard>/e");
             BuildAction = new InputAction("Build", type: InputActionType.Button, binding: "<Keyboard>/b");
             JumpAction = new InputAction("Jump", type: InputActionType.Button, binding: "<Keyboard>/space");
-
-            // Register callbacks
-            MovementAction.performed += ctx => MovementInput = ctx.ReadValue<Vector2>();
-            MovementAction.canceled += ctx => MovementInput = Vector2.zero;
-
-            InteractAction.performed += ctx => InteractTriggered = true;
-            InteractAction.canceled += ctx => InteractTriggered = false;
-
-            CastSpell1Action.performed += ctx => CastSpell1Triggered = true;
-            CastSpell1Action.canceled += ctx => CastSpell1Triggered = false;
-
-            CastSpell2Action.performed += ctx => CastSpell2Triggered = true;
-            CastSpell2Action.canceled += ctx => CastSpell2Triggered = false;
-
-            BuildAction.performed += ctx => BuildTriggered = true;
-            BuildAction.canceled += ctx => BuildTriggered = false;
-
-            JumpAction.performed += ctx => JumpTriggered = true;
-            JumpAction.canceled += ctx => JumpTriggered = false;
 
             Debug.Log($"[{nameof(PlayerInputHandler)}] Devices: Keyboard={(Keyboard.current != null)} Mouse={(Mouse.current != null)}");
         }
@@ -110,28 +69,31 @@ namespace ByteWar.Core
         private void OnDisable()
         {
             Debug.Log($"[{nameof(PlayerInputHandler)}] Disabling Input Actions.");
-            MovementAction.Disable();
-            CastSpell1Action.Disable();
-            CastSpell2Action.Disable();
-            InteractAction.Disable();
-            BuildAction.Disable();
-            JumpAction.Disable();
+            if (MovementAction != null) MovementAction.Disable();
+            if (CastSpell1Action != null) CastSpell1Action.Disable();
+            if (CastSpell2Action != null) CastSpell2Action.Disable();
+            if (InteractAction != null) InteractAction.Disable();
+            if (BuildAction != null) BuildAction.Disable();
+            if (JumpAction != null) JumpAction.Disable();
         }
-
-        private bool _isSimulated;
 
         private void Update()
         {
-            // Self-heal: actions can end up disabled after domain reloads / prefab regeneration / script toggles.
-            // This prevents the common "can't move" symptom from persisting silently.
-            if (!_isSimulated && (MovementAction == null || !MovementAction.enabled))
+            // Suppress all gameplay input when console or other overlay is active
+            if (InputSuppressed)
             {
-                EnsureActionsEnabled("Update self-heal");
+                MovementInput = Vector2.zero;
+                InteractTriggered = false;
+                CastSpell1Triggered = false;
+                CastSpell2Triggered = false;
+                BuildTriggered = false;
+                JumpTriggered = false;
+                return;
             }
 
-            if (!_isSimulated && MovementAction != null)
+            if (!_isSimulated)
             {
-                MovementInput = MovementAction.ReadValue<Vector2>();
+                PollKeyboard();
             }
 
             // Throttle logs to avoid per-frame spam.
@@ -145,6 +107,38 @@ namespace ByteWar.Core
                 }
                 _nextMoveLogTime = Time.unscaledTime + 0.5f;
             }
+        }
+
+        /// <summary>
+        /// Polls Keyboard.current directly for all gameplay input.
+        /// This mirrors the pattern used by BuildingController, ThirdPersonCamera,
+        /// ScreenLogger, and KeybindingHUD, which all read device state directly.
+        /// </summary>
+        private void PollKeyboard()
+        {
+            var kb = Keyboard.current;
+            if (kb == null)
+            {
+                MovementInput = Vector2.zero;
+                return;
+            }
+
+            // ── Movement (WASD + Arrows + ZQSD) ────────────────────────────────
+            float x = 0f, y = 0f;
+            if (kb.wKey.isPressed || kb.upArrowKey.isPressed || kb.zKey.isPressed) y += 1f;
+            if (kb.sKey.isPressed || kb.downArrowKey.isPressed) y -= 1f;
+            if (kb.aKey.isPressed || kb.leftArrowKey.isPressed || kb.qKey.isPressed) x -= 1f;
+            if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) x += 1f;
+
+            Vector2 raw = new Vector2(x, y);
+            MovementInput = raw.sqrMagnitude > 1f ? raw.normalized : raw;
+
+            // ── Button triggers (wasPressedThisFrame for one-shot actions) ──────
+            if (kb.eKey.wasPressedThisFrame) InteractTriggered = true;
+            if (kb.digit1Key.wasPressedThisFrame) CastSpell1Triggered = true;
+            if (kb.digit2Key.wasPressedThisFrame) CastSpell2Triggered = true;
+            if (kb.bKey.wasPressedThisFrame) BuildTriggered = true;
+            if (kb.spaceKey.wasPressedThisFrame) JumpTriggered = true;
         }
 
         // Helper to consume triggers so they don't fire multiple times per frame
@@ -214,6 +208,11 @@ namespace ByteWar.Core
             InteractTriggered = true;
         }
 
+        public void SimulateJumpPress()
+        {
+            JumpTriggered = true;
+        }
+
         public void EnsureActionsEnabled(string context)
         {
             if (MovementAction == null)
@@ -239,6 +238,31 @@ namespace ByteWar.Core
             Debug.Log($"[{nameof(PlayerInputHandler)}] InputActions enabled (context={context}). " +
                       $"Movement={MovementAction.enabled} Cast1={CastSpell1Action.enabled} Interact={InteractAction.enabled} " +
                       $"Keyboard={(Keyboard.current != null)} Mouse={(Mouse.current != null)}");
+        }
+
+        /// <summary>
+        /// Force disable/re-enable all InputActions to recover from IMGUI
+        /// TextField stealing keyboard focus from the Input System.
+        /// </summary>
+        public void ForceResetActions()
+        {
+            if (MovementAction == null) return;
+
+            try
+            {
+                MovementAction.Disable();
+                CastSpell1Action.Disable();
+                CastSpell2Action.Disable();
+                InteractAction.Disable();
+                BuildAction.Disable();
+                JumpAction.Disable();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[{nameof(PlayerInputHandler)}] ForceResetActions disable error: {ex.Message}");
+            }
+
+            EnsureActionsEnabled("ForceResetActions");
         }
     }
 }

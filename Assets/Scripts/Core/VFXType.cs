@@ -12,5 +12,6 @@ namespace ByteWar.Core
         ResourceDeath     = 3,
         BuildingPlace     = 4,
         ItemPickup        = 5,
+        CleaveHit         = 6,
     }
 }

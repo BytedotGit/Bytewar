@@ -1,6 +1,34 @@
-# Editor — Agent Guidance
+﻿# Editor - Agent Guidance
 
-Includes generators and build-time validation.
+## Key classes (auto-generated)
+
+| Class | Base | Interfaces | Network | RPCs |
+|-------|------|-----------|---------|------|
+| `AnimatorGenerator` | `` | - | - | - |
+| `AssetGenerator` | `` | - | - | - |
+| `AudioClipGenerator` | `` | - | - | - |
+| `BatchTestRunner` | `` | - | - | - |
+| `Callbacks` | `` | ICallbacks | - | - |
+| `BuildingMeshBuilder` | `` | - | - | - |
+| `BuildScript` | `` | - | - | - |
+| `CharacterGenerator` | `` | - | - | - |
+| `EnvironmentGenerator` | `` | - | - | - |
+| `InputHandlingBuildPreprocessor` | `` | IPreprocessBuildWithReport | - | - |
+| `InputHandlingEditorEnforcer` | `` | - | - | - |
+| `InputHandlingUtility` | `` | - | - | - |
+| `MCPCommands` | `` | - | - | - |
+| `MixamoDevEnforcer` | `` | - | - | - |
+| `MixamoLocalAssets` | `` | - | - | - |
+| `MixamoProcessor` | `` | - | - | - |
+| `PostProcessingSetup` | `` | - | - | - |
+| `PrefabGenerator` | `` | - | - | - |
+| `SceneGenerator` | `` | - | - | - |
+| `TerrainGenerator` | `` | - | - | - |
+| `TMPEssentialsBootstrap` | `` | - | - | - |
+| `UIGenerator` | `` | - | - | - |
+| `UnityMCPServer` | `` | - | - | - |
+| `ExecuteRequest` | `` | - | - | - |
+| `VFXPrefabGenerator` | `` | - | - | - |
 
 ## Invariants
 

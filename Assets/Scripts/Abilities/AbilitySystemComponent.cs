@@ -144,7 +144,7 @@ namespace ByteWar.Abilities
                 }
 
                 _cooldowns[ability.AbilityName] = actualCooldown;
-                PlayAbilityEffectClientRpc(abilityIndex, targetPosition);
+                PlayAbilityEffectClientRpc(abilityIndex, targetPosition, (int)ability.CastVFXType, (int)ability.CastSFXType);
             }
             else
             {
@@ -153,7 +153,7 @@ namespace ByteWar.Abilities
         }
 
         [ClientRpc]
-        private void PlayAbilityEffectClientRpc(int abilityIndex, Vector3 targetPosition)
+        private void PlayAbilityEffectClientRpc(int abilityIndex, Vector3 targetPosition, int vfxType, int sfxType)
         {
             Ability ability = _learnedAbilities[abilityIndex];
 
@@ -165,14 +165,14 @@ namespace ByteWar.Abilities
             }
             _cooldowns[ability.AbilityName] = actualCooldown;
 
-            // Play visual + audio effects on all clients
-            Debug.Log($"[AbilitySystemComponent] Playing VFX/SFX for {ability.AbilityName} at {targetPosition}");
+            // Play visual + audio effects on all clients using ability-specific types
+            Debug.Log($"[AbilitySystemComponent] Playing VFX={((Core.VFXType)vfxType)} SFX={((Core.SFXType)sfxType)} for {ability.AbilityName} at {targetPosition}");
 
             if (Core.VFXManager.Instance != null)
-                Core.VFXManager.Instance.PlayEffectLocal(Core.VFXType.FireballMuzzle, targetPosition);
+                Core.VFXManager.Instance.PlayEffectLocal((Core.VFXType)vfxType, targetPosition);
 
             if (Core.AudioManager.Instance != null)
-                Core.AudioManager.Instance.PlaySFX(Core.SFXType.FireballCast, targetPosition);
+                Core.AudioManager.Instance.PlaySFX((Core.SFXType)sfxType, targetPosition);
         }
 
         public float GetRemainingCooldown(string abilityName)

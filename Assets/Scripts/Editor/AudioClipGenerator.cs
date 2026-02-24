@@ -33,6 +33,7 @@ namespace ByteWar.Editor
             Save("ItemPickup",     ItemPickupSamples());
             Save("BuildingPlace",  BuildingPlaceSamples());
             Save("UIClick",        UIClickSamples());
+            Save("CleaveHit",     CleaveHitSamples());
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -42,16 +43,21 @@ namespace ByteWar.Editor
 
         // ── Synthesis methods ─────────────────────────────────────────────────────
 
-        // Footstep: 80 ms white noise burst with quick exponential decay envelope
+        // Footstep: 200 ms low-frequency thud with gentle noise layer
         private static float[] FootstepSamples()
         {
-            int len = (int)(SampleRate * 0.08f);
+            int len = (int)(SampleRate * 0.20f);
             float[] s = new float[len];
             var rng = new System.Random(1);
             for (int i = 0; i < len; i++)
             {
-                float env = Mathf.Exp(-i / (len * 0.3f));
-                s[i] = (float)(rng.NextDouble() * 2 - 1) * env * 0.7f;
+                float t = (float)i / len;
+                // Smooth fade-in then exponential decay avoids the click transient
+                float env = Mathf.Sin(Mathf.PI * t * 0.5f) * Mathf.Exp(-i / (len * 0.35f));
+                // Low-frequency thud (80 Hz) mixed with subtle noise
+                float thud = Mathf.Sin(2f * Mathf.PI * 80f * i / SampleRate);
+                float noise = (float)(rng.NextDouble() * 2 - 1) * 0.15f;
+                s[i] = (thud * 0.6f + noise) * env * 0.4f;
             }
             return s;
         }
@@ -143,6 +149,25 @@ namespace ByteWar.Editor
             {
                 float env = Mathf.Exp(-i / (len * 0.4f));
                 s[i] = Mathf.Sin(2f * Mathf.PI * 1200f * i / SampleRate) * env * 0.6f;
+            }
+            return s;
+        }
+
+        // CleaveHit: 250 ms aggressive low-mid sweep with metallic ring (sword slash)
+        private static float[] CleaveHitSamples()
+        {
+            int len = (int)(SampleRate * 0.25f);
+            float[] s = new float[len];
+            var rng = new System.Random(5);
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(Mathf.PI * t * 0.3f) * Mathf.Exp(-i / (len * 0.4f));
+                // Descending metallic sweep 600→200 Hz
+                float freq = Mathf.Lerp(600f, 200f, t);
+                float sweep = Mathf.Sin(2f * Mathf.PI * freq * i / SampleRate);
+                float noise = (float)(rng.NextDouble() * 2 - 1) * 0.3f;
+                s[i] = (sweep * 0.7f + noise) * env * 0.65f;
             }
             return s;
         }

@@ -23,13 +23,31 @@ namespace ByteWar.Building
         [SerializeField] private LayerMask _placementLayerMask = ~0;
         [SerializeField] private float _maxPlacementDistance = 20f;
         [SerializeField] private float _gridSize = 4f;
-        [SerializeField] private float _adjacencySnapRadius = 3f;
-        [SerializeField] private float _rotationStep = 45f;
+        [SerializeField] private float _adjacencySnapRadius = 5f;
+        [SerializeField] private float _rotationStep = 22.5f;
         [SerializeField] private float _removeCooldown = 0.3f;
 
         [Header("Prefab Registry (set by PrefabGenerator)")]
         [SerializeField] private GameObject _foundationPrefab;
         [SerializeField] private GameObject _wallPrefab;
+        [SerializeField] private GameObject _floorPrefab;
+        [SerializeField] private GameObject _rampPrefab;
+        [SerializeField] private GameObject _roof26Prefab;
+        [SerializeField] private GameObject _stairsPrefab;
+        [SerializeField] private GameObject _polePrefab;
+        [SerializeField] private GameObject _beamPrefab;
+        [SerializeField] private GameObject _angledWallPrefab;
+        [SerializeField] private GameObject _doorFramePrefab;
+        [SerializeField] private GameObject _windowPrefab;
+        [SerializeField] private GameObject _halfWallPrefab;
+
+        /// <summary>All building piece prefabs for inspection (e.g. AutoTester).</summary>
+        public GameObject[] BuildingPrefabs => new[]
+        {
+            _foundationPrefab, _wallPrefab, _floorPrefab, _rampPrefab,
+            _roof26Prefab, _stairsPrefab, _polePrefab, _beamPrefab, _angledWallPrefab,
+            _doorFramePrefab, _windowPrefab, _halfWallPrefab
+        };
 
         // Runtime state
         private bool _buildModeActive;
@@ -131,7 +149,7 @@ namespace ByteWar.Building
                     {
                         _selectedRecipeIndex = i;
                         Debug.Log($"[BuildingController] Selected recipe [{i + 1}]: {_recipes[i].RecipeName}");
-                        _preview.Clear();
+                        ClearPreview();
                     }
                     break;
                 }
@@ -155,7 +173,7 @@ namespace ByteWar.Building
             };
         }
 
-        // ── Rotation (scroll wheel) ──────────────────────────────────────────────
+        // ── Rotation (scroll wheel / Shift+scroll for pitch) ──────────────────
 
         private void HandleRotation()
         {
@@ -164,7 +182,12 @@ namespace ByteWar.Building
             if (Mathf.Abs(scroll) > 0.1f)
             {
                 float direction = scroll > 0f ? 1f : -1f;
-                _preview.Rotate(direction, _rotationStep);
+                bool shiftHeld = Keyboard.current != null &&
+                    (Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed);
+                if (shiftHeld)
+                    _preview.RotatePitch(direction, _rotationStep);
+                else
+                    _preview.Rotate(direction, _rotationStep);
             }
         }
 
@@ -181,20 +204,44 @@ namespace ByteWar.Building
             _preview.UpdatePreview(prefab, transform, Camera.main,
                 _maxPlacementDistance, _placementLayerMask, recipe.CanAfford(_inventory), true);
 
-            // Get pending position/rotation from preview and apply adjacency snap
-            Vector3 pos = _preview.LastValidPosition;
+            // Valheim-style nearest-pair snap using SnapPointMarker children
+            Vector3 rawPos = _preview.LastRawPosition;
             Quaternion rot = _preview.LastValidRotation;
             bool snapped = BuildingSnap.TryAdjacencySnap(
-                ref pos, ref rot, recipe.PieceType,
-                _adjacencySnapRadius, _gridSize, _overlapBuffer);
+                ref rawPos,
+                rot,
+                _preview.SnapPointLocals,
+                _preview.SnapPointTypes,
+                _adjacencySnapRadius,
+                _overlapBuffer,
+                _preview.LastHitPiece);
             _preview.IsSnapped = snapped;
+
+            // Use snapped position if found; otherwise free placement with surface normal
+            Vector3 pos;
+            if (snapped)
+            {
+                pos = rawPos;
+            }
+            else
+            {
+                // Free placement: use raw raycast position (no grid snap) for natural feel
+                pos = _preview.LastRawPosition;
+            }
             _preview.ApplySnappedTransform(pos, rot);
 
-            // Validity: can afford + position valid + support check
+            // Validity: can afford + position valid + support check + overlap + restrictions
             bool canAfford = recipe.CanAfford(_inventory);
             bool supported = BuildingSnap.CheckSupport(pos, recipe.PieceType, snapped, _gridSize, _overlapBuffer);
-            bool valid = _preview.PositionValid && canAfford && supported;
+            bool noOverlap = BuildingSnap.CheckNoOverlap(pos, rot, _preview.HalfExtents, _overlapBuffer);
+            bool positionOk = _preview.PositionValid || snapped;
+            bool valid = positionOk && canAfford && supported && noOverlap;
             _preview.FinalizePreview(valid);
+        }
+
+        private void ClearPreview()
+        {
+            _preview.Clear();
         }
 
         // ── Placement ─────────────────────────────────────────────────────────────
@@ -272,11 +319,11 @@ namespace ByteWar.Building
             // Broadcast VFX + audio to all clients
             PlayBuildingEffectClientRpc(position);
 
-            // Raise event bus channel — AudioManager and VFXManager subscribe to this
+            // Raise event bus channel
             GameEventBus.BuildingPlaced.Raise(new BuildingPlacedEvent
             {
                 PieceType = (int)recipe.PieceType,
-                Position  = position
+                Position = position
             });
         }
 
@@ -405,15 +452,35 @@ namespace ByteWar.Building
             {
                 BuildingPieceType.Foundation => _foundationPrefab,
                 BuildingPieceType.Wall => _wallPrefab,
+                BuildingPieceType.Floor => _floorPrefab,
+                BuildingPieceType.Ramp => _rampPrefab,
+                BuildingPieceType.Roof26 => _roof26Prefab,
+                BuildingPieceType.Stairs => _stairsPrefab,
+                BuildingPieceType.Pole => _polePrefab,
+                BuildingPieceType.Beam => _beamPrefab,
+                BuildingPieceType.AngledWall => _angledWallPrefab,
+                BuildingPieceType.DoorFrame => _doorFramePrefab,
+                BuildingPieceType.Window => _windowPrefab,
+                BuildingPieceType.HalfWall => _halfWallPrefab,
                 _ => null,
             };
         }
 
         /// <summary>Set building prefabs at generation time (called by PrefabGenerator).</summary>
-        public void SetBuildingPrefabs(GameObject foundation, GameObject wall)
+        public void SetBuildingPrefabs(GameObject foundation, GameObject wall, GameObject floor = null, GameObject ramp = null, GameObject roof26 = null, GameObject stairs = null, GameObject pole = null, GameObject beam = null, GameObject angledWall = null, GameObject doorFrame = null, GameObject window = null, GameObject halfWall = null)
         {
             _foundationPrefab = foundation;
             _wallPrefab = wall;
+            _floorPrefab = floor;
+            _rampPrefab = ramp;
+            _roof26Prefab = roof26;
+            _stairsPrefab = stairs;
+            _polePrefab = pole;
+            _beamPrefab = beam;
+            _angledWallPrefab = angledWall;
+            _doorFramePrefab = doorFrame;
+            _windowPrefab = window;
+            _halfWallPrefab = halfWall;
         }
 
         /// <summary>Set recipes at generation time.</summary>
