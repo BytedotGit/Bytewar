@@ -12,7 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f8918caf607c444c87892db32e448b4, type: 3}
   m_Name: DeployableAssetCatalog
   m_EditorClassIdentifier: ByteWar::ByteWar.UI.DeployableAssetCatalog
-  _entries:
-  - _displayName: BlenderE2EProp
-    _resourcePath: Generated/BlenderE2EProp/BlenderE2EProp
-    _previewResourcePath: Generated/BlenderE2EProp/Preview.png
+  _entries: []

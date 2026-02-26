@@ -1521,7 +1521,7 @@ Animator:
   m_GameObject: {fileID: 5174049880952391945}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 420482b791f1c7346a392005930902b1, type: 3}
-  m_Controller: {fileID: 9100000, guid: 33d470ebd3de1824c9932544d0b65e7e, type: 2}
+  m_Controller: {fileID: 9100000, guid: a2a434f6df9f5a5478f0de30e167b282, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1603,6 +1603,7 @@ MonoBehaviour:
   _adjacencySnapRadius: 5
   _rotationStep: 22.5
   _removeCooldown: 0.3
+  _internalBuildToggleInputEnabled: 0
   _foundationPrefab: {fileID: 129791130063525223, guid: 61c8eb9b2fca07445963b45d3bbcbb08, type: 3}
   _wallPrefab: {fileID: 4314267179206263010, guid: 67580faf99687144cab8a47f2212f3c1, type: 3}
   _floorPrefab: {fileID: 7506025572282258394, guid: 5ad201f3d9652f142a96ed2a8c5cc040, type: 3}

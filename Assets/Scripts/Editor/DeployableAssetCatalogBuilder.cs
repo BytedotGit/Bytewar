@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using Unity.Netcode;
 using UnityEngine;
 using ByteWar.UI;
 
@@ -40,9 +41,10 @@ namespace ByteWar.Editor
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                 if (prefab == null) continue;
 
-                // Keep the deploy UI clean: only list prefabs that can be deployed by AssetDeployUI.
-                if (prefab.GetComponent<LODGroup>() == null) continue;
-                if (prefab.GetComponent<Collider>() == null) continue;
+                // Keep the deploy UI aligned with server-side placement validation.
+                if (prefab.GetComponent<NetworkObject>() == null) continue;
+                if (prefab.GetComponentInChildren<LODGroup>(true) == null) continue;
+                if (prefab.GetComponentInChildren<Collider>(true) == null) continue;
 
                 string resourcePath = ToResourcesLoadPath(assetPath);
                 if (string.IsNullOrEmpty(resourcePath)) continue;
@@ -75,8 +77,9 @@ namespace ByteWar.Editor
             if (!assetPath.StartsWith(ResourcesRoot, StringComparison.OrdinalIgnoreCase)) return string.Empty;
 
             string relative = assetPath.Substring(ResourcesRoot.Length);
-            if (relative.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase))
-                relative = relative.Substring(0, relative.Length - ".prefab".Length);
+            string ext = Path.GetExtension(relative);
+            if (!string.IsNullOrEmpty(ext))
+                relative = relative.Substring(0, relative.Length - ext.Length);
 
             return relative.Replace('\\', '/');
         }

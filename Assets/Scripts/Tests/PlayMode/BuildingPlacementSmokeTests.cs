@@ -21,10 +21,11 @@ namespace ByteWar.Tests.PlayMode
         [UnitySetUp]
         public IEnumerator Setup()
         {
-            // Force DevMode off so resource costs are meaningful in these tests
+            // Force economy checks on so resource costs are meaningful in these tests
             _devOffConstants = ScriptableObject.CreateInstance<GameConstants>();
-            // DevMode defaults to false in the field declaration, so no reflection needed
             GameConstants.SetInstanceForTesting(_devOffConstants);
+            GameConstants.SetDevMode(false);
+            GameConstants.SetBuildingCostsEnabled(true);
 
             _networkManager = NGOTestHelper.CreateNetworkManager();
 
@@ -90,6 +91,7 @@ namespace ByteWar.Tests.PlayMode
             for (int i = 0; i < 4; i++) inv.AddItem(wood);
             for (int i = 0; i < 2; i++) inv.AddItem(stone);
 
+            Assert.IsTrue(GameConstants.IsBuildingCostsEnabled(), "Building costs should be enabled for this affordability test.");
             Assert.IsTrue(recipe.CanAfford(inv), "Player should be able to afford the foundation.");
 
             // Directly invoke the ServerRpc via reflection-free approach:
@@ -122,6 +124,7 @@ namespace ByteWar.Tests.PlayMode
 
             bc.SetRecipes(new List<BuildingRecipe> { recipe });
 
+            Assert.IsTrue(GameConstants.IsBuildingCostsEnabled(), "Building costs should be enabled for this affordability denial test.");
             Assert.IsFalse(recipe.CanAfford(inv), "Player should NOT be able to afford the foundation.");
             Assert.IsFalse(recipe.ConsumeResources(inv), "ConsumeResources should fail.");
 

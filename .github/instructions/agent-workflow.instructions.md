@@ -143,7 +143,20 @@ When you encounter a failure, follow this protocol:
 | **Designer**  | RPG balance decisions: stat scaling, talent trees, crafting recipes, damage formulas. Provides mathematical justifications.           |
 | **Architect** | System design, interface design, ECS vs MonoBehaviour decisions, cross-system dependency analysis.                                    |
 | **Debugger**  | Player.log analysis, test failure diagnosis, root-cause analysis. Methodical: read error → identify file:line → propose fix → test.   |
+| **BuildOps**  | CI/build/test artifact validation and release gating. Confirms go/no-go from logs, test results, and AutoTester signals.              |
+| **Explore**   | Read-only codebase exploration and Q&A for broad context gathering, dependency mapping, and deep implementation understanding.         |
+| **Search**    | Fast read/search-only discovery for symbols, files, and usage mapping when speed and low token usage are priorities.                  |
 | **Reviewer**  | Convention enforcement. Validates changes against architecture instructions: encapsulation, interfaces, 800 LOC limit, test coverage. |
+
+### Model Routing (Custom Agents)
+
+- Use `GPT-5.3-Codex` for `BuildOps`, `Architect`, and `Reviewer` tasks requiring deep cross-file reasoning and release verification decisions.
+- Use `Claude Opus 4.6` for `Debugger` tasks with iterative error recovery loops.
+- Keep `Debugger` pinned to `Claude Opus 4.6`; if Opus is unavailable, use `Claude Sonnet 4.6` and do not route Debugger tasks to `GPT-5.3-Codex`.
+- Use `Gemini 3.1 Pro (Preview)` for `Designer` tasks involving UI/UX/gameplay design decisions.
+- Use `Gemini 3 Flash (Preview)` for `Explore` and `Search` tasks focused on fast, low-cost read-only discovery.
+- Prefer `Search` for first-pass symbol/file lookup; escalate to `Explore` for broad context mapping and deep read-only synthesis.
+- Use `Claude Sonnet 4.6` as the primary fallback when a preferred agent model is unavailable.
 
 ## 6. Anti-Patterns (NEVER Do These)
 

@@ -172,6 +172,34 @@ namespace ByteWar.Tests.EditMode
         }
 
         [Test]
+        public void AutoTest_KeyboardTurnFollow_AlignsYawToTargetWhenNotOrbiting()
+        {
+            var camGo = new GameObject("Test_ThirdPersonCamera");
+            var targetRoot = new GameObject("TargetRoot");
+            var target = new GameObject("CameraTarget");
+
+            try
+            {
+                target.transform.SetParent(targetRoot.transform);
+
+                var camera = camGo.AddComponent<ThirdPersonCamera>();
+                camera.SetTarget(target.transform, pivotHeight: 0f);
+                camera.AutoTest_SetOrbitAngles(0f, 0f, immediate: true);
+                camera.AutoTest_SetMouseState(leftHeld: false, rightHeld: false, leftDragging: false);
+
+                targetRoot.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+                camera.AutoTest_ApplyKeyboardTurnFollowTick(1f);
+
+                Assert.That(camera.CameraYaw, Is.EqualTo(90f).Within(0.1f), "Camera yaw should follow target yaw when not orbiting.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(camGo);
+                Object.DestroyImmediate(targetRoot);
+            }
+        }
+
+        [Test]
         public void AutoTest_FirstPerson_ExpandsPitchClamp_ToLookStraightUpDown()
         {
             var camGo = new GameObject("Test_ThirdPersonCamera");

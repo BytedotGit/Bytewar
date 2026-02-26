@@ -7,15 +7,15 @@ namespace ByteWar.Tests.EditMode
     public class PlayerMovementFacingTests
     {
         [Test]
-        public void ShouldFaceMoveDirectionWhenRmbHeld_WPlusA_ReturnsTrue()
+        public void ShouldFaceMoveDirectionWhenRmbHeld_WPlusA_ReturnsFalse()
         {
-            Assert.IsTrue(PlayerMovement.ShouldFaceMoveDirectionWhenRmbHeld(new Vector2(-1f, 1f), isMoving: true));
+            Assert.IsFalse(PlayerMovement.ShouldFaceMoveDirectionWhenRmbHeld(new Vector2(-1f, 1f), isMoving: true));
         }
 
         [Test]
-        public void ShouldFaceMoveDirectionWhenRmbHeld_WPlusD_ReturnsTrue()
+        public void ShouldFaceMoveDirectionWhenRmbHeld_WPlusD_ReturnsFalse()
         {
-            Assert.IsTrue(PlayerMovement.ShouldFaceMoveDirectionWhenRmbHeld(new Vector2(1f, 1f), isMoving: true));
+            Assert.IsFalse(PlayerMovement.ShouldFaceMoveDirectionWhenRmbHeld(new Vector2(1f, 1f), isMoving: true));
         }
 
         [Test]

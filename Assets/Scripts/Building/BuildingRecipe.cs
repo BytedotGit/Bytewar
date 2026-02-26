@@ -28,7 +28,7 @@ namespace ByteWar.Building
         /// </summary>
         public bool CanAfford(InventoryComponent inventory)
         {
-            if (GameConstants.IsDevMode()) return true;
+            if (GameConstants.ShouldBypassBuildingCosts()) return true;
             if (inventory == null) return false;
             foreach (var ingredient in Cost)
             {
@@ -44,9 +44,9 @@ namespace ByteWar.Building
         /// </summary>
         public bool ConsumeResources(InventoryComponent inventory)
         {
-            if (GameConstants.IsDevMode())
+            if (GameConstants.ShouldBypassBuildingCosts())
             {
-                Debug.Log($"[BuildingRecipe] DevMode: skipping resource consumption for '{RecipeName}'.");
+                Debug.Log($"[BuildingRecipe] Building cost bypass active: skipping resource consumption for '{RecipeName}'.");
                 return true;
             }
 

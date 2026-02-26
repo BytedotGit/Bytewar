@@ -24,6 +24,24 @@ This repository is designed to be developed with GitHub Copilot Chat.
 - Unity automation: `Tools/UnityMCP/`
 - Blender asset automation (headless): `Tools/BlenderMCP/`
 
+## Practical Agent Routing Matrix
+
+Use this quick matrix to choose the right custom agent before starting work.
+
+| Task Type | Agent to Invoke | Why |
+| --- | --- | --- |
+| CI/build/test artifact triage and release gate checks | `BuildOps` | Enforces evidence-based go/no-go decisions from logs and test artifacts |
+| Large architecture changes, interface decisions, dependency flow | `Architect` | Best for deep cross-file design and guardrail checks |
+| Build/test/runtime failures, stack traces, Player.log triage | `Debugger` | Focused root-cause workflow for iterative error recovery |
+| UI/UX decisions, gameplay balance, 3D/design trade-offs | `Designer` | Best fit for design reasoning and value tuning |
+| Fast discovery of files/symbols/usages (narrow lookup) | `Search` | Lowest-cost, fastest read/search pass |
+| Broad read-only exploration and context mapping (quick/medium/thorough) | `Explore` | Structured deep discovery when Search results need synthesis and dependency mapping |
+| PR audits, convention checks, docs/test coverage verification | `Reviewer` | Final quality gate against repo standards |
+
+If a preferred model is temporarily unavailable, use the same agent role and rely on the documented fallback policy in `.github/copilot-instructions.md`.
+
+For repeatable post-change validation of agent models/routing, run `.github/AGENT_REGRESSION_CHECKLIST.md`.
+
 ## General Unity C# Conventions
 
 - Use modern C# features where applicable.

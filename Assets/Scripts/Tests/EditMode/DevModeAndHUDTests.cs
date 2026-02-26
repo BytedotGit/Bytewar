@@ -26,13 +26,14 @@ namespace ByteWar.Tests.EditMode
             GameConstants.SetInstanceForTesting(_savedInstance);
         }
 
-        /// <summary>Creates a test GameConstants instance with the given DevMode value.</summary>
-        private static GameConstants CreateTestConstants(bool devMode)
+        /// <summary>Creates a test GameConstants instance with explicit DevMode and building cost policy.</summary>
+        private static GameConstants CreateTestConstants(bool devMode, bool buildingCostsEnabled = false)
         {
             var gc = ScriptableObject.CreateInstance<GameConstants>();
-            // Use reflection or serialized field to set DevMode
-            var field = typeof(GameConstants).GetField("_devMode", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            field.SetValue(gc, devMode);
+            var devModeField = typeof(GameConstants).GetField("_devMode", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            devModeField.SetValue(gc, devMode);
+            var costsField = typeof(GameConstants).GetField("_buildingCostsEnabled", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            costsField.SetValue(gc, buildingCostsEnabled);
             GameConstants.SetInstanceForTesting(gc);
             return gc;
         }
@@ -88,6 +89,29 @@ namespace ByteWar.Tests.EditMode
 
             GameConstants.SetDevMode(false);
             Assert.IsFalse(GameConstants.IsDevMode(), "DevMode should be false after SetDevMode(false) even if asset is missing.");
+        }
+
+        [Test]
+        public void GameConstants_SetBuildingCostsEnabled_Toggles_BuildingCostPolicy()
+        {
+            var gc = CreateTestConstants(false, false);
+            Assert.IsFalse(GameConstants.IsBuildingCostsEnabled(), "Building costs should start disabled.");
+
+            GameConstants.SetBuildingCostsEnabled(true);
+            Assert.IsTrue(GameConstants.IsBuildingCostsEnabled(), "Building costs should be enabled after SetBuildingCostsEnabled(true).");
+
+            GameConstants.SetBuildingCostsEnabled(false);
+            Assert.IsFalse(GameConstants.IsBuildingCostsEnabled(), "Building costs should be disabled after SetBuildingCostsEnabled(false).");
+
+            Object.DestroyImmediate(gc);
+        }
+
+        [Test]
+        public void GameConstants_ShouldBypassBuildingCosts_TrueWhenDevModeEnabled()
+        {
+            var gc = CreateTestConstants(true, true);
+            Assert.IsTrue(GameConstants.ShouldBypassBuildingCosts(), "DevMode should bypass building costs even when costs are enabled.");
+            Object.DestroyImmediate(gc);
         }
 
         // ── DevConsole ───────────────────────────────────────────────────────
@@ -186,7 +210,7 @@ namespace ByteWar.Tests.EditMode
         public void BuildingRecipe_CanAfford_InDevMode_ReturnsTrue_WithEmptyInventory()
         {
             // Explicitly enable DevMode for this test
-            var gc = CreateTestConstants(true);
+            var gc = CreateTestConstants(true, true);
 
             var recipe = ScriptableObject.CreateInstance<BuildingRecipe>();
             var wood = ScriptableObject.CreateInstance<Item>();
@@ -203,6 +227,7 @@ namespace ByteWar.Tests.EditMode
             // Empty inventory — normally unaffordable
 
             Assert.IsTrue(GameConstants.IsDevMode(), "DevMode should be explicitly enabled.");
+            Assert.IsTrue(GameConstants.IsBuildingCostsEnabled(), "Building costs should be enabled to validate DevMode bypass.");
             Assert.IsTrue(recipe.CanAfford(inv), "In DevMode, CanAfford should always return true.");
 
             Object.DestroyImmediate(go);
@@ -215,7 +240,7 @@ namespace ByteWar.Tests.EditMode
         public void BuildingRecipe_CanAfford_NotInDevMode_ReturnsFalse_WithEmptyInventory()
         {
             // Explicitly disable DevMode for this test
-            var gc = CreateTestConstants(false);
+            var gc = CreateTestConstants(false, true);
 
             var recipe = ScriptableObject.CreateInstance<BuildingRecipe>();
             var wood = ScriptableObject.CreateInstance<Item>();
@@ -231,6 +256,7 @@ namespace ByteWar.Tests.EditMode
             var inv = go.AddComponent<InventoryComponent>();
 
             Assert.IsFalse(GameConstants.IsDevMode(), "DevMode should be explicitly disabled.");
+            Assert.IsTrue(GameConstants.IsBuildingCostsEnabled(), "Building costs should be enabled for economy checks.");
             Assert.IsFalse(recipe.CanAfford(inv), "Without DevMode, CanAfford should return false with empty inventory.");
 
             Object.DestroyImmediate(go);
@@ -243,7 +269,7 @@ namespace ByteWar.Tests.EditMode
         public void BuildingRecipe_ConsumeResources_InDevMode_ReturnsTrue_WithoutRemoving()
         {
             // Explicitly enable DevMode for this test
-            var gc = CreateTestConstants(true);
+            var gc = CreateTestConstants(true, true);
 
             var recipe = ScriptableObject.CreateInstance<BuildingRecipe>();
             var wood = ScriptableObject.CreateInstance<Item>();
@@ -262,6 +288,7 @@ namespace ByteWar.Tests.EditMode
             inv.AddItem(wood);
 
             Assert.IsTrue(GameConstants.IsDevMode(), "DevMode should be explicitly enabled.");
+            Assert.IsTrue(GameConstants.IsBuildingCostsEnabled(), "Building costs should be enabled to validate DevMode bypass.");
             bool result = recipe.ConsumeResources(inv);
             Assert.IsTrue(result, "In DevMode, ConsumeResources should return true.");
             Assert.AreEqual(2, inv.Items.Count, "In DevMode, items should not be consumed.");

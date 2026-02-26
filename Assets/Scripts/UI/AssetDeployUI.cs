@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ByteWar.Core;
+using ByteWar.Building;
 using ByteWar.Networking;
 using Unity.Netcode;
 using UnityEngine;
@@ -9,12 +9,11 @@ using UnityEngine.InputSystem;
 namespace ByteWar.UI
 {
     /// <summary>
-    /// In-game IMGUI panel to select and deploy test assets.
-    /// Visible only while BOTH Shift and Tab are held; releasing either hides it.
-    /// Shows a folder/subfolder view derived from the real Resources paths.
-    /// Displays a preview thumbnail (if available) alongside the asset name.
+    /// Tap-B deploy browser with nested categories.
+    /// Click categories/items to drill and select deploy targets.
+    /// Leaf selection enters placement mode and remains active until cancelled.
     /// </summary>
-    public sealed class AssetDeployUI : MonoBehaviour
+    public sealed partial class AssetDeployUI : MonoBehaviour
     {
         private const string CatalogResourcesLoadPath = "Generated/DeployableAssetCatalog";
         private const string RootFolderName = "Generated";
@@ -23,178 +22,241 @@ namespace ByteWar.UI
         private const string FallbackPrefabResourcesPath = "Generated/BlenderE2EProp/BlenderE2EProp";
         private const string FallbackPreviewResourcesPath = "Generated/BlenderE2EProp/Preview";
 
-        private bool _visible;
+        [Header("Placement")]
+        [SerializeField] private LayerMask _placementRaycastMask = ~0;
+        [SerializeField] private float _placementRaycastDistance = 250f;
+        [SerializeField] private float _placementYOffset = 0.02f;
+        [SerializeField] private float _placementRotationStep = 15f;
 
-        [Header("Drag & Drop Placement")]
-        [SerializeField] private LayerMask _dragRaycastMask = ~0;
-        [SerializeField] private float _dragStartPixelThreshold = 8f;
+        [Header("3D Preview")]
+        [SerializeField] private float _radialPreviewTargetSize = 1.6f;
+        [SerializeField] private float _radialPreviewMinScale = 0.35f;
+        [SerializeField] private float _radialPreviewMaxScale = 2.5f;
 
         private bool _interactionActive;
-
-        private bool _dragArmed;
-        private DeployableAssetCatalog.Entry _armedEntry;
-        private Vector2 _armedMouseDownScreenPos;
-
-        private bool _isDragging;
-        private DeployableAssetCatalog.Entry _dragEntry;
-        private GameObject _dragGhost;
-        private bool _dragPlacementValid;
-        private Vector3 _dragPlacementPoint;
-
         private bool _cursorCaptured;
         private CursorLockMode _prevCursorLockState;
         private bool _prevCursorVisible;
 
-        private bool _inputSuppressed;
-        private PlayerInputHandler _cachedInputHandler;
-        private float _nextInputHandlerSearchTime;
+        private BuildingController _cachedBuildingController;
+        private float _nextBuildingControllerSearchTime;
+        private float _nextTreeRefreshTime;
+        private string _treeSignature;
 
         private DeployableAssetCatalog _catalog;
         private IReadOnlyList<DeployableAssetCatalog.Entry> _entries;
-        private FolderNode _root;
-        private readonly List<string> _currentPath = new();
         private DeployableAssetCatalog.Entry _selectedEntry;
 
-        private readonly Dictionary<string, Texture2D> _previewCache = new(StringComparer.OrdinalIgnoreCase);
+        private RadialNode _rootNode;
+        private RadialNode _activeNode;
+        private RadialNode _selectedLeaf;
 
-        private Vector2 _scroll;
+        private bool _isBrowserOpen;
+        private Vector2 _browserScroll;
+
+        private PlacementMode _placementMode;
+        private float _developerPlacementYaw;
+        private bool _developerPlacementValid;
+        private Vector3 _developerPlacementPoint;
+
+        private GameObject _previewGhost;
+        private string _previewGhostSourceKey;
+        private Vector3 _previewGhostBaseScale = Vector3.one;
+        private float _previewGhostRadialScale = 1f;
+
         private string _status;
-
         private GUIStyle _headerStyle;
-        private GUIStyle _breadcrumbStyle;
-        private GUIStyle _folderButtonStyle;
-        private GUIStyle _assetButtonStyle;
+        private GUIStyle _labelStyle;
+        private GUIStyle _segmentStyle;
 
-        public static bool IsOpenShortcutHeld(bool shiftHeld, bool tabHeld)
+        private readonly Dictionary<string, GameObject> _resourcePrefabCache = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Texture2D> _previewTextureCache = new(StringComparer.OrdinalIgnoreCase);
+
+        private enum PlacementMode
         {
-            return shiftHeld && tabHeld;
+            None = 0,
+            DeveloperAsset = 1,
+            BuildingRecipe = 2,
         }
 
-        internal static bool ComputePanelVisible(bool shortcutHeld, bool isDragging)
+        private enum RadialLeafKind
         {
-            return shortcutHeld && !isDragging;
+            None = 0,
+            DeveloperAsset = 1,
+            BuildingRecipe = 2,
         }
 
-        internal static bool ComputeInteractionActive(bool shortcutHeld, bool dragArmed, bool isDragging)
+        public static bool IsOpenShortcutPressed(bool bPressedThisFrame)
         {
-            return shortcutHeld || dragArmed || isDragging;
+            return bPressedThisFrame;
+        }
+
+        internal static Vector2 ComputeFlickVector(Vector2 holdStart, Vector2 holdEnd)
+        {
+            return holdEnd - holdStart;
+        }
+
+        internal static int ResolveRadialSegmentIndex(Vector2 flickVector, int segmentCount)
+        {
+            if (segmentCount <= 0) return -1;
+            if (flickVector.sqrMagnitude <= 0.0001f) return -1;
+
+            float mirroredX = -flickVector.x;
+            float angle = Mathf.Atan2(flickVector.y, mirroredX);
+            if (angle < 0f)
+                angle += Mathf.PI * 2f;
+
+            float segmentSize = (Mathf.PI * 2f) / segmentCount;
+            int index = Mathf.FloorToInt(angle / segmentSize);
+            return Mathf.Clamp(index, 0, segmentCount - 1);
+        }
+
+        internal static bool IsValidSegment(int index, int segmentCount)
+        {
+            return index >= 0 && index < segmentCount;
+        }
+
+        internal static Vector2 ResolveRadialDrawDirection(int segmentIndex, int segmentCount)
+        {
+            if (segmentCount <= 0)
+                return Vector2.right;
+
+            int wrappedIndex = ((segmentIndex % segmentCount) + segmentCount) % segmentCount;
+            float angle = ((Mathf.PI * 2f) / segmentCount) * wrappedIndex;
+            return new Vector2(-Mathf.Cos(angle), -Mathf.Sin(angle));
+        }
+
+        internal static bool TryExtractPreviewBounds(GameObject root, out Bounds bounds)
+        {
+            bounds = default;
+            if (root == null)
+                return false;
+
+            bool hasBounds = false;
+
+            var renderers = root.GetComponentsInChildren<Renderer>(true);
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                var renderer = renderers[i];
+                if (renderer == null)
+                    continue;
+
+                Bounds current = renderer.bounds;
+                if (current.size.sqrMagnitude <= 0.0001f)
+                    continue;
+
+                if (!hasBounds)
+                {
+                    bounds = current;
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(current.min);
+                    bounds.Encapsulate(current.max);
+                }
+            }
+
+            var colliders = root.GetComponentsInChildren<Collider>(true);
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                var collider = colliders[i];
+                if (collider == null)
+                    continue;
+
+                Bounds current = collider.bounds;
+                if (current.size.sqrMagnitude <= 0.0001f)
+                    continue;
+
+                if (!hasBounds)
+                {
+                    bounds = current;
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(current.min);
+                    bounds.Encapsulate(current.max);
+                }
+            }
+
+            return hasBounds;
+        }
+
+        internal static float ComputeRadialPreviewScale(Bounds bounds, float targetSize, float minScale, float maxScale)
+        {
+            float clampedTargetSize = Mathf.Max(0.01f, targetSize);
+            float clampedMinScale = Mathf.Max(0.01f, minScale);
+            float clampedMaxScale = Mathf.Max(clampedMinScale, maxScale);
+
+            float maxExtent = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z));
+            if (maxExtent <= 0.0001f)
+                return 1f;
+
+            float rawScale = clampedTargetSize / maxExtent;
+            return Mathf.Clamp(rawScale, clampedMinScale, clampedMaxScale);
+        }
+
+        internal static string NormalizeResourceLoadPath(string resourcePath)
+        {
+            if (string.IsNullOrWhiteSpace(resourcePath))
+                return string.Empty;
+
+            string normalized = resourcePath.Trim().Replace('\\', '/');
+
+            int slash = normalized.LastIndexOf('/');
+            int dot = normalized.LastIndexOf('.');
+            if (dot > slash)
+                normalized = normalized.Substring(0, dot);
+
+            return normalized;
         }
 
         private void Awake()
         {
             EnsureCatalogLoaded();
+            RefreshBuildingController();
+            RebuildRadialTree();
             EnsureDefaultSelection();
         }
 
         private void Update()
         {
-            bool shiftHeld = IsShiftHeldRaw();
-            bool tabHeld = IsTabHeldRaw();
-            bool shortcutHeld = IsOpenShortcutHeld(shiftHeld, tabHeld);
+            EnsureCatalogLoaded();
+            RefreshBuildingController();
+            RefreshRadialTreeIfNeeded();
 
-            // Panel visibility is only while the shortcut is held.
-            // Interaction (cursor + input suppression) also stays active while dragging.
-            _visible = ComputePanelVisible(shortcutHeld, _isDragging);
-            SetInteractionActive(ComputeInteractionActive(shortcutHeld, _dragArmed, _isDragging));
+            HandleBrowserInput();
+            if (_cachedBuildingController != null)
+                _cachedBuildingController.SetExternalInputSuppressed(_isBrowserOpen);
 
-            UpdateDragAndDrop();
+            HandlePlacementFlow();
+            UpdatePreviewGhost();
+
+            bool needsCapturedInteraction = _isBrowserOpen || _placementMode == PlacementMode.DeveloperAsset;
+            SetInteractionActive(needsCapturedInteraction);
         }
 
         private void OnDisable()
         {
-            _visible = false;
-            _dragArmed = false;
-            _isDragging = false;
-            DestroyDragGhost();
+            _isBrowserOpen = false;
+            _placementMode = PlacementMode.None;
+            if (_cachedBuildingController != null)
+                _cachedBuildingController.SetExternalInputSuppressed(false);
+            DestroyPreviewGhost();
             SetInteractionActive(false);
         }
 
         private void OnGUI()
         {
-            if (!_visible) return;
-
-            EnsureCatalogLoaded();
-
             EnsureStyles();
 
-            const float pad = 10f;
-            float w = Mathf.Min(720f, Screen.width - (pad * 2f));
-            float h = Mathf.Min(520f, Screen.height - (pad * 2f));
+            DrawStatusHUD();
 
-            float x = Mathf.Max(pad, (Screen.width - w) * 0.5f);
-            float y = Mathf.Max(pad, (Screen.height - h) * 0.5f);
+            if (!_isBrowserOpen || _activeNode == null)
+                return;
 
-            GUI.Box(new Rect(x, y, w, h), string.Empty);
-
-            GUILayout.BeginArea(new Rect(x + 10f, y + 10f, w - 20f, h - 20f));
-            GUILayout.Label("Asset Deploy (hold Shift+Tab)", _headerStyle);
-
-            GUILayout.Space(6f);
-            DrawBreadcrumb();
-
-            GUILayout.Space(6f);
-
-            var node = GetCurrentNode();
-            if (node == null)
-            {
-                _currentPath.Clear();
-                node = _root;
-            }
-
-            if (_selectedEntry != null)
-                GUILayout.Label($"Selected: {_selectedEntry.DisplayName}");
-
-            _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.ExpandHeight(true));
-
-            // Folders
-            if (node != null && node.SortedFolderNames.Count > 0)
-            {
-                for (int i = 0; i < node.SortedFolderNames.Count; i++)
-                {
-                    string folderName = node.SortedFolderNames[i];
-                    if (GUILayout.Button($"[Folder] {folderName}", _folderButtonStyle, GUILayout.Height(26f)))
-                    {
-                        _currentPath.Add(folderName);
-                        _scroll = Vector2.zero;
-                        GUI.FocusControl(null);
-                    }
-                }
-
-                GUILayout.Space(6f);
-            }
-
-            // Assets
-            if (node != null && node.SortedAssets.Count > 0)
-            {
-                for (int i = 0; i < node.SortedAssets.Count; i++)
-                    DrawAssetRow(node.SortedAssets[i]);
-            }
-            else
-            {
-                GUILayout.Label("No assets in this folder.");
-            }
-
-            GUILayout.EndScrollView();
-
-            GUILayout.Space(6f);
-
-            if (GUILayout.Button("Deploy near player", GUILayout.Height(30f)))
-            {
-                if (TryDeployNearLocalPlayer(out var spawned, out var msg))
-                {
-                    _status = $"Deployed {spawned.name}";
-                    Debug.Log($"[AssetDeployUI] {_status} at {spawned.transform.position}");
-                }
-                else
-                {
-                    _status = msg;
-                    Debug.LogWarning($"[AssetDeployUI] Deploy failed: {msg}");
-                }
-            }
-
-            GUILayout.Space(4f);
-            GUILayout.Label(_status ?? string.Empty);
-            GUILayout.EndArea();
+            DrawBrowser();
         }
 
         public bool TryDeployNearLocalPlayer(out GameObject spawned, out string message)
@@ -235,9 +297,8 @@ namespace ByteWar.UI
             EnsureDefaultSelection();
 
             var entry = GetSelectedEntryOrDefault();
-            string resourcePath = entry.ResourcePath;
-
-            var prefab = Resources.Load<GameObject>(resourcePath);
+            string resourcePath = NormalizeResourceLoadPath(entry.ResourcePath);
+            var prefab = LoadResourcePrefab(resourcePath);
             if (prefab == null)
             {
                 message = $"Resources prefab missing: {resourcePath}";
@@ -267,574 +328,366 @@ namespace ByteWar.UI
             return true;
         }
 
-        private void EnsureStyles()
+        private void HandleBrowserInput()
         {
-            if (_headerStyle != null) return;
-            _headerStyle = new GUIStyle(GUI.skin.label)
+            if (WasEscapePressed())
             {
-                fontStyle = FontStyle.Bold,
-                fontSize = 14,
-            };
-
-            _breadcrumbStyle = new GUIStyle(GUI.skin.button)
-            {
-                alignment = TextAnchor.MiddleLeft,
-                fontSize = 12,
-            };
-
-            _folderButtonStyle = new GUIStyle(GUI.skin.button)
-            {
-                alignment = TextAnchor.MiddleLeft,
-                fontSize = 12,
-            };
-
-            _assetButtonStyle = new GUIStyle(GUI.skin.button)
-            {
-                alignment = TextAnchor.MiddleLeft,
-                fontSize = 12,
-                wordWrap = true,
-            };
-        }
-
-        private void DrawBreadcrumb()
-        {
-            GUILayout.BeginHorizontal();
-
-            bool hasParent = _currentPath.Count > 0;
-            if (hasParent && GUILayout.Button("Up", GUILayout.Width(44f)))
-            {
-                _currentPath.RemoveAt(_currentPath.Count - 1);
-                _scroll = Vector2.zero;
+                HandleEscapeAction();
+                return;
             }
 
-            if (GUILayout.Button(RootFolderName, _breadcrumbStyle, GUILayout.Width(100f)))
-            {
-                _currentPath.Clear();
-                _scroll = Vector2.zero;
-            }
-
-            for (int i = 0; i < _currentPath.Count; i++)
-            {
-                GUILayout.Label("/", GUILayout.Width(10f));
-                string segment = _currentPath[i];
-                if (GUILayout.Button(segment, _breadcrumbStyle))
-                {
-                    // Trim to this segment.
-                    int removeCount = _currentPath.Count - (i + 1);
-                    if (removeCount > 0)
-                        _currentPath.RemoveRange(i + 1, removeCount);
-                    _scroll = Vector2.zero;
-                }
-            }
-
-            GUILayout.EndHorizontal();
-        }
-
-        private void DrawAssetRow(DeployableAssetCatalog.Entry entry)
-        {
-            if (entry == null) return;
-
-            GUILayout.BeginHorizontal(GUILayout.Height(66f));
-
-            Rect r = GUILayoutUtility.GetRect(64f, 64f, GUILayout.Width(64f), GUILayout.Height(64f));
-            var tex = GetPreviewTexture(entry);
-            if (tex != null)
-                GUI.DrawTexture(r, tex, ScaleMode.ScaleToFit);
-            else
-                GUI.Box(r, string.Empty);
-
-            bool isSelected = ReferenceEquals(_selectedEntry, entry);
-            Color oldBg = GUI.backgroundColor;
-            if (isSelected) GUI.backgroundColor = new Color(0.75f, 0.95f, 0.75f, 1f);
-
-            Rect labelRect = GUILayoutUtility.GetRect(
-                new GUIContent(entry.DisplayName),
-                _assetButtonStyle,
-                GUILayout.Height(64f),
-                GUILayout.ExpandWidth(true));
-
-            GUI.Box(labelRect, entry.DisplayName, _assetButtonStyle);
-
-            // Click-to-select, click-drag to place.
-            var e = Event.current;
-            if (e != null && e.type == EventType.MouseDown && e.button == 0 && labelRect.Contains(e.mousePosition))
-            {
-                _selectedEntry = entry;
-                _status = $"Selected {entry.DisplayName}";
-
-                ArmDrag(entry);
-                e.Use();
-            }
-
-            GUI.backgroundColor = oldBg;
-
-            GUILayout.EndHorizontal();
-            GUILayout.Space(2f);
-        }
-
-        private void ArmDrag(DeployableAssetCatalog.Entry entry)
-        {
-            if (entry == null) return;
-
-            _dragArmed = true;
-            _armedEntry = entry;
-            _armedMouseDownScreenPos = ReadMouseScreenPosition();
-        }
-
-        private void UpdateDragAndDrop()
-        {
-            // Arm phase: wait for cursor movement while LMB is still held.
-            if (_dragArmed && !_isDragging)
-            {
-                bool lmbHeld = IsLeftMousePressed();
-                if (!lmbHeld)
-                {
-                    _dragArmed = false;
-                    _armedEntry = null;
-                    return;
-                }
-
-                Vector2 now = ReadMouseScreenPosition();
-                float dist = Vector2.Distance(now, _armedMouseDownScreenPos);
-                if (dist >= _dragStartPixelThreshold)
-                {
-                    StartDrag(_armedEntry);
-                }
-            }
-
-            if (!_isDragging)
+            if (!IsOpenShortcutPressed(WasBuildKeyPressed()))
                 return;
 
-            // Drag phase: ghost follows cursor ray; release LMB to place.
+            OpenBrowser();
+        }
+
+        private void OpenBrowser()
+        {
             EnsureCatalogLoaded();
-            EnsureDefaultSelection();
+            RefreshBuildingController();
 
-            UpdateDragRaycast();
-            EnsureDragGhost();
+            if (_activeNode == null)
+                _activeNode = _rootNode;
 
-            if (_dragGhost != null)
+            _isBrowserOpen = true;
+            _browserScroll = Vector2.zero;
+            _status = $"Asset browser: {GetNodePath(_activeNode)}";
+        }
+
+        private void CloseBrowser(string status = null)
+        {
+            if (!_isBrowserOpen)
+                return;
+
+            _isBrowserOpen = false;
+            if (!string.IsNullOrWhiteSpace(status))
+                _status = status;
+        }
+
+        private void HandleEscapeAction()
+        {
+            bool hadBrowserOpen = _isBrowserOpen;
+            if (hadBrowserOpen)
+                CloseBrowser();
+
+            if (_placementMode != PlacementMode.None)
             {
-                _dragGhost.transform.position = _dragPlacementPoint;
-                _dragGhost.transform.rotation = GetDragRotation();
-            }
-
-            // Cancel
-            if (WasCancelPressed())
-            {
-                _status = "Drag cancelled.";
-                StopDrag();
+                CancelPlacementMode();
                 return;
             }
 
-            // Drop
-            if (WasLeftMouseReleased())
+            if (hadBrowserOpen)
+                _status = "Asset browser closed.";
+        }
+
+        private void HandleBrowserNodeSelection(RadialNode chosen)
+        {
+            if (chosen == null)
+                return;
+
+            if (chosen.Children.Count > 0)
             {
-                if (!_dragPlacementValid)
-                {
-                    _status = "Invalid placement (no surface hit).";
-                    StopDrag();
-                    return;
-                }
+                _activeNode = chosen;
+                _status = $"Category: {GetNodePath(chosen)}";
+                return;
+            }
 
-                if (TryDeployAt(_dragPlacementPoint, GetDragRotation(), out var spawned, out var msg))
-                {
-                    _status = $"Deployed {spawned.name}";
-                }
-                else
-                {
-                    _status = msg;
-                }
+            if (chosen.LeafKind == RadialLeafKind.None)
+                return;
 
-                StopDrag();
+            SelectLeaf(chosen);
+            CloseBrowser();
+        }
+
+        internal bool TrySelectBrowserNodeForTests(string displayName)
+        {
+            if (_activeNode == null || string.IsNullOrWhiteSpace(displayName))
+                return false;
+
+            for (int i = 0; i < _activeNode.Children.Count; i++)
+            {
+                RadialNode child = _activeNode.Children[i];
+                if (!string.Equals(child.DisplayName, displayName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                HandleBrowserNodeSelection(child);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void NavigateBrowserBack()
+        {
+            if (_activeNode == null || _activeNode.Parent == null)
+                return;
+
+            _activeNode = _activeNode.Parent;
+            _status = $"Category: {GetNodePath(_activeNode)}";
+        }
+
+        internal bool IsBrowserOpenForTests => _isBrowserOpen;
+        internal bool IsPlacementModeActiveForTests => _placementMode != PlacementMode.None;
+
+        internal void OpenBrowserForTests()
+        {
+            OpenBrowser();
+        }
+
+        internal void EnterDeveloperPlacementModeForTests(DeployableAssetCatalog.Entry entry)
+        {
+            _selectedEntry = entry;
+            EnterDeveloperPlacementMode();
+        }
+
+        internal void SelectDeveloperEntryFromBrowserForTests(DeployableAssetCatalog.Entry entry)
+        {
+            _isBrowserOpen = true;
+            _selectedEntry = entry;
+            EnterDeveloperPlacementMode();
+            CloseBrowser();
+        }
+
+        internal void HandleEscapeForTests()
+        {
+            HandleEscapeAction();
+        }
+
+        private void SelectLeaf(RadialNode node)
+        {
+            _selectedLeaf = node;
+
+            if (node.LeafKind == RadialLeafKind.DeveloperAsset)
+            {
+                _selectedEntry = node.CatalogEntry;
+                EnterDeveloperPlacementMode();
+                return;
+            }
+
+            if (node.LeafKind == RadialLeafKind.BuildingRecipe)
+            {
+                EnterBuildingPlacementMode(node.BuildingPieceType, node.PreferredRecipeIndex, node.DisplayName);
             }
         }
 
-        private void StartDrag(DeployableAssetCatalog.Entry entry)
+        private void EnterDeveloperPlacementMode()
         {
-            _dragArmed = false;
-            _armedEntry = null;
-
-            _dragEntry = entry;
-            _isDragging = _dragEntry != null;
-        }
-
-        private void StopDrag()
-        {
-            _isDragging = false;
-            _dragEntry = null;
-            DestroyDragGhost();
-        }
-
-        private void EnsureDragGhost()
-        {
-            if (_dragGhost != null)
-                return;
-
-            if (_dragEntry == null || string.IsNullOrEmpty(_dragEntry.ResourcePath))
-                return;
-
-            var prefab = Resources.Load<GameObject>(_dragEntry.ResourcePath);
-            if (prefab == null)
-                return;
-
-            _dragGhost = Instantiate(prefab);
-            _dragGhost.name = $"{prefab.name}_DRAG_GHOST";
-
-            // Make sure the ghost cannot be raycast-hit and cannot interact with physics/network.
-            SetLayerRecursively(_dragGhost, 2 /* Ignore Raycast */);
-
-            foreach (var col in _dragGhost.GetComponentsInChildren<Collider>(true))
-                col.enabled = false;
-            foreach (var rb in _dragGhost.GetComponentsInChildren<Rigidbody>(true))
-                rb.isKinematic = true;
-
-            foreach (var netObj in _dragGhost.GetComponentsInChildren<NetworkObject>(true))
-                netObj.enabled = false;
-            foreach (var netBeh in _dragGhost.GetComponentsInChildren<NetworkBehaviour>(true))
-                netBeh.enabled = false;
-
-            foreach (var r in _dragGhost.GetComponentsInChildren<Renderer>(true))
+            if (_selectedEntry == null)
             {
-                r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                r.receiveShadows = false;
+                _status = "Developer asset leaf missing catalog entry.";
+                return;
+            }
+
+            if (_cachedBuildingController != null)
+            {
+                _cachedBuildingController.SetExternalRightClickCancelMode(false);
+                if (_cachedBuildingController.IsBuildModeActive)
+                    _cachedBuildingController.SetBuildModeActive(false);
+            }
+
+            _placementMode = PlacementMode.DeveloperAsset;
+            _developerPlacementYaw = Camera.main != null ? Camera.main.transform.eulerAngles.y : 0f;
+            string placementModeLabel = IsDeveloperEntryServerPlacementReady(_selectedEntry)
+                ? "networked"
+                : "local-only";
+            _status = $"Developer placement ({placementModeLabel}): {_selectedEntry.DisplayName} (LMB place, wheel rotate, Esc cancel).";
+        }
+
+        private void EnterBuildingPlacementMode(BuildingPieceType pieceType, int preferredRecipeIndex, string displayName)
+        {
+            if (!TryConfigureBuildingControllerForRecipe(pieceType, preferredRecipeIndex, out _, out string message))
+            {
+                _status = $"Building placement unavailable: {message}";
+                return;
+            }
+
+            _placementMode = PlacementMode.BuildingRecipe;
+            _status = $"Building placement: {displayName} (LMB place, wheel rotate, Esc cancel).";
+        }
+
+        private void HandlePlacementFlow()
+        {
+            if (_isBrowserOpen)
+                return;
+
+            if (_placementMode == PlacementMode.None)
+                return;
+
+            if (WasEscapePressed())
+            {
+                CancelPlacementMode();
+                return;
+            }
+
+            if (_placementMode == PlacementMode.DeveloperAsset)
+            {
+                UpdateDeveloperPlacementInput();
             }
         }
 
-        private void DestroyDragGhost()
+        private void CancelPlacementMode()
         {
-            if (_dragGhost == null) return;
-            Destroy(_dragGhost);
-            _dragGhost = null;
+            if (_cachedBuildingController != null)
+            {
+                _cachedBuildingController.SetExternalRightClickCancelMode(false);
+                if (_placementMode == PlacementMode.BuildingRecipe)
+                    _cachedBuildingController.SetBuildModeActive(false);
+            }
+
+            _placementMode = PlacementMode.None;
+            _selectedLeaf = null;
+            _developerPlacementValid = false;
+            _status = "Placement cancelled.";
         }
 
-        private void UpdateDragRaycast()
+        private void UpdateDeveloperPlacementInput()
+        {
+            float wheel = ReadMouseWheelDelta();
+            if (Mathf.Abs(wheel) > 0.01f)
+            {
+                float direction = wheel > 0f ? 1f : -1f;
+                _developerPlacementYaw += direction * _placementRotationStep;
+            }
+
+            UpdateDeveloperPlacementPoint();
+
+            if (!WasLeftMousePressed())
+                return;
+
+            if (_selectedEntry == null)
+            {
+                _status = "No developer asset selected.";
+                return;
+            }
+
+            if (!_developerPlacementValid)
+            {
+                _status = "Invalid placement point.";
+                return;
+            }
+
+            var rotation = Quaternion.Euler(0f, _developerPlacementYaw, 0f);
+            if (TryPlaceDeveloperAsset(_selectedEntry, _developerPlacementPoint, rotation, out var spawned, out var message))
+            {
+                _status = spawned != null
+                    ? $"Placed developer asset: {spawned.name}."
+                    : "Developer placement request sent to server.";
+            }
+            else
+            {
+                _status = message;
+            }
+        }
+
+        private void UpdateDeveloperPlacementPoint()
         {
             Camera cam = Camera.main;
             if (cam == null)
             {
-                _dragPlacementValid = false;
-                _dragPlacementPoint = Vector3.zero;
+                _developerPlacementValid = false;
+                _developerPlacementPoint = Vector3.zero;
                 return;
             }
 
             Vector2 mouse = ReadMouseScreenPosition();
             Ray ray = cam.ScreenPointToRay(new Vector3(mouse.x, mouse.y, 0f));
 
-            if (Physics.Raycast(ray, out RaycastHit hit, 250f, _dragRaycastMask, QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(ray, out RaycastHit hit, _placementRaycastDistance, _placementRaycastMask, QueryTriggerInteraction.Ignore))
             {
-                _dragPlacementValid = true;
-                _dragPlacementPoint = hit.point;
-                _dragPlacementPoint.y += 0.02f;
+                _developerPlacementValid = true;
+                _developerPlacementPoint = hit.point;
+                _developerPlacementPoint.y += _placementYOffset;
             }
             else
             {
-                _dragPlacementValid = false;
-                _dragPlacementPoint = ray.origin + ray.direction * 8f;
+                _developerPlacementValid = false;
+                _developerPlacementPoint = ray.origin + ray.direction * 8f;
             }
         }
 
-        private Quaternion GetDragRotation()
+        private bool TryPlaceDeveloperAsset(DeployableAssetCatalog.Entry entry, Vector3 position, Quaternion rotation, out GameObject spawned, out string message)
         {
-            Camera cam = Camera.main;
-            if (cam == null) return Quaternion.identity;
-            Vector3 e = cam.transform.eulerAngles;
-            return Quaternion.Euler(0f, e.y, 0f);
-        }
+            spawned = null;
+            message = string.Empty;
 
-        private static void SetLayerRecursively(GameObject go, int layer)
-        {
-            if (go == null) return;
-            go.layer = layer;
-            foreach (Transform child in go.transform)
-                SetLayerRecursively(child.gameObject, layer);
-        }
+            bool serverPlacementReady = IsDeveloperEntryServerPlacementReady(entry);
 
-        private static bool IsShiftHeldRaw()
-        {
-            var kb = Keyboard.current;
-            if (kb != null)
-                return kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed;
-
-            return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-        }
-
-        private static bool IsTabHeldRaw()
-        {
-            var kb = Keyboard.current;
-            if (kb != null)
-                return kb.tabKey.isPressed;
-
-            return Input.GetKey(KeyCode.Tab);
-        }
-
-        private static Vector2 ReadMouseScreenPosition()
-        {
-            var m = Mouse.current;
-            if (m != null)
-                return m.position.ReadValue();
-
-            return Input.mousePosition;
-        }
-
-        private static bool IsLeftMousePressed()
-        {
-            var m = Mouse.current;
-            if (m != null)
-                return m.leftButton.isPressed;
-
-            return Input.GetMouseButton(0);
-        }
-
-        private static bool WasLeftMouseReleased()
-        {
-            var m = Mouse.current;
-            if (m != null)
-                return m.leftButton.wasReleasedThisFrame;
-
-            return Input.GetMouseButtonUp(0);
-        }
-
-        private static bool WasCancelPressed()
-        {
-            var kb = Keyboard.current;
-            var m = Mouse.current;
-
-            bool esc = kb != null ? kb.escapeKey.wasPressedThisFrame : Input.GetKeyDown(KeyCode.Escape);
-            bool rmb = m != null ? m.rightButton.wasPressedThisFrame : Input.GetMouseButtonDown(1);
-            return esc || rmb;
-        }
-
-        private Texture2D GetPreviewTexture(DeployableAssetCatalog.Entry entry)
-        {
-            string previewPath = entry.PreviewResourcePath;
-            if (string.IsNullOrEmpty(previewPath))
-                return null;
-
-            if (_previewCache.TryGetValue(previewPath, out var cached))
-                return cached;
-
-            var loaded = Resources.Load<Texture2D>(previewPath);
-            _previewCache[previewPath] = loaded;
-            return loaded;
-        }
-
-        private void EnsureCatalogLoaded()
-        {
-            if (_root != null && _entries != null && _entries.Count > 0)
-                return;
-
-            _catalog = Resources.Load<DeployableAssetCatalog>(CatalogResourcesLoadPath);
-            _entries = _catalog != null ? _catalog.Entries : null;
-
-            if (_entries == null || _entries.Count == 0)
+            RefreshBuildingController();
+            if (_cachedBuildingController != null && serverPlacementReady)
             {
-                // Fallback for repos/builds where the catalog asset hasn't been generated yet.
-                _entries = new List<DeployableAssetCatalog.Entry>
-                {
-                    new DeployableAssetCatalog.Entry(FallbackDisplayName, FallbackPrefabResourcesPath, FallbackPreviewResourcesPath)
-                };
+                string resourcePath = NormalizeResourceLoadPath(entry?.ResourcePath);
+                string displayName = entry?.DisplayName ?? string.Empty;
+                bool success = _cachedBuildingController.TryRequestDeveloperAssetPlacement(position, rotation, resourcePath, displayName);
+                message = success ? "OK" : "Developer placement request rejected.";
+                return success;
             }
 
-            _root = BuildFolderTree(_entries);
+            _selectedEntry = entry;
+            bool localSuccess = TryDeployAt(position, rotation, out spawned, out message);
+            if (localSuccess && _cachedBuildingController != null && !serverPlacementReady)
+                message = "Placed locally (developer prefab is not network-ready).";
+
+            return localSuccess;
         }
 
-        private void EnsureDefaultSelection()
+        private bool IsDeveloperEntryServerPlacementReady(DeployableAssetCatalog.Entry entry)
         {
-            if (_selectedEntry != null && !string.IsNullOrEmpty(_selectedEntry.ResourcePath))
-                return;
-
-            _selectedEntry = GetSelectedEntryOrDefault();
+            string resourcePath = NormalizeResourceLoadPath(entry?.ResourcePath);
+            GameObject prefab = LoadResourcePrefab(resourcePath);
+            return HasRequiredDeveloperSpawnComponents(prefab);
         }
 
-        private DeployableAssetCatalog.Entry GetSelectedEntryOrDefault()
+        private bool TryConfigureBuildingControllerForRecipe(BuildingPieceType pieceType, int preferredRecipeIndex, out int selectedRecipeIndex, out string message)
         {
-            if (_selectedEntry != null && !string.IsNullOrEmpty(_selectedEntry.ResourcePath))
-                return _selectedEntry;
+            selectedRecipeIndex = -1;
+            message = string.Empty;
 
-            if (_entries != null)
+            RefreshBuildingController();
+            if (_cachedBuildingController == null)
             {
-                for (int i = 0; i < _entries.Count; i++)
-                {
-                    var e = _entries[i];
-                    if (e != null && !string.IsNullOrEmpty(e.ResourcePath))
-                    {
-                        _selectedEntry = e;
-                        return e;
-                    }
-                }
+                message = "Local BuildingController not found.";
+                return false;
             }
 
-            _selectedEntry = new DeployableAssetCatalog.Entry(FallbackDisplayName, FallbackPrefabResourcesPath, FallbackPreviewResourcesPath);
-            return _selectedEntry;
-        }
-
-        private static FolderNode BuildFolderTree(IReadOnlyList<DeployableAssetCatalog.Entry> entries)
-        {
-            var root = new FolderNode();
-            if (entries == null) return root;
-
-            for (int i = 0; i < entries.Count; i++)
+            selectedRecipeIndex = ResolveRecipeIndex(_cachedBuildingController, pieceType, preferredRecipeIndex);
+            if (selectedRecipeIndex < 0)
             {
-                var entry = entries[i];
-                if (entry == null) continue;
-                if (string.IsNullOrEmpty(entry.ResourcePath)) continue;
-
-                string rp = entry.ResourcePath.Replace('\\', '/');
-                if (rp.StartsWith($"{RootFolderName}/", StringComparison.OrdinalIgnoreCase))
-                    rp = rp.Substring(RootFolderName.Length + 1);
-
-                string[] parts = rp.Split('/');
-                if (parts.Length == 0) continue;
-
-                var node = root;
-                for (int p = 0; p < parts.Length - 1; p++)
-                {
-                    string folder = parts[p];
-                    if (string.IsNullOrEmpty(folder)) continue;
-                    node = node.GetOrCreate(folder);
-                }
-
-                node.Assets.Add(entry);
+                message = $"No recipe mapped for {pieceType}.";
+                return false;
             }
 
-            root.SortRecursive();
-            return root;
-        }
-
-        private FolderNode GetCurrentNode()
-        {
-            var node = _root;
-            for (int i = 0; i < _currentPath.Count; i++)
+            _cachedBuildingController.SetBuildModeActive(true);
+            _cachedBuildingController.SetExternalRightClickCancelMode(true);
+            _cachedBuildingController.SetExternalCancelOnRightClick(false);
+            if (!_cachedBuildingController.TrySelectRecipeIndex(selectedRecipeIndex, clearPreview: true))
             {
-                if (node == null) return null;
-                string seg = _currentPath[i];
-                if (!node.Folders.TryGetValue(seg, out var next))
-                    return null;
-                node = next;
+                message = "Failed to select building recipe index.";
+                return false;
             }
 
-            return node;
+            message = "OK";
+            return true;
         }
 
-        private void SetInteractionActive(bool active)
+        private static int ResolveRecipeIndex(BuildingController controller, BuildingPieceType pieceType, int preferredRecipeIndex)
         {
-            if (_interactionActive == active)
+            var recipes = controller.Recipes;
+            if (recipes == null || recipes.Count == 0)
+                return -1;
+
+            if (preferredRecipeIndex >= 0 && preferredRecipeIndex < recipes.Count)
+                return preferredRecipeIndex;
+
+            for (int i = 0; i < recipes.Count; i++)
             {
-                if (_interactionActive)
-                {
-                    MaintainCursorWhileActive();
-                    TryApplyInputSuppressionWhileVisible();
-                }
-                return;
+                var recipe = recipes[i];
+                if (recipe != null && recipe.PieceType == pieceType)
+                    return i;
             }
 
-            _interactionActive = active;
-
-            if (_interactionActive)
-            {
-                CaptureCursor();
-                MaintainCursorWhileActive();
-                TryApplyInputSuppressionWhileVisible();
-                return;
-            }
-
-            ReleaseCursor();
-            ReleaseInputSuppression();
+            return -1;
         }
 
-        private void MaintainCursorWhileActive()
-        {
-            if (!_cursorCaptured) return;
-
-            if (Cursor.lockState != CursorLockMode.None)
-                Cursor.lockState = CursorLockMode.None;
-            if (!Cursor.visible)
-                Cursor.visible = true;
-        }
-
-        private void CaptureCursor()
-        {
-            if (_cursorCaptured) return;
-            _cursorCaptured = true;
-
-            _prevCursorLockState = Cursor.lockState;
-            _prevCursorVisible = Cursor.visible;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-
-        private void ReleaseCursor()
-        {
-            if (!_cursorCaptured) return;
-            _cursorCaptured = false;
-
-            Cursor.lockState = _prevCursorLockState;
-            Cursor.visible = _prevCursorVisible;
-        }
-
-        private void TryApplyInputSuppressionWhileVisible()
-        {
-            if (_inputSuppressed && _cachedInputHandler != null)
-                return;
-
-            if (Time.unscaledTime < _nextInputHandlerSearchTime)
-                return;
-
-            _nextInputHandlerSearchTime = Time.unscaledTime + 1f;
-
-            if (_cachedInputHandler == null)
-                _cachedInputHandler = FindFirstObjectByType<PlayerInputHandler>();
-
-            if (_cachedInputHandler == null)
-                return;
-
-            _cachedInputHandler.SetInputSuppressed(this, true);
-            _inputSuppressed = true;
-        }
-
-        private void ReleaseInputSuppression()
-        {
-            if (!_inputSuppressed) return;
-            _inputSuppressed = false;
-
-            if (_cachedInputHandler != null)
-                _cachedInputHandler.SetInputSuppressed(this, false);
-        }
-
-        private sealed class FolderNode
-        {
-            public readonly Dictionary<string, FolderNode> Folders = new(StringComparer.OrdinalIgnoreCase);
-            public readonly List<DeployableAssetCatalog.Entry> Assets = new();
-
-            public readonly List<string> SortedFolderNames = new();
-            public readonly List<DeployableAssetCatalog.Entry> SortedAssets = new();
-
-            public FolderNode GetOrCreate(string name)
-            {
-                if (!Folders.TryGetValue(name, out var child))
-                {
-                    child = new FolderNode();
-                    Folders[name] = child;
-                }
-
-                return child;
-            }
-
-            public void SortRecursive()
-            {
-                SortedFolderNames.Clear();
-                SortedAssets.Clear();
-
-                foreach (var kvp in Folders)
-                    SortedFolderNames.Add(kvp.Key);
-                SortedFolderNames.Sort(StringComparer.OrdinalIgnoreCase);
-
-                SortedAssets.AddRange(Assets);
-                SortedAssets.Sort((a, b) => string.CompareOrdinal(a?.DisplayName, b?.DisplayName));
-
-                foreach (var kvp in Folders)
-                    kvp.Value.SortRecursive();
-            }
-        }
     }
 }

@@ -31,6 +31,10 @@ namespace ByteWar.Core
         [Tooltip("When true, building costs are bypassed for testing.")]
         [SerializeField] private bool _devMode = false;
 
+        [Header("Building Economy")]
+        [Tooltip("When true, building placement consumes recipe resources.")]
+        [SerializeField] private bool _buildingCostsEnabled = false;
+
         // ── Read-only accessors ───────────────────────────────────────────────
         public float MoveSpeed => _moveSpeed;
         public float TurnSpeed => _turnSpeed;
@@ -43,6 +47,7 @@ namespace ByteWar.Core
         public float InteractionRange => _interactionRange;
         public int TargetFrameRate => _targetFrameRate;
         public bool DevMode => _devMode;
+        public bool BuildingCostsEnabled => _buildingCostsEnabled;
 
         // ── Runtime singleton accessor ────────────────────────────────────────
         private static GameConstants _instance;
@@ -86,6 +91,8 @@ namespace ByteWar.Core
         public static float GetInteractionRange() => Instance != null ? Instance.InteractionRange : 100f;
         public static int GetTargetFrameRate() => Instance != null ? Instance.TargetFrameRate : 60;
         public static bool IsDevMode() => Instance != null && Instance.DevMode;
+        public static bool IsBuildingCostsEnabled() => Instance != null && Instance.BuildingCostsEnabled;
+        public static bool ShouldBypassBuildingCosts() => !IsBuildingCostsEnabled() || IsDevMode();
 
         /// <summary>Toggles DevMode at runtime. Resets on restart (does not persist to asset).</summary>
         public static void SetDevMode(bool enabled)
@@ -98,6 +105,20 @@ namespace ByteWar.Core
             else
             {
                 Debug.LogWarning("[GameConstants] Cannot set DevMode: Instance is null.");
+            }
+        }
+
+        /// <summary>Toggles building cost enforcement at runtime. Resets on restart (does not persist to asset).</summary>
+        public static void SetBuildingCostsEnabled(bool enabled)
+        {
+            if (Instance != null)
+            {
+                Instance._buildingCostsEnabled = enabled;
+                Debug.Log($"[GameConstants] BuildingCostsEnabled set to {enabled}");
+            }
+            else
+            {
+                Debug.LogWarning("[GameConstants] Cannot set BuildingCostsEnabled: Instance is null.");
             }
         }
 

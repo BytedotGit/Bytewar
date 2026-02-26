@@ -113,6 +113,53 @@ namespace ByteWar.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator NetworkPlayer_ADTurn_RotatesInPlace_AndCameraFollows()
+        {
+            GameObject camObj = new GameObject("Main Camera");
+            camObj.tag = "MainCamera";
+            camObj.AddComponent<Camera>();
+            camObj.transform.position = new Vector3(0, 5, -10);
+            camObj.transform.rotation = Quaternion.identity;
+
+            _networkManager.StartHost();
+            yield return NGOTestHelper.WaitForLocalPlayerReady(_networkManager);
+
+            var playerObj = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+            var inputHandler = playerObj.GetComponent<PlayerInputHandler>();
+            Assert.IsNotNull(inputHandler, "PlayerInputHandler should be attached to the player.");
+
+            var tpc = Camera.main != null ? Camera.main.GetComponent<ThirdPersonCamera>() : null;
+            Assert.IsNotNull(tpc, "ThirdPersonCamera should exist on Main Camera.");
+
+            // Ensure deterministic turn-only semantics for this test.
+            tpc.AutoTest_SetMouseState(leftHeld: false, rightHeld: false, leftDragging: false);
+
+            Vector3 startPos = playerObj.transform.position;
+            float startYaw = playerObj.transform.eulerAngles.y;
+            float startCamYaw = tpc.CameraYaw;
+
+            inputHandler.SetSimulatedMovement(new Vector2(1f, 0f));
+            yield return new WaitForSeconds(1.25f);
+            inputHandler.ClearSimulatedMovement();
+
+            Vector3 endPos = playerObj.transform.position;
+            float endYaw = playerObj.transform.eulerAngles.y;
+            float endCamYaw = tpc.CameraYaw;
+
+            float yawDelta = Mathf.Abs(Mathf.DeltaAngle(startYaw, endYaw));
+            float camYawDelta = Mathf.Abs(Mathf.DeltaAngle(startCamYaw, endCamYaw));
+            float movedDuringTurn = Vector2.Distance(
+                new Vector2(startPos.x, startPos.z),
+                new Vector2(endPos.x, endPos.z));
+
+            Assert.Greater(yawDelta, 5f, "A/D input should rotate player yaw when RMB is not held.");
+            Assert.Greater(camYawDelta, 5f, "Camera yaw should follow player keyboard turn.");
+            Assert.LessOrEqual(movedDuringTurn, 0.6f, "A/D turn should not translate significantly when RMB is not held.");
+
+            Object.Destroy(camObj);
+        }
+
+        [UnityTest]
         public IEnumerator JumpPressedMidAir_DoesNotQueueJumpOnLanding()
         {
             // Arrange — ground so CharacterController can become grounded during the test.

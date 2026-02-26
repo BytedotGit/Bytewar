@@ -65,6 +65,15 @@ Every change MUST pass ALL of the following before being considered complete:
 | Pre-existing test failure        | Fix it immediately — test failures are never "unrelated" |
 | Failing test after 3 attempts    | Log to `ERROR_LOG.md`, escalate to user                  |
 
+## Model Routing Policy
+
+- **Architecture / Complex implementation**: Use `GPT-5.3-Codex` (`Architect`, `Reviewer`) for deep multi-file reasoning and implementation planning.
+- **Debugging loops**: Use `Claude Opus 4.6` (`Debugger`) for stack-trace diagnosis and iterative root-cause analysis.
+- **Design choices**: Use `Gemini 3.1 Pro (Preview)` (`Designer`) for UI/UX, gameplay balance, and 3D/design decision support.
+- **Explore / Search workflows**: Use `Gemini 3 Flash (Preview)` (`Explore`, `Search`) for fast, low-cost read-only discovery.
+- **Primary fallback**: Prefer `Claude Sonnet 4.6` when the primary model for an agent is unavailable, degraded, or rate-limited.
+- **Fallback rule**: Keep the same agent role; only swap model tier unless the task intent changes.
+
 ## Build & Test Commands
 
 ```powershell
@@ -94,3 +103,18 @@ Start-Process -FilePath "Builds\Windows\ByteWar.exe" `
 $logPath = "$env:USERPROFILE\AppData\LocalLow\BytedotGit\ByteWar\Player.log"
 Get-Content $logPath | Select-String "(PASS|FAIL|Exception|AutoTester)" | Select-Object -Last 30
 ```
+
+## Known Benign External Warnings
+
+The following warnings are environment/runtime noise and are **not** project defects when success markers are present:
+
+- `[Licensing::Module] Error: Access token is unavailable; failed to update`
+  - Common in Unity batchmode when token refresh is unavailable but license entitlement resolves in the same run.
+- `d3d12: failed to query info queue interface (0x80004002)`
+  - Common on Windows machines without the optional **Graphics Tools** debug-layer components.
+
+Treat verification as successful when:
+
+1. Build/test exit codes are 0,
+2. AutoTester reports PASS markers,
+3. No real `FAIL` markers or runtime `Exception` lines are present.

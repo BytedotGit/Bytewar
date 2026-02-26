@@ -115,8 +115,8 @@ namespace ByteWar.Networking
                 float yawDelta = input.x * GameConstants.GetKeyboardTurnSpeedDegPerSec() * Time.deltaTime;
                 if (Mathf.Abs(yawDelta) > 0.0001f)
                 {
-                    Vector3 e = transform.eulerAngles;
-                    transform.rotation = Quaternion.Euler(0f, e.y + yawDelta, 0f);
+                    Vector3 euler = transform.eulerAngles;
+                    transform.rotation = Quaternion.Euler(0f, euler.y + yawDelta, 0f);
                 }
 
                 // No strafing when RMB is not held.
@@ -167,22 +167,11 @@ namespace ByteWar.Networking
             // Rotation
             if (rmbHeld)
             {
-                // RMB held: face travel direction when moving diagonally forward (W+A / W+D),
-                // otherwise keep classic camera-yaw facing (strafing/backpedal).
-                if (ShouldFaceMoveDirectionWhenRmbHeld(input, isMoving))
-                {
-                    Quaternion targetRot = Quaternion.LookRotation(moveDir.normalized);
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
-                                                          Time.deltaTime * GameConstants.GetTurnSpeed());
-                }
-                else
-                {
-                    Quaternion faceCam = Quaternion.Euler(0f, camYaw, 0f);
-                    transform.rotation = Quaternion.Slerp(transform.rotation, faceCam,
-                                                          Time.deltaTime * GameConstants.GetTurnSpeed());
-                }
+                Quaternion faceCam = Quaternion.Euler(0f, camYaw, 0f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, faceCam,
+                                                      Time.deltaTime * GameConstants.GetTurnSpeed());
             }
-            else if (isMoving)
+            else if (isMoving && input.y >= -0.01f)
             {
                 Quaternion targetRot = Quaternion.LookRotation(moveDir.normalized);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
@@ -198,9 +187,9 @@ namespace ByteWar.Networking
 
         internal static bool ShouldFaceMoveDirectionWhenRmbHeld(Vector2 input, bool isMoving)
         {
-            // Requested behavior: W+A / W+D should turn to face the actual diagonal travel direction.
-            // Preserve classic WoW: pure strafing and backpedal do not rotate to movement direction.
-            return isMoving && input.y > 0.01f && Mathf.Abs(input.x) > 0.01f;
+            // RMB movement remains camera-facing for forward/strafe/backpedal in this control model.
+            // Method retained for existing tests and compatibility.
+            return false;
         }
 
         // ── Abilities ─────────────────────────────────────────────────────────────

@@ -25,3 +25,4 @@ MonoBehaviour:
   _interactionRange: 100
   _targetFrameRate: 60
   _devMode: 0
+  _buildingCostsEnabled: 0

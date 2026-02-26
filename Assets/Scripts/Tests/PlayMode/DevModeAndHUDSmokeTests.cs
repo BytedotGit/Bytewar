@@ -46,14 +46,14 @@ namespace ByteWar.Tests.PlayMode
         {
             // Explicitly enable DevMode for this test
             var gc = ScriptableObject.CreateInstance<GameConstants>();
-            var field = typeof(GameConstants).GetField("_devMode",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            field.SetValue(gc, true);
             GameConstants.SetInstanceForTesting(gc);
+            GameConstants.SetBuildingCostsEnabled(true);
+            GameConstants.SetDevMode(true);
 
             try
             {
                 Assert.IsTrue(GameConstants.IsDevMode(), "DevMode should be explicitly enabled.");
+                Assert.IsTrue(GameConstants.IsBuildingCostsEnabled(), "Building costs should be enabled to validate DevMode bypass.");
 
                 // Get player's BuildingController
                 var playerObj = _networkManager.SpawnManager.GetLocalPlayerObject();

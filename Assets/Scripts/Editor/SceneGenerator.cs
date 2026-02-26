@@ -131,11 +131,11 @@ namespace ByteWar.Editor
             keybindingHudObj.AddComponent<ByteWar.UI.KeybindingHUD>();
             Debug.Log("[SceneGenerator] KeybindingHUD added (toggle with F2).");
 
-            // ── 10d. Asset Deploy UI (for viewing/spawning test assets) ─────────
-            // Visible only while holding Shift+Tab.
+            // ── 10d. Asset Deploy UI (tap-B browser + placement flow) ───────────
+            // Open browser with B, click category/item to pick nested entries.
             GameObject assetDeployUiObj = new GameObject("AssetDeployUI");
             assetDeployUiObj.AddComponent<AssetDeployUI>();
-            Debug.Log("[SceneGenerator] AssetDeployUI added (hold Shift+Tab).");
+            Debug.Log("[SceneGenerator] AssetDeployUI added (tap B browser).");
 
             // ── 11. Scatter greybox environment props ────────────────────────────
             GenerateGreyboxProps();

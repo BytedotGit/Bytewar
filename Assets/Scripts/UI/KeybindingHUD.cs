@@ -77,10 +77,10 @@ namespace ByteWar.UI
             GUILayout.Label("E  –  Interact / Gather", _labelStyle);
             GUILayout.Label("1  –  Ability 1 (Cleave)", _labelStyle);
             GUILayout.Label("2  –  Ability 2", _labelStyle);
-            GUILayout.Label("B  –  Toggle Build Mode", _labelStyle);
+            GUILayout.Label("B (tap)  –  Asset Browser", _labelStyle);
             GUILayout.Label("F1  –  Screen Logger", _labelStyle);
             GUILayout.Label("F2  –  Toggle This HUD", _labelStyle);
-            GUILayout.Label("Shift+Tab (hold)  –  Asset Deploy UI", _labelStyle);
+            GUILayout.Label("Browser: click category/item to select", _labelStyle);
 
             // Build mode section
             if (_buildingController != null && _buildingController.IsBuildModeActive)
@@ -88,7 +88,7 @@ namespace ByteWar.UI
                 GUILayout.Space(8);
                 GUILayout.Label("BUILD MODE", _headerStyle);
                 GUILayout.Space(4);
-                GUILayout.Label("1-9  –  Select Recipe", _labelStyle);
+                GUILayout.Label("Use browser item to select recipe", _labelStyle);
                 GUILayout.Label("Scroll  –  Rotate Piece", _labelStyle);
                 GUILayout.Label("Shift+Scroll  –  Tilt/Pitch", _labelStyle);
                 GUILayout.Label("Left Click  –  Place", _labelStyle);

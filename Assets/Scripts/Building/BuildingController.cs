@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 using ByteWar.Survival;
 using ByteWar.Core;
+using ByteWar.UI;
 using System;
 using System.Collections.Generic;
 
@@ -18,6 +19,9 @@ namespace ByteWar.Building
     /// </summary>
     public class BuildingController : NetworkBehaviour
     {
+        private const string DeveloperPlacementCatalogResourcesPath = "Generated/DeployableAssetCatalog";
+        private const string DeveloperPlacementFallbackResourcesPath = "Generated/BlenderE2EProp/BlenderE2EProp";
+
         [Header("Configuration")]
         [SerializeField] private List<BuildingRecipe> _recipes = new();
         [SerializeField] private LayerMask _placementLayerMask = ~0;
@@ -26,6 +30,7 @@ namespace ByteWar.Building
         [SerializeField] private float _adjacencySnapRadius = 5f;
         [SerializeField] private float _rotationStep = 22.5f;
         [SerializeField] private float _removeCooldown = 0.3f;
+        [SerializeField] private bool _internalBuildToggleInputEnabled = false;
 
         [Header("Prefab Registry (set by PrefabGenerator)")]
         [SerializeField] private GameObject _foundationPrefab;
@@ -51,11 +56,17 @@ namespace ByteWar.Building
 
         // Runtime state
         private bool _buildModeActive;
+        private bool _externalInputSuppressed;
+        private bool _externalRightClickCancelMode;
+        private bool _externalCancelOnRightClick = true;
         private int _selectedRecipeIndex;
         private float _lastRemoveTime;
 
         // Non-alloc overlap
         private readonly Collider[] _overlapBuffer = new Collider[32];
+
+        private static readonly HashSet<string> _developerPlacementAllowlist = new(StringComparer.OrdinalIgnoreCase);
+        private static bool _developerPlacementAllowlistInitialized;
 
         private PlayerInputHandler _inputHandler;
         private InventoryComponent _inventory;
@@ -71,6 +82,7 @@ namespace ByteWar.Building
         public bool IsBuildModeActive => _buildModeActive;
         public int SelectedRecipeIndex => _selectedRecipeIndex;
         public List<BuildingRecipe> Recipes => _recipes;
+        public bool IsExternalInputSuppressed => _externalInputSuppressed;
 
         // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -79,6 +91,7 @@ namespace ByteWar.Building
             _inputHandler = GetComponent<PlayerInputHandler>();
             _inventory = GetComponent<InventoryComponent>();
             _preview = new BuildingPreview();
+            _internalBuildToggleInputEnabled = false;
         }
 
         public override void OnNetworkSpawn()
@@ -100,12 +113,21 @@ namespace ByteWar.Building
             if (!IsSpawned || !IsOwner) return;
 
             // Toggle build mode
-            if (_inputHandler != null && _inputHandler.ConsumeBuild())
+            if (_internalBuildToggleInputEnabled && _inputHandler != null && _inputHandler.ConsumeBuild())
             {
                 ToggleBuildMode();
             }
 
             if (!_buildModeActive) return;
+
+            if (_externalInputSuppressed)
+                return;
+
+            if (ShouldCancelBuildModeThisFrame())
+            {
+                SetBuildModeActive(false);
+                return;
+            }
 
             HandleRecipeSelection();
             HandleRotation();
@@ -118,18 +140,99 @@ namespace ByteWar.Building
 
         public void ToggleBuildMode()
         {
-            _buildModeActive = !_buildModeActive;
+            SetBuildModeActive(!_buildModeActive);
+        }
+
+        public void SetInternalBuildToggleInputEnabled(bool enabled)
+        {
+            _internalBuildToggleInputEnabled = enabled;
+        }
+
+        public void SetBuildModeActive(bool active, bool clearPreview = true)
+        {
+            if (_buildModeActive == active)
+            {
+                if (clearPreview)
+                    _preview.Clear();
+
+                if (_cameraController != null)
+                    _cameraController.SuppressZoom = _buildModeActive;
+                return;
+            }
+
+            _buildModeActive = active;
             Debug.Log($"[BuildingController] Build mode {(_buildModeActive ? "ON" : "OFF")} owner={OwnerClientId}");
 
             if (_cameraController != null)
                 _cameraController.SuppressZoom = _buildModeActive;
 
-            if (!_buildModeActive)
-            {
+            if (clearPreview)
                 _preview.Clear();
-            }
 
             OnBuildModeChanged?.Invoke(_buildModeActive);
+        }
+
+        public bool TrySelectRecipeIndex(int recipeIndex, bool clearPreview = true)
+        {
+            if (recipeIndex < 0 || recipeIndex >= _recipes.Count)
+                return false;
+
+            if (_selectedRecipeIndex != recipeIndex)
+            {
+                _selectedRecipeIndex = recipeIndex;
+                Debug.Log($"[BuildingController] Selected recipe [{recipeIndex + 1}]: {_recipes[recipeIndex].RecipeName}");
+            }
+
+            if (clearPreview)
+                ClearPreview();
+
+            return true;
+        }
+
+        public bool TrySelectRecipeByType(BuildingPieceType pieceType, bool clearPreview = true)
+        {
+            int recipeIndex = FindRecipeForType(pieceType);
+            if (recipeIndex < 0)
+                return false;
+
+            return TrySelectRecipeIndex(recipeIndex, clearPreview);
+        }
+
+        public void SetExternalRightClickCancelMode(bool enabled)
+        {
+            _externalRightClickCancelMode = enabled;
+            if (!enabled)
+                _externalCancelOnRightClick = true;
+        }
+
+        public void SetExternalCancelOnRightClick(bool enabled)
+        {
+            _externalCancelOnRightClick = enabled;
+        }
+
+        public bool TryRequestDeveloperAssetPlacement(Vector3 position, Quaternion rotation, string resourcePath, string displayName)
+        {
+            if (!IsSpawned || !IsOwner)
+            {
+                Debug.LogWarning("[BuildingController] Developer asset placement denied: requester is not the spawned owner.");
+                return false;
+            }
+
+            if (!TryNormalizeResourcePath(resourcePath, out string normalizedPath))
+            {
+                Debug.LogWarning($"[BuildingController] Developer asset placement denied: invalid resource path '{resourcePath}'.");
+                return false;
+            }
+
+            PlaceDeveloperAssetServerRpc(position, rotation, normalizedPath, displayName ?? string.Empty);
+            return true;
+        }
+
+        public void SetExternalInputSuppressed(bool suppressed)
+        {
+            _externalInputSuppressed = suppressed;
+            if (_externalInputSuppressed)
+                _preview.Clear();
         }
 
         // ── Recipe selection (number keys 1-9) ───────────────────────────────────
@@ -145,12 +248,7 @@ namespace ByteWar.Building
             {
                 if (GetNumberKeyPressed(kb, i + 1))
                 {
-                    if (_selectedRecipeIndex != i)
-                    {
-                        _selectedRecipeIndex = i;
-                        Debug.Log($"[BuildingController] Selected recipe [{i + 1}]: {_recipes[i].RecipeName}");
-                        ClearPreview();
-                    }
+                    TrySelectRecipeIndex(i);
                     break;
                 }
             }
@@ -354,6 +452,11 @@ namespace ByteWar.Building
             }
 
             // Right-click in build mode: repair
+            if (_externalRightClickCancelMode)
+            {
+                return;
+            }
+
             if (Mouse.current.rightButton.wasPressedThisFrame)
             {
                 if (TryGetTargetPiece(out BuildingPiece target))
@@ -361,6 +464,169 @@ namespace ByteWar.Building
                     RepairBuildingServerRpc(target.NetworkObjectId);
                 }
             }
+        }
+
+        private bool ShouldCancelBuildModeThisFrame()
+        {
+            if (!_externalRightClickCancelMode)
+                return false;
+
+            bool rightClickPressed = _externalCancelOnRightClick && Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame;
+            bool escapePressed = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
+            return rightClickPressed || escapePressed;
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+        private void PlaceDeveloperAssetServerRpc(Vector3 position, Quaternion rotation, string resourcePath, string displayName, RpcParams rpcParams = default)
+        {
+            ulong senderClientId = rpcParams.Receive.SenderClientId;
+            if (senderClientId != OwnerClientId)
+            {
+                Debug.LogWarning($"[BuildingController] Developer asset placement denied: sender {senderClientId} is not owner {OwnerClientId}.");
+                return;
+            }
+
+            if (!CanBypassBuildingCostsForDeveloperPlacement())
+            {
+                Debug.LogWarning($"[BuildingController] Developer asset placement denied for client {senderClientId}: DevMode/bypass not enabled.");
+                return;
+            }
+
+            if (!TryNormalizeResourcePath(resourcePath, out string normalizedPath))
+            {
+                Debug.LogWarning($"[BuildingController] Developer asset placement denied: invalid resource path '{resourcePath}'.");
+                return;
+            }
+
+            if (!IsDeveloperPlacementPathAllowlisted(normalizedPath))
+            {
+                Debug.LogWarning($"[BuildingController] Developer asset placement denied: resource path '{normalizedPath}' is not allowlisted.");
+                return;
+            }
+
+            GameObject prefab = Resources.Load<GameObject>(normalizedPath);
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[BuildingController] Developer asset placement denied: prefab not found at Resources path '{normalizedPath}'.");
+                return;
+            }
+
+            var prefabNetworkObject = prefab.GetComponent<NetworkObject>();
+            var prefabCollider = prefab.GetComponentInChildren<Collider>(true);
+            var prefabLodGroup = prefab.GetComponentInChildren<LODGroup>(true);
+            if (prefabNetworkObject == null || prefabCollider == null || prefabLodGroup == null)
+            {
+                Debug.LogWarning($"[BuildingController] Developer asset placement denied for '{normalizedPath}': required components missing (NetworkObject={prefabNetworkObject != null}, Collider={prefabCollider != null}, LODGroup={prefabLodGroup != null}).");
+                return;
+            }
+
+            GameObject instance = Instantiate(prefab, position, rotation);
+            string resolvedName = string.IsNullOrWhiteSpace(displayName) ? prefab.name : displayName.Trim();
+            instance.name = resolvedName;
+
+            NetworkObject spawnedNetworkObject = instance.GetComponent<NetworkObject>();
+            if (spawnedNetworkObject == null)
+            {
+                Debug.LogError("[BuildingController] Developer asset instance missing NetworkObject after instantiate. Destroying instance.");
+                Destroy(instance);
+                return;
+            }
+
+            spawnedNetworkObject.Spawn();
+            Debug.Log($"[BuildingController] Developer asset placed '{resolvedName}' from '{normalizedPath}' at {position} by client {senderClientId} netObj={spawnedNetworkObject.NetworkObjectId}");
+
+            PlayBuildingEffectClientRpc(position);
+        }
+
+        private static bool CanBypassBuildingCostsForDeveloperPlacement()
+        {
+            return GameConstants.ShouldBypassBuildingCosts() || GameConstants.IsDevMode();
+        }
+
+        private static bool IsDeveloperPlacementPathAllowlisted(string normalizedPath)
+        {
+            EnsureDeveloperPlacementAllowlistInitialized();
+            return IsDeveloperPlacementPathAllowlisted(normalizedPath, _developerPlacementAllowlist);
+        }
+
+        private static void EnsureDeveloperPlacementAllowlistInitialized()
+        {
+            if (_developerPlacementAllowlistInitialized)
+                return;
+
+            _developerPlacementAllowlistInitialized = true;
+            _developerPlacementAllowlist.Clear();
+
+            if (TryNormalizeResourcePath(DeveloperPlacementFallbackResourcesPath, out string fallbackPath))
+                _developerPlacementAllowlist.Add(fallbackPath);
+
+            var catalog = Resources.Load<DeployableAssetCatalog>(DeveloperPlacementCatalogResourcesPath);
+            if (catalog == null || catalog.Entries == null)
+            {
+                Debug.LogWarning("[BuildingController] Developer placement allowlist: catalog missing or empty; using fallback allowlist entries only.");
+                return;
+            }
+
+            int addedCount = 0;
+            for (int i = 0; i < catalog.Entries.Count; i++)
+            {
+                var entry = catalog.Entries[i];
+                if (entry == null)
+                    continue;
+
+                if (!TryNormalizeResourcePath(entry.ResourcePath, out string allowlistedPath))
+                    continue;
+
+                if (_developerPlacementAllowlist.Add(allowlistedPath))
+                    addedCount++;
+            }
+
+            Debug.Log($"[BuildingController] Developer placement allowlist initialized with {_developerPlacementAllowlist.Count} paths (catalog additions={addedCount}).");
+        }
+
+        private static bool IsDeveloperPlacementPathAllowlisted(string normalizedPath, HashSet<string> allowlist)
+        {
+            if (string.IsNullOrWhiteSpace(normalizedPath))
+                return false;
+
+            if (allowlist == null || allowlist.Count == 0)
+                return false;
+
+            return allowlist.Contains(normalizedPath);
+        }
+
+        private static bool TryNormalizeResourcePath(string rawPath, out string normalizedPath)
+        {
+            normalizedPath = string.Empty;
+            if (string.IsNullOrWhiteSpace(rawPath))
+                return false;
+
+            string trimmed = rawPath.Trim();
+            string slashNormalized = trimmed.Replace('\\', '/');
+            while (slashNormalized.Contains("//", StringComparison.Ordinal))
+                slashNormalized = slashNormalized.Replace("//", "/", StringComparison.Ordinal);
+
+            string withoutResourcesPrefix = slashNormalized.StartsWith("Resources/", StringComparison.OrdinalIgnoreCase)
+                ? slashNormalized.Substring("Resources/".Length)
+                : slashNormalized;
+
+            string withoutLeadingSlash = withoutResourcesPrefix.Trim('/');
+            if (string.IsNullOrWhiteSpace(withoutLeadingSlash))
+                return false;
+
+            if (withoutLeadingSlash.Contains("..", StringComparison.Ordinal))
+                return false;
+
+            int extensionStart = withoutLeadingSlash.LastIndexOf('.');
+            int finalSlash = withoutLeadingSlash.LastIndexOf('/');
+            if (extensionStart > finalSlash)
+                withoutLeadingSlash = withoutLeadingSlash.Substring(0, extensionStart);
+
+            if (string.IsNullOrWhiteSpace(withoutLeadingSlash))
+                return false;
+
+            normalizedPath = withoutLeadingSlash;
+            return true;
         }
 
         private bool TryGetTargetPiece(out BuildingPiece piece)

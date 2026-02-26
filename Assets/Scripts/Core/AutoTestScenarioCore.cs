@@ -235,6 +235,10 @@ namespace ByteWar.Core
             Vector3 startPos = localPlayer.transform.position;
             Quaternion handRotStart = leftHand != null ? leftHand.rotation : Quaternion.identity;
             float yawStart = localPlayer.transform.eulerAngles.y;
+            float camYawStart = tpc.CameraYaw;
+
+            // Ensure deterministic movement semantics for this check regardless of host mouse state.
+            tpc.AutoTest_SetMouseState(leftHeld: false, rightHeld: false, leftDragging: false);
 
             Debug.Log($"[AutoTester] StartPos={startPos}");
             Debug.Log("[AutoTester] Simulating movement input (Forward) for 1.5s...");
@@ -272,14 +276,27 @@ namespace ByteWar.Core
             float yawDelta = Mathf.Abs(Mathf.DeltaAngle(yawStart, yawEnd));
             Debug.Log($"[AutoTester] Turn sanity: yawStart={yawStart:0.0} yawEnd={yawEnd:0.0} yawDelta={yawDelta:0.0}");
 
+            float camYawEnd = tpc.CameraYaw;
+            float camYawDelta = Mathf.Abs(Mathf.DeltaAngle(camYawStart, camYawEnd));
+            Debug.Log($"[AutoTester] Camera follow sanity: camYawStart={camYawStart:0.0} camYawEnd={camYawEnd:0.0} camYawDelta={camYawDelta:0.0}");
+
             Vector3 afterTurnPos = localPlayer.transform.position;
-            float movedDuringTurn = Vector3.Distance(afterForwardPos, afterTurnPos);
+            float movedDuringTurn = Vector2.Distance(
+                new Vector2(afterForwardPos.x, afterForwardPos.z),
+                new Vector2(afterTurnPos.x, afterTurnPos.z));
             Debug.Log($"[AutoTester] Turn sanity: movedDuringTurn={movedDuringTurn:0.000}");
 
             if (yawDelta < 5f)
             {
                 Debug.LogError("[AutoTester] FAIL: Core - Expected A/D input to turn player when RMB is not held.");
                 Application.Quit(40);
+                yield break;
+            }
+
+            if (camYawDelta < 5f)
+            {
+                Debug.LogError("[AutoTester] FAIL: Core - Expected camera to follow A/D turning when RMB is not held.");
+                Application.Quit(42);
                 yield break;
             }
 

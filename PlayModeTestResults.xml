@@ -1,25 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<test-run id="2" testcasecount="37" result="Passed" total="37" passed="37" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:10:00Z" duration="5.800419">
-  <test-suite type="TestSuite" id="1060" name="ByteWar" fullname="ByteWar" runstate="Runnable" testcasecount="37" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:10:00Z" duration="5.800419" total="37" passed="37" failed="0" inconclusive="0" skipped="0" asserts="0">
+<test-run id="2" testcasecount="39" result="Passed" total="39" passed="39" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:39Z" duration="5.7829352">
+  <test-suite type="TestSuite" id="1062" name="ByteWar" fullname="ByteWar" runstate="Runnable" testcasecount="39" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:39Z" duration="5.782935" total="39" passed="39" failed="0" inconclusive="0" skipped="0" asserts="0">
     <properties>
       <property name="platform" value="PlayMode" />
     </properties>
-    <test-suite type="Assembly" id="1053" name="ByteWar.Tests.PlayMode.dll" fullname="C:/Projects/SurvivalRPG/Library/ScriptAssemblies/ByteWar.Tests.PlayMode.dll" runstate="Runnable" testcasecount="37" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:10:00Z" duration="5.789981" total="37" passed="37" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <test-suite type="Assembly" id="1055" name="ByteWar.Tests.PlayMode.dll" fullname="C:/Projects/SurvivalRPG/Library/ScriptAssemblies/ByteWar.Tests.PlayMode.dll" runstate="Runnable" testcasecount="39" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:39Z" duration="5.773432" total="39" passed="39" failed="0" inconclusive="0" skipped="0" asserts="0">
       <properties>
-        <property name="_PID" value="45508" />
+        <property name="_PID" value="36044" />
         <property name="_APPDOMAIN" value="Unity Child Domain" />
         <property name="platform" value="PlayMode" />
         <property name="EditorOnly" value="False" />
       </properties>
-      <test-suite type="TestSuite" id="1054" name="ByteWar" fullname="ByteWar" runstate="Runnable" testcasecount="37" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:10:00Z" duration="5.788728" total="37" passed="37" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestSuite" id="1056" name="ByteWar" fullname="ByteWar" runstate="Runnable" testcasecount="39" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:39Z" duration="5.772136" total="39" passed="39" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-suite type="TestSuite" id="1055" name="Tests" fullname="ByteWar.Tests" runstate="Runnable" testcasecount="37" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:10:00Z" duration="5.787777" total="37" passed="37" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <test-suite type="TestSuite" id="1057" name="Tests" fullname="ByteWar.Tests" runstate="Runnable" testcasecount="39" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:39Z" duration="5.771223" total="39" passed="39" failed="0" inconclusive="0" skipped="0" asserts="0">
           <properties />
-          <test-suite type="TestSuite" id="1056" name="PlayMode" fullname="ByteWar.Tests.PlayMode" runstate="Runnable" testcasecount="37" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:10:00Z" duration="5.786635" total="37" passed="37" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <test-suite type="TestSuite" id="1058" name="PlayMode" fullname="ByteWar.Tests.PlayMode" runstate="Runnable" testcasecount="39" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:39Z" duration="5.770249" total="39" passed="39" failed="0" inconclusive="0" skipped="0" asserts="0">
             <properties />
-            <test-suite type="TestFixture" id="1001" name="AssetDeployUISmokeTests" fullname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests" classname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:09:54Z" duration="0.042069" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1001" name="AssetDeployUISmokeTests" fullname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests" classname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.057273" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1002" name="AssetDeployUI_CanDeployBlenderE2EProp_WhenPrefabPresent" fullname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests.AssetDeployUI_CanDeployBlenderE2EProp_WhenPrefabPresent" methodname="AssetDeployUI_CanDeployBlenderE2EProp_WhenPrefabPresent" classname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests" runstate="Runnable" seed="355600804" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:09:54Z" duration="0.028250" asserts="0">
+              <test-case id="1002" name="AssetDeployUI_BrowserHelpers_ReturnExpectedValues" fullname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests.AssetDeployUI_BrowserHelpers_ReturnExpectedValues" methodname="AssetDeployUI_BrowserHelpers_ReturnExpectedValues" classname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests" runstate="Runnable" seed="831758656" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.027812" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="AssetDeployUI_CanDeployBlenderE2EProp_WhenPrefabPresent" fullname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests.AssetDeployUI_CanDeployBlenderE2EProp_WhenPrefabPresent" methodname="AssetDeployUI_CanDeployBlenderE2EProp_WhenPrefabPresent" classname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests" runstate="Runnable" seed="663494886" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.009429" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1003" name="BuildingController_ExternalInputSuppressed_FlagsState" fullname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests.BuildingController_ExternalInputSuppressed_FlagsState" methodname="BuildingController_ExternalInputSuppressed_FlagsState" classname="ByteWar.Tests.PlayMode.AssetDeployUISmokeTests" runstate="Runnable" seed="91446150" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.006479" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -27,9 +41,9 @@
                 </properties>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1003" name="BlenderE2EPropSmokeTests" fullname="ByteWar.Tests.PlayMode.BlenderE2EPropSmokeTests" classname="ByteWar.Tests.PlayMode.BlenderE2EPropSmokeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:09:54Z" duration="0.006221" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1005" name="BlenderE2EPropSmokeTests" fullname="ByteWar.Tests.PlayMode.BlenderE2EPropSmokeTests" classname="ByteWar.Tests.PlayMode.BlenderE2EPropSmokeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.003440" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1004" name="BlenderE2EProp_CanLoadFromResources_WhenPresent" fullname="ByteWar.Tests.PlayMode.BlenderE2EPropSmokeTests.BlenderE2EProp_CanLoadFromResources_WhenPresent" methodname="BlenderE2EProp_CanLoadFromResources_WhenPresent" classname="ByteWar.Tests.PlayMode.BlenderE2EPropSmokeTests" runstate="Runnable" seed="1522827517" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:09:54Z" duration="0.002750" asserts="0">
+              <test-case id="1006" name="BlenderE2EProp_CanLoadFromResources_WhenPresent" fullname="ByteWar.Tests.PlayMode.BlenderE2EPropSmokeTests.BlenderE2EProp_CanLoadFromResources_WhenPresent" methodname="BlenderE2EProp_CanLoadFromResources_WhenPresent" classname="ByteWar.Tests.PlayMode.BlenderE2EPropSmokeTests" runstate="Runnable" seed="831948038" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.002344" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -37,15 +51,17 @@
                 </properties>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1005" name="BuildingPlacementSmokeTests" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:09:55Z" duration="0.394281" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1007" name="BuildingPlacementSmokeTests" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.390330" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1008" name="BuildingPiece_Spawns_WithCorrectType" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests.BuildingPiece_Spawns_WithCorrectType" methodname="BuildingPiece_Spawns_WithCorrectType" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" seed="1947783144" result="Passed" start-time="2026-02-24 14:09:54Z" end-time="2026-02-24 14:09:55Z" duration="0.341090" asserts="0">
+              <test-case id="1010" name="BuildingPiece_Spawns_WithCorrectType" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests.BuildingPiece_Spawns_WithCorrectType" methodname="BuildingPiece_Spawns_WithCorrectType" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" seed="947049715" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.335857" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61291 for PlayMode test NetworkManager.
+                <output><![CDATA[[GameConstants] DevMode set to False
+[GameConstants] BuildingCostsEnabled set to True
+[NGOTestHelper] Using UnityTransport port 60096 for PlayMode test NetworkManager.
 NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry value of: 0!
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
@@ -70,13 +86,15 @@ NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry va
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1007" name="PlaceFoundation_WithoutResources_Fails" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests.PlaceFoundation_WithoutResources_Fails" methodname="PlaceFoundation_WithoutResources_Fails" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" seed="1299062079" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.020011" asserts="0">
+              <test-case id="1009" name="PlaceFoundation_WithoutResources_Fails" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests.PlaceFoundation_WithoutResources_Fails" methodname="PlaceFoundation_WithoutResources_Fails" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" seed="2009789852" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.019143" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61292 for PlayMode test NetworkManager.
+                <output><![CDATA[[GameConstants] DevMode set to False
+[GameConstants] BuildingCostsEnabled set to True
+[NGOTestHelper] Using UnityTransport port 60097 for PlayMode test NetworkManager.
 NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry value of: 0!
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
@@ -100,13 +118,15 @@ NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry va
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1006" name="PlaceFoundation_WithResources_SpawnsBuildingPiece" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests.PlaceFoundation_WithResources_SpawnsBuildingPiece" methodname="PlaceFoundation_WithResources_SpawnsBuildingPiece" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" seed="1491627125" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.031137" asserts="0">
+              <test-case id="1008" name="PlaceFoundation_WithResources_SpawnsBuildingPiece" fullname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests.PlaceFoundation_WithResources_SpawnsBuildingPiece" methodname="PlaceFoundation_WithResources_SpawnsBuildingPiece" classname="ByteWar.Tests.PlayMode.BuildingPlacementSmokeTests" runstate="Runnable" seed="1886776752" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.033188" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61293 for PlayMode test NetworkManager.
+                <output><![CDATA[[GameConstants] DevMode set to False
+[GameConstants] BuildingCostsEnabled set to True
+[NGOTestHelper] Using UnityTransport port 60098 for PlayMode test NetworkManager.
 NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry value of: 0!
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
@@ -147,15 +167,15 @@ NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry va
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1009" name="CombatSmokeTests" fullname="ByteWar.Tests.PlayMode.CombatSmokeTests" classname="ByteWar.Tests.PlayMode.CombatSmokeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.127065" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1011" name="CombatSmokeTests" fullname="ByteWar.Tests.PlayMode.CombatSmokeTests" classname="ByteWar.Tests.PlayMode.CombatSmokeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.125965" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1010" name="ClientCastsAbility_ServerProcessesManaAndCooldown_EnemyTakesDamage" fullname="ByteWar.Tests.PlayMode.CombatSmokeTests.ClientCastsAbility_ServerProcessesManaAndCooldown_EnemyTakesDamage" methodname="ClientCastsAbility_ServerProcessesManaAndCooldown_EnemyTakesDamage" classname="ByteWar.Tests.PlayMode.CombatSmokeTests" runstate="Runnable" seed="2103338328" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.125996" asserts="0">
+              <test-case id="1012" name="ClientCastsAbility_ServerProcessesManaAndCooldown_EnemyTakesDamage" fullname="ByteWar.Tests.PlayMode.CombatSmokeTests.ClientCastsAbility_ServerProcessesManaAndCooldown_EnemyTakesDamage" methodname="ClientCastsAbility_ServerProcessesManaAndCooldown_EnemyTakesDamage" classname="ByteWar.Tests.PlayMode.CombatSmokeTests" runstate="Runnable" seed="1606290698" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.125022" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61294 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 60099 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -176,25 +196,25 @@ NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry va
 [EnemyAI] Spawned 'Enemy' (NetworkObjectId=3) at (2.00, 0.00, 0.00).
 [EnemyAI] 'Enemy' found target: TestPlayer
 [Test] Casting MockDamageAbility...
-[MockDamageAbility] Executing at (1.98, 0.00, 0.00)
+[MockDamageAbility] Executing at (1.99, 0.00, 0.00)
 [EnemyAI] 'Enemy' health: 100.0 → 75.0
 [MockDamageAbility] Applied 25 damage to Enemy
-[AbilitySystemComponent] Playing VFX=FireballMuzzle SFX=FireballCast for MockDamage at (1.98, 0.00, 0.00)
+[AbilitySystemComponent] Playing VFX=FireballMuzzle SFX=FireballCast for MockDamage at (1.99, 0.00, 0.00)
 [Test] Combat smoke test passed successfully.
 [PlayerRegistry] Unregistered player 'TestPlayer'. Total: 0
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1011" name="DevModeAndHUDSmokeTests" fullname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" classname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.058478" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1013" name="DevModeAndHUDSmokeTests" fullname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" classname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.052791" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1013" name="DevMode_AllowsFreeBuildingPlacement" fullname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests.DevMode_AllowsFreeBuildingPlacement" methodname="DevMode_AllowsFreeBuildingPlacement" classname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" runstate="Runnable" seed="1120466323" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.018084" asserts="0">
+              <test-case id="1015" name="DevMode_AllowsFreeBuildingPlacement" fullname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests.DevMode_AllowsFreeBuildingPlacement" methodname="DevMode_AllowsFreeBuildingPlacement" classname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" runstate="Runnable" seed="209119238" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.017270" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61295 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 60100 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -211,18 +231,20 @@ NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry va
 [ThirdPersonCamera] Target set to TestPlayer. pivotHeight=1.40. Cached 0 renderers.
 [NetworkPlayer] CameraTarget missing; using root target with pivotHeight=1.40
 [NetworkPlayer] VisualMode: stamp=Unknown actual=PrimitiveFallback child='(none)' skinned=0 renderers=0 mixamoRig=False netObj=2 ownerClient=0
+[GameConstants] BuildingCostsEnabled set to True
+[GameConstants] DevMode set to True
 [Test] SKIP: BuildingController not on test player.
 [PlayerRegistry] Unregistered player 'TestPlayer'. Total: 0
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1014" name="EnemyAI_HasCharacterController_WhenProperlySetup" fullname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests.EnemyAI_HasCharacterController_WhenProperlySetup" methodname="EnemyAI_HasCharacterController_WhenProperlySetup" classname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" runstate="Runnable" seed="2019481790" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.018549" asserts="0">
+              <test-case id="1016" name="EnemyAI_HasCharacterController_WhenProperlySetup" fullname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests.EnemyAI_HasCharacterController_WhenProperlySetup" methodname="EnemyAI_HasCharacterController_WhenProperlySetup" classname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" runstate="Runnable" seed="848442553" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.016931" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61296 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 60101 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -245,13 +267,13 @@ NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry va
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1012" name="KeybindingHUD_Instantiates_InPlayMode" fullname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests.KeybindingHUD_Instantiates_InPlayMode" methodname="KeybindingHUD_Instantiates_InPlayMode" classname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" runstate="Runnable" seed="415189902" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.019918" asserts="0">
+              <test-case id="1014" name="KeybindingHUD_Instantiates_InPlayMode" fullname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests.KeybindingHUD_Instantiates_InPlayMode" methodname="KeybindingHUD_Instantiates_InPlayMode" classname="ByteWar.Tests.PlayMode.DevModeAndHUDSmokeTests" runstate="Runnable" seed="1810384116" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:34Z" duration="0.017130" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61297 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 60102 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -275,32 +297,32 @@ NetworkPrefab (Building_Wall) has a duplicate GlobalObjectIdHash source entry va
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1015" name="EnemySpawnerTests" fullname="ByteWar.Tests.PlayMode.EnemySpawnerTests" classname="ByteWar.Tests.PlayMode.EnemySpawnerTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.514005" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1017" name="EnemySpawnerTests" fullname="ByteWar.Tests.PlayMode.EnemySpawnerTests" classname="ByteWar.Tests.PlayMode.EnemySpawnerTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:35Z" duration="0.515262" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1016" name="EnemySpawner_SpawnsEnemiesUpToMax" fullname="ByteWar.Tests.PlayMode.EnemySpawnerTests.EnemySpawner_SpawnsEnemiesUpToMax" methodname="EnemySpawner_SpawnsEnemiesUpToMax" classname="ByteWar.Tests.PlayMode.EnemySpawnerTests" runstate="Runnable" seed="1464835822" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.512745" asserts="0">
+              <test-case id="1018" name="EnemySpawner_SpawnsEnemiesUpToMax" fullname="ByteWar.Tests.PlayMode.EnemySpawnerTests.EnemySpawner_SpawnsEnemiesUpToMax" methodname="EnemySpawner_SpawnsEnemiesUpToMax" classname="ByteWar.Tests.PlayMode.EnemySpawnerTests" runstate="Runnable" seed="1562056946" result="Passed" start-time="2026-02-25 04:37:34Z" end-time="2026-02-25 04:37:35Z" duration="0.514278" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61298 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 60103 for PlayMode test NetworkManager.
 [EnemySpawner] Started spawner at (0.00, 0.00, 0.00). MaxEnemies=2
-[EnemyAI] Spawned 'EnemyPrefab(Clone)' (NetworkObjectId=3) at (4.68, 0.00, -0.48).
-[EnemySpawner] Spawned enemy at (4.68, 0.00, -0.48). Active enemies: 1/2
-[EnemyAI] Spawned 'EnemyPrefab(Clone)' (NetworkObjectId=4) at (-1.69, 0.00, 4.81).
-[EnemySpawner] Spawned enemy at (-1.69, 0.00, 4.81). Active enemies: 2/2
+[EnemyAI] Spawned 'EnemyPrefab(Clone)' (NetworkObjectId=3) at (3.57, 0.00, -3.29).
+[EnemySpawner] Spawned enemy at (3.57, 0.00, -3.29). Active enemies: 1/2
+[EnemyAI] Spawned 'EnemyPrefab(Clone)' (NetworkObjectId=4) at (-0.42, 0.00, 1.63).
+[EnemySpawner] Spawned enemy at (-0.42, 0.00, 1.63). Active enemies: 2/2
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1017" name="GameLoopTests" fullname="ByteWar.Tests.PlayMode.GameLoopTests" classname="ByteWar.Tests.PlayMode.GameLoopTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.030409" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1019" name="GameLoopTests" fullname="ByteWar.Tests.PlayMode.GameLoopTests" classname="ByteWar.Tests.PlayMode.GameLoopTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-25 04:37:35Z" end-time="2026-02-25 04:37:35Z" duration="0.033642" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1018" name="EndToEndGameLoop_GatherCraftEquipCombat" fullname="ByteWar.Tests.PlayMode.GameLoopTests.EndToEndGameLoop_GatherCraftEquipCombat" methodname="EndToEndGameLoop_GatherCraftEquipCombat" classname="ByteWar.Tests.PlayMode.GameLoopTests" runstate="Runnable" seed="721986924" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:55Z" duration="0.029388" asserts="0">
+              <test-case id="1020" name="EndToEndGameLoop_GatherCraftEquipCombat" fullname="ByteWar.Tests.PlayMode.GameLoopTests.EndToEndGameLoop_GatherCraftEquipCombat" methodname="EndToEndGameLoop_GatherCraftEquipCombat" classname="ByteWar.Tests.PlayMode.GameLoopTests" runstate="Runnable" seed="1822298287" result="Passed" start-time="2026-02-25 04:37:35Z" end-time="2026-02-25 04:37:35Z" duration="0.032670" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61299 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59604 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -340,15 +362,15 @@ End-to-End Game Loop Test Completed Successfully!
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1019" name="MeleeAttackSmokeTests" fullname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" classname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:56Z" duration="0.324464" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1021" name="MeleeAttackSmokeTests" fullname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" classname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-02-25 04:37:35Z" end-time="2026-02-25 04:37:35Z" duration="0.325487" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1020" name="EnemyTakeDamage_ReducesHealth_AndDiesAtZero" fullname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests.EnemyTakeDamage_ReducesHealth_AndDiesAtZero" methodname="EnemyTakeDamage_ReducesHealth_AndDiesAtZero" classname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" runstate="Runnable" seed="1462425728" result="Passed" start-time="2026-02-24 14:09:55Z" end-time="2026-02-24 14:09:56Z" duration="0.311398" asserts="0">
+              <test-case id="1022" name="EnemyTakeDamage_ReducesHealth_AndDiesAtZero" fullname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests.EnemyTakeDamage_ReducesHealth_AndDiesAtZero" methodname="EnemyTakeDamage_ReducesHealth_AndDiesAtZero" classname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" runstate="Runnable" seed="1411180902" result="Passed" start-time="2026-02-25 04:37:35Z" end-time="2026-02-25 04:37:35Z" duration="0.312976" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61300 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59605 for PlayMode test NetworkManager.
 [EnemyAI] Spawned 'TestEnemy' (NetworkObjectId=2) at (0.00, 0.00, 0.00).
 [Test] Dealing 10 damage to enemy...
 [EnemyAI] 'TestEnemy' health: 100.0 → 90.0
@@ -360,27 +382,27 @@ End-to-End Game Loop Test Completed Successfully!
 [Test] MeleeAttack smoke test passed.
 ]]></output>
               </test-case>
-              <test-case id="1021" name="EnemyTargetTracker_SetTarget_FiresEvent" fullname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests.EnemyTargetTracker_SetTarget_FiresEvent" methodname="EnemyTargetTracker_SetTarget_FiresEvent" classname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" runstate="Runnable" seed="1474153402" result="Passed" start-time="2026-02-24 14:09:56Z" end-time="2026-02-24 14:09:56Z" duration="0.011930" asserts="0">
+              <test-case id="1023" name="EnemyTargetTracker_SetTarget_FiresEvent" fullname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests.EnemyTargetTracker_SetTarget_FiresEvent" methodname="EnemyTargetTracker_SetTarget_FiresEvent" classname="ByteWar.Tests.PlayMode.MeleeAttackSmokeTests" runstate="Runnable" seed="353334086" result="Passed" start-time="2026-02-25 04:37:35Z" end-time="2026-02-25 04:37:35Z" duration="0.011333" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61301 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59606 for PlayMode test NetworkManager.
 [EnemyAI] Spawned 'Target' (NetworkObjectId=2) at (0.00, 0.00, 0.00).
 [Test] EnemyTargetTracker test passed.
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1022" name="PlayerInputTests" fullname="ByteWar.Tests.PlayMode.PlayerInputTests" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-02-24 14:09:56Z" end-time="2026-02-24 14:09:57Z" duration="1.541120" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1024" name="PlayerInputTests" fullname="ByteWar.Tests.PlayMode.PlayerInputTests" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-02-25 04:37:35Z" end-time="2026-02-25 04:37:37Z" duration="1.525949" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1026" name="JumpPressedMidAir_DoesNotQueueJumpOnLanding" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.JumpPressedMidAir_DoesNotQueueJumpOnLanding" methodname="JumpPressedMidAir_DoesNotQueueJumpOnLanding" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="2082853502" result="Passed" start-time="2026-02-24 14:09:56Z" end-time="2026-02-24 14:09:57Z" duration="0.988087" asserts="0">
+              <test-case id="1028" name="JumpPressedMidAir_DoesNotQueueJumpOnLanding" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.JumpPressedMidAir_DoesNotQueueJumpOnLanding" methodname="JumpPressedMidAir_DoesNotQueueJumpOnLanding" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="1433991930" result="Passed" start-time="2026-02-25 04:37:35Z" end-time="2026-02-25 04:37:36Z" duration="0.971706" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 61302 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59607 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -402,13 +424,13 @@ End-to-End Game Loop Test Completed Successfully!
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1025" name="NetworkPlayer_MovesBasedOnInput" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.NetworkPlayer_MovesBasedOnInput" methodname="NetworkPlayer_MovesBasedOnInput" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="1338167298" result="Passed" start-time="2026-02-24 14:09:57Z" end-time="2026-02-24 14:09:57Z" duration="0.515518" asserts="0">
+              <test-case id="1027" name="NetworkPlayer_MovesBasedOnInput" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.NetworkPlayer_MovesBasedOnInput" methodname="NetworkPlayer_MovesBasedOnInput" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="1045351286" result="Passed" start-time="2026-02-25 04:37:36Z" end-time="2026-02-25 04:37:37Z" duration="0.516148" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54207 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59608 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -431,13 +453,13 @@ End-to-End Game Loop Test Completed Successfully!
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1023" name="PlayerInputHandler_RegistersMovementInput" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.PlayerInputHandler_RegistersMovementInput" methodname="PlayerInputHandler_RegistersMovementInput" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="972755653" result="Passed" start-time="2026-02-24 14:09:57Z" end-time="2026-02-24 14:09:57Z" duration="0.019307" asserts="0">
+              <test-case id="1025" name="PlayerInputHandler_RegistersMovementInput" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.PlayerInputHandler_RegistersMovementInput" methodname="PlayerInputHandler_RegistersMovementInput" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="1725791920" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.020104" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54208 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59609 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -459,13 +481,13 @@ End-to-End Game Loop Test Completed Successfully!
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1024" name="PlayerInteraction_ConsumesInteractAction" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.PlayerInteraction_ConsumesInteractAction" methodname="PlayerInteraction_ConsumesInteractAction" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="1308680884" result="Passed" start-time="2026-02-24 14:09:57Z" end-time="2026-02-24 14:09:57Z" duration="0.016669" asserts="0">
+              <test-case id="1026" name="PlayerInteraction_ConsumesInteractAction" fullname="ByteWar.Tests.PlayMode.PlayerInputTests.PlayerInteraction_ConsumesInteractAction" methodname="PlayerInteraction_ConsumesInteractAction" classname="ByteWar.Tests.PlayMode.PlayerInputTests" runstate="Runnable" seed="97653751" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.016346" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54209 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59610 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -487,15 +509,15 @@ End-to-End Game Loop Test Completed Successfully!
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1027" name="ResourceGatheringSmokeTests" fullname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests" classname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-24 14:09:57Z" end-time="2026-02-24 14:09:57Z" duration="0.120494" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1029" name="ResourceGatheringSmokeTests" fullname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests" classname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.122622" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1028" name="PlayerDamagesResourceNode_NodeDestroyed_ItemAddedToInventory" fullname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests.PlayerDamagesResourceNode_NodeDestroyed_ItemAddedToInventory" methodname="PlayerDamagesResourceNode_NodeDestroyed_ItemAddedToInventory" classname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests" runstate="Runnable" seed="1698938069" result="Passed" start-time="2026-02-24 14:09:57Z" end-time="2026-02-24 14:09:57Z" duration="0.118830" asserts="0">
+              <test-case id="1030" name="PlayerDamagesResourceNode_NodeDestroyed_ItemAddedToInventory" fullname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests.PlayerDamagesResourceNode_NodeDestroyed_ItemAddedToInventory" methodname="PlayerDamagesResourceNode_NodeDestroyed_ItemAddedToInventory" classname="ByteWar.Tests.PlayMode.ResourceGatheringSmokeTests" runstate="Runnable" seed="1192827182" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.121035" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54210 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59611 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -531,9 +553,9 @@ End-to-End Game Loop Test Completed Successfully!
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1029" name="ThirdPersonCameraFirstPersonTests" fullname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests" classname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-24 14:09:57Z" end-time="2026-02-24 14:09:57Z" duration="0.007515" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1031" name="ThirdPersonCameraFirstPersonTests" fullname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests" classname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.006356" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1030" name="FirstPersonMode_PlacesCameraAtPivot_AndHidesRenderers" fullname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests.FirstPersonMode_PlacesCameraAtPivot_AndHidesRenderers" methodname="FirstPersonMode_PlacesCameraAtPivot_AndHidesRenderers" classname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests" runstate="Runnable" seed="2008560024" result="Passed" start-time="2026-02-24 14:09:57Z" end-time="2026-02-24 14:09:57Z" duration="0.006601" asserts="0">
+              <test-case id="1032" name="FirstPersonMode_PlacesCameraAtPivot_AndHidesRenderers" fullname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests.FirstPersonMode_PlacesCameraAtPivot_AndHidesRenderers" methodname="FirstPersonMode_PlacesCameraAtPivot_AndHidesRenderers" classname="ByteWar.Tests.PlayMode.ThirdPersonCameraFirstPersonTests" runstate="Runnable" seed="551977361" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.005470" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -545,15 +567,15 @@ End-to-End Game Loop Test Completed Successfully!
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1031" name="UITests" fullname="ByteWar.Tests.PlayMode.UITests" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-02-24 14:09:57Z" end-time="2026-02-24 14:09:58Z" duration="0.240381" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1033" name="UITests" fullname="ByteWar.Tests.PlayMode.UITests" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.255947" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1033" name="ActionBarUI_UpdatesWhenAbilityCast" fullname="ByteWar.Tests.PlayMode.UITests.ActionBarUI_UpdatesWhenAbilityCast" methodname="ActionBarUI_UpdatesWhenAbilityCast" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="698066088" result="Passed" start-time="2026-02-24 14:09:57Z" end-time="2026-02-24 14:09:58Z" duration="0.169951" asserts="0">
+              <test-case id="1035" name="ActionBarUI_UpdatesWhenAbilityCast" fullname="ByteWar.Tests.PlayMode.UITests.ActionBarUI_UpdatesWhenAbilityCast" methodname="ActionBarUI_UpdatesWhenAbilityCast" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="202171799" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.169181" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54211 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59612 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -578,13 +600,13 @@ ActionBarUI updated correctly.
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1035" name="CraftingUI_UpdatesWhenStationSet" fullname="ByteWar.Tests.PlayMode.UITests.CraftingUI_UpdatesWhenStationSet" methodname="CraftingUI_UpdatesWhenStationSet" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="1476862835" result="Passed" start-time="2026-02-24 14:09:58Z" end-time="2026-02-24 14:09:58Z" duration="0.026613" asserts="0">
+              <test-case id="1037" name="CraftingUI_UpdatesWhenStationSet" fullname="ByteWar.Tests.PlayMode.UITests.CraftingUI_UpdatesWhenStationSet" methodname="CraftingUI_UpdatesWhenStationSet" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="336644047" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.029511" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54212 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59613 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -608,13 +630,13 @@ CraftingUI updated correctly.
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1034" name="InventoryUI_UpdatesWhenItemAdded" fullname="ByteWar.Tests.PlayMode.UITests.InventoryUI_UpdatesWhenItemAdded" methodname="InventoryUI_UpdatesWhenItemAdded" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="1032573041" result="Passed" start-time="2026-02-24 14:09:58Z" end-time="2026-02-24 14:09:58Z" duration="0.022949" asserts="0">
+              <test-case id="1036" name="InventoryUI_UpdatesWhenItemAdded" fullname="ByteWar.Tests.PlayMode.UITests.InventoryUI_UpdatesWhenItemAdded" methodname="InventoryUI_UpdatesWhenItemAdded" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="1689819631" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.027731" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54213 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59614 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -642,13 +664,13 @@ InventoryUI updated correctly.
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1032" name="PlayerVitalsUI_UpdatesWhenAttributesChange" fullname="ByteWar.Tests.PlayMode.UITests.PlayerVitalsUI_UpdatesWhenAttributesChange" methodname="PlayerVitalsUI_UpdatesWhenAttributesChange" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="2144573811" result="Passed" start-time="2026-02-24 14:09:58Z" end-time="2026-02-24 14:09:58Z" duration="0.019050" asserts="0">
+              <test-case id="1034" name="PlayerVitalsUI_UpdatesWhenAttributesChange" fullname="ByteWar.Tests.PlayMode.UITests.PlayerVitalsUI_UpdatesWhenAttributesChange" methodname="PlayerVitalsUI_UpdatesWhenAttributesChange" classname="ByteWar.Tests.PlayMode.UITests" runstate="Runnable" seed="1296633430" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.027891" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54214 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 59615 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -675,9 +697,9 @@ PlayerVitalsUI updated correctly.
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1036" name="VFXSmokeTests" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-02-24 14:09:58Z" end-time="2026-02-24 14:09:59Z" duration="1.256460" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1038" name="VFXSmokeTests" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:38Z" duration="1.238423" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1038" name="AudioManager_PlaySFX_DoesNotThrow_InPlayMode" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.AudioManager_PlaySFX_DoesNotThrow_InPlayMode" methodname="AudioManager_PlaySFX_DoesNotThrow_InPlayMode" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="1325619002" result="Passed" start-time="2026-02-24 14:09:58Z" end-time="2026-02-24 14:09:58Z" duration="0.026833" asserts="0">
+              <test-case id="1040" name="AudioManager_PlaySFX_DoesNotThrow_InPlayMode" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.AudioManager_PlaySFX_DoesNotThrow_InPlayMode" methodname="AudioManager_PlaySFX_DoesNotThrow_InPlayMode" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="1004365088" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.013262" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -691,7 +713,7 @@ There are no audio listeners in the scene. Please ensure there is always one aud
 [VFXSmokeTests] PASS: AudioManager.PlaySFX executes without exceptions.
 ]]></output>
               </test-case>
-              <test-case id="1037" name="AudioManager_Singleton_InitialisesOnAwake" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.AudioManager_Singleton_InitialisesOnAwake" methodname="AudioManager_Singleton_InitialisesOnAwake" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="2027445976" result="Passed" start-time="2026-02-24 14:09:58Z" end-time="2026-02-24 14:09:58Z" duration="0.002844" asserts="0">
+              <test-case id="1039" name="AudioManager_Singleton_InitialisesOnAwake" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.AudioManager_Singleton_InitialisesOnAwake" methodname="AudioManager_Singleton_InitialisesOnAwake" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="1294607913" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:37Z" duration="0.004329" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -703,7 +725,7 @@ There are no audio listeners in the scene. Please ensure there is always one aud
 [VFXSmokeTests] PASS: AudioManager.Instance is set.
 ]]></output>
               </test-case>
-              <test-case id="1039" name="FootstepController_StepCount_IncreasesWhenGroundedAndMoving" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.FootstepController_StepCount_IncreasesWhenGroundedAndMoving" methodname="FootstepController_StepCount_IncreasesWhenGroundedAndMoving" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="56971677" result="Passed" start-time="2026-02-24 14:09:58Z" end-time="2026-02-24 14:09:59Z" duration="1.203996" asserts="0">
+              <test-case id="1041" name="FootstepController_StepCount_IncreasesWhenGroundedAndMoving" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.FootstepController_StepCount_IncreasesWhenGroundedAndMoving" methodname="FootstepController_StepCount_IncreasesWhenGroundedAndMoving" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="1032378587" result="Passed" start-time="2026-02-25 04:37:37Z" end-time="2026-02-25 04:37:38Z" duration="1.205144" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -1088,101 +1110,11 @@ There are no audio listeners in the scene. Please ensure there is always one aud
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 [VFXSmokeTests] FootstepCount: initial=0 final=1
 [VFXSmokeTests] PASS: FootstepController ran without exceptions.
 ]]></output>
               </test-case>
-              <test-case id="1041" name="GameEventBus_BuildingPlaced_AudioManager_Responds" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.GameEventBus_BuildingPlaced_AudioManager_Responds" methodname="GameEventBus_BuildingPlaced_AudioManager_Responds" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="305874281" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:09:59Z" duration="0.013198" asserts="0">
+              <test-case id="1043" name="GameEventBus_BuildingPlaced_AudioManager_Responds" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.GameEventBus_BuildingPlaced_AudioManager_Responds" methodname="GameEventBus_BuildingPlaced_AudioManager_Responds" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="984354690" result="Passed" start-time="2026-02-25 04:37:38Z" end-time="2026-02-25 04:37:38Z" duration="0.005670" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -1193,10 +1125,11 @@ There are no audio listeners in the scene. Please ensure there is always one aud
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 [AudioManager] Spatial SFX: BuildingPlace at (10.00, 0.00, 10.00)
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 [VFXSmokeTests] PASS: GameEventBus.BuildingPlaced handled without exceptions.
 ]]></output>
               </test-case>
-              <test-case id="1040" name="VFXManager_PlayEffectLocal_SpawnsPrefabInScene" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.VFXManager_PlayEffectLocal_SpawnsPrefabInScene" methodname="VFXManager_PlayEffectLocal_SpawnsPrefabInScene" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="1699125180" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:09:59Z" duration="0.007826" asserts="0">
+              <test-case id="1042" name="VFXManager_PlayEffectLocal_SpawnsPrefabInScene" fullname="ByteWar.Tests.PlayMode.VFXSmokeTests.VFXManager_PlayEffectLocal_SpawnsPrefabInScene" methodname="VFXManager_PlayEffectLocal_SpawnsPrefabInScene" classname="ByteWar.Tests.PlayMode.VFXSmokeTests" runstate="Runnable" seed="44913172" result="Passed" start-time="2026-02-25 04:37:38Z" end-time="2026-02-25 04:37:38Z" duration="0.008174" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -1208,9 +1141,9 @@ There are no audio listeners in the scene. Please ensure there is always one aud
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1042" name="VisualGroundingTests" fullname="ByteWar.Tests.PlayMode.VisualGroundingTests" classname="ByteWar.Tests.PlayMode.VisualGroundingTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:09:59Z" duration="0.070729" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1044" name="VisualGroundingTests" fullname="ByteWar.Tests.PlayMode.VisualGroundingTests" classname="ByteWar.Tests.PlayMode.VisualGroundingTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-25 04:37:38Z" end-time="2026-02-25 04:37:38Z" duration="0.053841" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1043" name="NetworkPlayer_VisualGrounding_CorrectsSmallHover_UsingTerrain" fullname="ByteWar.Tests.PlayMode.VisualGroundingTests.NetworkPlayer_VisualGrounding_CorrectsSmallHover_UsingTerrain" methodname="NetworkPlayer_VisualGrounding_CorrectsSmallHover_UsingTerrain" classname="ByteWar.Tests.PlayMode.VisualGroundingTests" runstate="Runnable" seed="66511132" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:09:59Z" duration="0.069909" asserts="0">
+              <test-case id="1045" name="NetworkPlayer_VisualGrounding_CorrectsSmallHover_UsingTerrain" fullname="ByteWar.Tests.PlayMode.VisualGroundingTests.NetworkPlayer_VisualGrounding_CorrectsSmallHover_UsingTerrain" methodname="NetworkPlayer_VisualGrounding_CorrectsSmallHover_UsingTerrain" classname="ByteWar.Tests.PlayMode.VisualGroundingTests" runstate="Runnable" seed="1863369202" result="Passed" start-time="2026-02-25 04:37:38Z" end-time="2026-02-25 04:37:38Z" duration="0.052902" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -1225,15 +1158,15 @@ There are no audio listeners in the scene. Please ensure there is always one aud
 ]]></output>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1044" name="WarriorAbilitySmokeTests" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:10:00Z" duration="1.049564" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1046" name="WarriorAbilitySmokeTests" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-02-25 04:37:38Z" end-time="2026-02-25 04:37:39Z" duration="1.059371" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1052" name="AbilitySystem_InvalidIndex_DoesNotThrow" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.AbilitySystem_InvalidIndex_DoesNotThrow" methodname="AbilitySystem_InvalidIndex_DoesNotThrow" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="1089261400" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:09:59Z" duration="0.017864" asserts="0">
+              <test-case id="1054" name="AbilitySystem_InvalidIndex_DoesNotThrow" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.AbilitySystem_InvalidIndex_DoesNotThrow" methodname="AbilitySystem_InvalidIndex_DoesNotThrow" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="148245772" result="Passed" start-time="2026-02-25 04:37:38Z" end-time="2026-02-25 04:37:38Z" duration="0.019037" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54599 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 50433 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -1261,13 +1194,13 @@ PlayerVitalsUI bound to local player AttributeSet.
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1050" name="CleaveAbility_Cast_PlaysAudioWithoutException" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_Cast_PlaysAudioWithoutException" methodname="CleaveAbility_Cast_PlaysAudioWithoutException" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="137396695" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:09:59Z" duration="0.167906" asserts="0">
+              <test-case id="1052" name="CleaveAbility_Cast_PlaysAudioWithoutException" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_Cast_PlaysAudioWithoutException" methodname="CleaveAbility_Cast_PlaysAudioWithoutException" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="495204166" result="Passed" start-time="2026-02-25 04:37:38Z" end-time="2026-02-25 04:37:39Z" duration="0.169343" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54600 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 50434 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -1504,62 +1437,18 @@ There are no audio listeners in the scene. Please ensure there is always one aud
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 [WarriorAbilitySmokeTests] PASS: CleaveAbility audio dispatch no exceptions.
 [PlayerRegistry] Unregistered player 'TestPlayer'. Total: 0
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1051" name="CleaveAbility_Cast_PlaysVFXWithoutException" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_Cast_PlaysVFXWithoutException" methodname="CleaveAbility_Cast_PlaysVFXWithoutException" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="1391915783" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:09:59Z" duration="0.167803" asserts="0">
+              <test-case id="1053" name="CleaveAbility_Cast_PlaysVFXWithoutException" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_Cast_PlaysVFXWithoutException" methodname="CleaveAbility_Cast_PlaysVFXWithoutException" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="746305415" result="Passed" start-time="2026-02-25 04:37:39Z" end-time="2026-02-25 04:37:39Z" duration="0.168997" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54601 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 50435 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -1590,13 +1479,13 @@ PlayerVitalsUI bound to local player AttributeSet.
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1048" name="CleaveAbility_DamagesEnemyInArc" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_DamagesEnemyInArc" methodname="CleaveAbility_DamagesEnemyInArc" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="980510315" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:09:59Z" duration="0.169882" asserts="0">
+              <test-case id="1050" name="CleaveAbility_DamagesEnemyInArc" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_DamagesEnemyInArc" methodname="CleaveAbility_DamagesEnemyInArc" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="372820310" result="Passed" start-time="2026-02-25 04:37:39Z" end-time="2026-02-25 04:37:39Z" duration="0.172415" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54602 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 50436 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -1620,23 +1509,23 @@ PlayerVitalsUI bound to local player AttributeSet.
 [EnemyAI] Spawned 'TestEnemy' (NetworkObjectId=3) at (0.00, 0.00, 3.00).
 [EnemyAI] 'TestEnemy' found target: TestPlayer
 [EnemyAI] 'TestEnemy' moving towards TestPlayer
-[CleaveAbility] Executing cleave: origin=(0.00, 3.00, 0.00) forward=(0.00, 0.00, 1.00) radius=6 arc=120 overlaps=2
+[CleaveAbility] Executing cleave: origin=(0.00, 1.00, 0.00) forward=(0.00, 0.00, 1.00) radius=6 arc=120 overlaps=2
 [EnemyAI] 'TestEnemy' health: 100.0 → 75.0
-[CleaveAbility] Hit 'TestEnemy' for 25 damage. angle=45.1
+[CleaveAbility] Hit 'TestEnemy' for 25 damage. angle=18.5
 [CleaveAbility] Cleave complete: hit 1 targets.
-[AbilitySystemComponent] Playing VFX=CleaveHit SFX=CleaveHit for Test Cleave at (0.00, 2.00, 0.00)
+[AbilitySystemComponent] Playing VFX=CleaveHit SFX=CleaveHit for Test Cleave at (0.00, 0.00, 0.00)
 [WarriorAbilitySmokeTests] PASS: Enemy health 100 -> 75.
 [PlayerRegistry] Unregistered player 'TestPlayer'. Total: 0
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1049" name="CleaveAbility_DoesNotDamageEnemyBehind" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_DoesNotDamageEnemyBehind" methodname="CleaveAbility_DoesNotDamageEnemyBehind" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="1202474626" result="Passed" start-time="2026-02-24 14:09:59Z" end-time="2026-02-24 14:10:00Z" duration="0.169074" asserts="0">
+              <test-case id="1051" name="CleaveAbility_DoesNotDamageEnemyBehind" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_DoesNotDamageEnemyBehind" methodname="CleaveAbility_DoesNotDamageEnemyBehind" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="513013680" result="Passed" start-time="2026-02-25 04:37:39Z" end-time="2026-02-25 04:37:39Z" duration="0.172809" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54603 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 50437 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -1668,13 +1557,13 @@ PlayerVitalsUI bound to local player AttributeSet.
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1047" name="CleaveAbility_InsufficientMana_CastFails" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_InsufficientMana_CastFails" methodname="CleaveAbility_InsufficientMana_CastFails" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="1967281976" result="Passed" start-time="2026-02-24 14:10:00Z" end-time="2026-02-24 14:10:00Z" duration="0.017480" asserts="0">
+              <test-case id="1049" name="CleaveAbility_InsufficientMana_CastFails" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_InsufficientMana_CastFails" methodname="CleaveAbility_InsufficientMana_CastFails" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="468734030" result="Passed" start-time="2026-02-25 04:37:39Z" end-time="2026-02-25 04:37:39Z" duration="0.018116" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54604 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 50438 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -1701,13 +1590,13 @@ PlayerVitalsUI bound to local player AttributeSet.
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1046" name="CleaveAbility_OnCooldown_CastFails" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_OnCooldown_CastFails" methodname="CleaveAbility_OnCooldown_CastFails" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="1029346137" result="Passed" start-time="2026-02-24 14:10:00Z" end-time="2026-02-24 14:10:00Z" duration="0.166951" asserts="0">
+              <test-case id="1048" name="CleaveAbility_OnCooldown_CastFails" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_OnCooldown_CastFails" methodname="CleaveAbility_OnCooldown_CastFails" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="1872614906" result="Passed" start-time="2026-02-25 04:37:39Z" end-time="2026-02-25 04:37:39Z" duration="0.167446" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54605 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 50439 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False
@@ -1737,13 +1626,13 @@ Iron Tide Cleave is on cooldown.
 [PlayerInputHandler] Disabling Input Actions.
 ]]></output>
               </test-case>
-              <test-case id="1045" name="CleaveAbility_TryCast_ConsumesManaAndSetsCooldown" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_TryCast_ConsumesManaAndSetsCooldown" methodname="CleaveAbility_TryCast_ConsumesManaAndSetsCooldown" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="905340263" result="Passed" start-time="2026-02-24 14:10:00Z" end-time="2026-02-24 14:10:00Z" duration="0.170018" asserts="0">
+              <test-case id="1047" name="CleaveAbility_TryCast_ConsumesManaAndSetsCooldown" fullname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests.CleaveAbility_TryCast_ConsumesManaAndSetsCooldown" methodname="CleaveAbility_TryCast_ConsumesManaAndSetsCooldown" classname="ByteWar.Tests.PlayMode.WarriorAbilitySmokeTests" runstate="Runnable" seed="828192983" result="Passed" start-time="2026-02-25 04:37:39Z" end-time="2026-02-25 04:37:39Z" duration="0.168384" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
-                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 54606 for PlayMode test NetworkManager.
+                <output><![CDATA[[NGOTestHelper] Using UnityTransport port 50440 for PlayMode test NetworkManager.
 [NGOTestHelper] Local player exists but is not usable for tests (missing/unspawned NetworkBehaviours). Replacing with test player...
 [PlayerInputHandler] Initializing input (direct keyboard polling).
 [PlayerInputHandler] Devices: Keyboard=False Mouse=False

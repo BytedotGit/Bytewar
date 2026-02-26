@@ -19,6 +19,8 @@ namespace ByteWar.Core
         public bool CastSpell1Triggered { get; private set; }
         public bool CastSpell2Triggered { get; private set; }
         public bool BuildTriggered { get; private set; }
+        public bool BuildHeld { get; private set; }
+        public bool BuildReleasedThisFrame { get; private set; }
         public bool JumpTriggered { get; private set; }
 
         /// <summary>When true, all gameplay input is suppressed (e.g., console is open).</summary>
@@ -139,6 +141,8 @@ namespace ByteWar.Core
                 CastSpell1Triggered = false;
                 CastSpell2Triggered = false;
                 BuildTriggered = false;
+                BuildHeld = false;
+                BuildReleasedThisFrame = false;
                 JumpTriggered = false;
                 return;
             }
@@ -172,6 +176,8 @@ namespace ByteWar.Core
             if (kb == null)
             {
                 MovementInput = Vector2.zero;
+                BuildHeld = false;
+                BuildReleasedThisFrame = false;
                 return;
             }
 
@@ -190,6 +196,8 @@ namespace ByteWar.Core
             if (kb.digit1Key.wasPressedThisFrame) CastSpell1Triggered = true;
             if (kb.digit2Key.wasPressedThisFrame) CastSpell2Triggered = true;
             if (kb.bKey.wasPressedThisFrame) BuildTriggered = true;
+            BuildHeld = kb.bKey.isPressed;
+            BuildReleasedThisFrame = kb.bKey.wasReleasedThisFrame;
             if (kb.spaceKey.wasPressedThisFrame) JumpTriggered = true;
         }
 
@@ -231,6 +239,17 @@ namespace ByteWar.Core
                 BuildTriggered = false;
                 return true;
             }
+            return false;
+        }
+
+        public bool ConsumeBuildReleased()
+        {
+            if (BuildReleasedThisFrame)
+            {
+                BuildReleasedThisFrame = false;
+                return true;
+            }
+
             return false;
         }
 

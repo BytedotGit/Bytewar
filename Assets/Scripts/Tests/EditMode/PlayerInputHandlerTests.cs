@@ -103,6 +103,8 @@ namespace ByteWar.Tests.EditMode
             {
                 var handler = go.AddComponent<PlayerInputHandler>();
                 handler.SetSimulatedMovement(new Vector2(1f, 1f));
+                SetPrivateAutoProperty(handler, "BuildHeld", true);
+                SetPrivateAutoProperty(handler, "BuildReleasedThisFrame", true);
                 handler.InputSuppressed = true;
 
                 // Call Update to trigger suppression
@@ -111,7 +113,31 @@ namespace ByteWar.Tests.EditMode
 
                 Assert.AreEqual(Vector2.zero, handler.MovementInput, "Movement should be zero when suppressed.");
                 Assert.IsFalse(handler.InteractTriggered, "Interact should be false when suppressed.");
+                Assert.IsFalse(handler.BuildHeld, "BuildHeld should be false when suppressed.");
+                Assert.IsFalse(handler.BuildReleasedThisFrame, "BuildReleasedThisFrame should be false when suppressed.");
                 Assert.IsFalse(handler.JumpTriggered, "Jump should be false when suppressed.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(go);
+            }
+        }
+
+        [Test]
+        public void ConsumeBuildReleased_WhenFlagSet_ReturnsTrueAndClearsFlag()
+        {
+            var go = new GameObject("Test_ConsumeBuildReleased");
+            try
+            {
+                var handler = go.AddComponent<PlayerInputHandler>();
+                SetPrivateAutoProperty(handler, "BuildReleasedThisFrame", true);
+
+                bool consumedFirst = handler.ConsumeBuildReleased();
+                bool consumedSecond = handler.ConsumeBuildReleased();
+
+                Assert.IsTrue(consumedFirst, "First consume should return true when release flag is set.");
+                Assert.IsFalse(handler.BuildReleasedThisFrame, "Consume should clear BuildReleasedThisFrame.");
+                Assert.IsFalse(consumedSecond, "Second consume should return false after flag is cleared.");
             }
             finally
             {
@@ -148,6 +174,14 @@ namespace ByteWar.Tests.EditMode
             {
                 Object.DestroyImmediate(go);
             }
+        }
+
+        private static void SetPrivateAutoProperty<T>(object target, string propertyName, T value)
+        {
+            string backingFieldName = $"<{propertyName}>k__BackingField";
+            FieldInfo backingField = target.GetType().GetField(backingFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.NotNull(backingField, $"Expected backing field '{backingFieldName}' to exist.");
+            backingField.SetValue(target, value);
         }
     }
 }

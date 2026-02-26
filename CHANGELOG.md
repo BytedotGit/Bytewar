@@ -4,6 +4,30 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Developer Asset Deploy Flow
+
+- Restored WoW-style keyboard turning behavior: `A`/`D` now rotate in place (no strafe) when RMB is not held, and the third-person camera yaw follows character turning.
+- Corrected RMB movement facing to remain camera-facing during strafe/backpedal (WoW mouse-look semantics) instead of rotating toward movement direction.
+- Hardened Core AutoTester turn validation by forcing neutral mouse-button state before turn-only checks and asserting camera-follow yaw change during `A`/`D` turning.
+- Added an in-browser preview section for both structure entries and developer assets (thumbnail when `Preview` texture exists, contextual preview card otherwise).
+- Developer assets now appear in the browser when they are displayable (collider + `LODGroup`) even if not network-ready; network-ready assets keep server-authoritative placement, and non-network-ready assets fall back to local-only developer placement with explicit status messaging.
+- Replaced hold-B radial interaction with a tap-B development asset browser (IMGUI list/tree): LMB selects category/item, item selection closes browser and enters placement mode.
+- Placement mode now remains active for repeated world placements; Esc deterministically exits placement mode and closes the browser when open.
+- Browser-open state now suppresses build-placement input to prevent accidental world placement clicks while selecting in UI.
+- Aligned deploy offer reliability with server authority: catalog/browser now filter to prefabs that satisfy required spawn components (`NetworkObject` on root, plus collider and `LODGroup`).
+- Replaced the hold Shift+Tab drag deploy workflow with a hold-B two-step radial deploy flow.
+- Added nested radial categories (Structures + Developer Assets) with live 3D preview.
+- Added a developer-stage no-cost building policy controlled by the `GameConstants` building-cost switch.
+- Added a server-authoritative developer asset placement path in `BuildingController`.
+- Fixed a legacy toggle-path regression where `B` could still enter direct structure placement before radial selection (internal build toggle now disabled by default/runtime and in `NetworkPlayer` prefab).
+- Improved radial label readability and clipping behavior.
+- Fixed movement input suppression while radial and developer placement UI are active.
+- Added radial back navigation via Backspace and Back segment.
+- Updated radial release behavior to commit the last valid hovered segment for more reliable hold/release selection.
+- Corrected radial up/down visual mapping.
+- Improved top radial header layout to avoid clipping.
+- Normalized radial 3D preview scale across asset sizes.
+
 ### Blender MCP Server (Tooling)
 
 - Added `Tools/BlenderMCP/` MCP server to drive headless Blender and export FBX assets into `Assets/Art/...`.
@@ -21,6 +45,7 @@ All notable changes to this project are documented here.
 - `AssetDeployUI` now shows a folder/subfolder browser (mirrors `Resources` paths) with preview thumbnails loaded from `Resources`.
 - Keybind changed to **hold Shift+Tab** to open; releasing either key hides the UI.
 - Shift+Tab deploy UI panel is now centered on screen.
+- Fixed deploy UI thumbnails not rendering when catalog preview paths included file extensions (e.g., `.png`); preview paths are now normalized for `Resources.Load`.
 
 ### Controls + Blender Solidity Fix
 

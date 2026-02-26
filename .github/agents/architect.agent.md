@@ -1,7 +1,7 @@
 ---
 name: Architect
 description: "Use when evaluating architecture, reviewing system design, checking interface adherence, analyzing dependencies, proposing class extraction, or deciding between MonoBehaviour vs ECS. Handles questions about encapsulation, server authority, dependency direction, and 800 LOC limits."
-model: "Claude Opus 4.6"
+model: "GPT-5.3-Codex"
 ---
 
 # Architect Agent

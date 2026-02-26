@@ -18,15 +18,86 @@ namespace ByteWar.Tests.EditMode
         {
             _savedInstance = GameConstants.Instance;
             var gc = ScriptableObject.CreateInstance<GameConstants>();
-            var field = typeof(GameConstants).GetField("_devMode",
+            var devModeField = typeof(GameConstants).GetField("_devMode",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            field.SetValue(gc, false);
+            devModeField.SetValue(gc, false);
+            var costsField = typeof(GameConstants).GetField("_buildingCostsEnabled",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            costsField.SetValue(gc, true);
             GameConstants.SetInstanceForTesting(gc);
         }
 
         private void RestoreDevMode()
         {
             GameConstants.SetInstanceForTesting(_savedInstance);
+        }
+
+        [Test]
+        public void BuildingController_InternalBuildToggle_DefaultsToFalse()
+        {
+            var go = new GameObject("Test_BuildingController_DefaultToggle");
+            try
+            {
+                var controller = go.AddComponent<BuildingController>();
+                var field = typeof(BuildingController).GetField("_internalBuildToggleInputEnabled",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
+                Assert.NotNull(field, "Expected _internalBuildToggleInputEnabled field to exist.");
+                bool value = (bool)field.GetValue(controller);
+                Assert.IsFalse(value, "BuildingController should default internal B toggle input to false so hold-B radial owns B.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(go);
+            }
+        }
+
+        [Test]
+        public void DeveloperPlacementAllowlistHelper_ReturnsTrue_ForAllowlistedPath()
+        {
+            var method = typeof(BuildingController).GetMethod(
+                "IsDeveloperPlacementPathAllowlisted",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static,
+                null,
+                new[] { typeof(string), typeof(HashSet<string>) },
+                null);
+
+            Assert.NotNull(method, "Expected private allowlist helper to exist.");
+
+            var allowlist = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
+            {
+                "Generated/BlenderE2EProp/BlenderE2EProp"
+            };
+
+            bool allowed = (bool)method.Invoke(
+                null,
+                new object[] { "generated/blendere2eprop/blendere2eprop", allowlist });
+
+            Assert.IsTrue(allowed, "Allowlisted developer resource path should be accepted.");
+        }
+
+        [Test]
+        public void DeveloperPlacementAllowlistHelper_ReturnsFalse_ForMissingPath()
+        {
+            var method = typeof(BuildingController).GetMethod(
+                "IsDeveloperPlacementPathAllowlisted",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static,
+                null,
+                new[] { typeof(string), typeof(HashSet<string>) },
+                null);
+
+            Assert.NotNull(method, "Expected private allowlist helper to exist.");
+
+            var allowlist = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
+            {
+                "Generated/BlenderE2EProp/BlenderE2EProp"
+            };
+
+            bool allowed = (bool)method.Invoke(
+                null,
+                new object[] { "Generated/NotAllowlisted/Prefab", allowlist });
+
+            Assert.IsFalse(allowed, "Non-allowlisted developer resource path should be rejected.");
         }
 
         // ── Helper: create a piece with SnapPointMarker children ──────────────
@@ -418,26 +489,32 @@ namespace ByteWar.Tests.EditMode
         [Test]
         public void BuildingRecipe_CanAfford_ReturnsTrueWhenSufficient()
         {
-            var recipe = ScriptableObject.CreateInstance<BuildingRecipe>();
-            var wood = ScriptableObject.CreateInstance<Item>();
-            wood.ItemName = "Wood";
-
-            recipe.SetCost(new List<RecipeIngredient>
+            DisableDevMode();
+            try
             {
-                new RecipeIngredient { Item = wood, Amount = 3 }
-            });
+                var recipe = ScriptableObject.CreateInstance<BuildingRecipe>();
+                var wood = ScriptableObject.CreateInstance<Item>();
+                wood.ItemName = "Wood";
 
-            var go = new GameObject("Player");
-            var inv = go.AddComponent<InventoryComponent>();
-            inv.AddItem(wood);
-            inv.AddItem(wood);
-            inv.AddItem(wood);
+                recipe.SetCost(new List<RecipeIngredient>
+                {
+                    new RecipeIngredient { Item = wood, Amount = 3 }
+                });
 
-            Assert.IsTrue(recipe.CanAfford(inv));
+                var go = new GameObject("Player");
+                var inv = go.AddComponent<InventoryComponent>();
+                inv.AddItem(wood);
+                inv.AddItem(wood);
+                inv.AddItem(wood);
 
-            Object.DestroyImmediate(go);
-            Object.DestroyImmediate(recipe);
-            Object.DestroyImmediate(wood);
+                Assert.IsTrue(GameConstants.IsBuildingCostsEnabled(), "Building costs should be enabled for economy checks.");
+                Assert.IsTrue(recipe.CanAfford(inv));
+
+                Object.DestroyImmediate(go);
+                Object.DestroyImmediate(recipe);
+                Object.DestroyImmediate(wood);
+            }
+            finally { RestoreDevMode(); }
         }
 
         [Test]

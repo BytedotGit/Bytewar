@@ -63,6 +63,7 @@ namespace ByteWar.Core
         [Header("Smoothing")]
         [SerializeField] private float _orbitSmoothing = 14f;
         [SerializeField] private float _posSmoothing = 16f;
+        [SerializeField] private float _keyboardTurnCameraFollowSpeed = 8f;
 
         [Header("Collision")]
         [SerializeField] private float _collisionRadius = 0.15f;
@@ -121,8 +122,6 @@ namespace ByteWar.Core
             if (!_initialized || _target == null) return;
 
             var mouse = Mouse.current;
-            if (mouse == null) return;
-
             var keyboard = Keyboard.current;
             if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
             {
@@ -138,6 +137,14 @@ namespace ByteWar.Core
 
         private void ReadMouseButtons(Mouse mouse)
         {
+            if (mouse == null)
+            {
+                IsRightMouseHeld = false;
+                IsLeftMouseHeld = false;
+                IsLeftMouseDragging = false;
+                return;
+            }
+
             IsRightMouseHeld = mouse.rightButton.isPressed;
             IsLeftMouseHeld = mouse.leftButton.isPressed;
 
@@ -183,7 +190,7 @@ namespace ByteWar.Core
                     Cursor.visible = true;
                 }
 
-                Vector2 mouseDelta = mouse.delta.ReadValue();
+                Vector2 mouseDelta = mouse != null ? mouse.delta.ReadValue() : Vector2.zero;
                 _yaw += mouseDelta.x * _mouseSensitivity;
                 _pitch -= mouseDelta.y * _mouseSensitivity;
                 _pitch = ClampPitchForCurrentDistance(_pitch);
@@ -195,6 +202,10 @@ namespace ByteWar.Core
                     Cursor.lockState = CursorLockMode.None;
                     Cursor.visible = true;
                 }
+
+                // WoW-style keyboard turning: when not orbiting with mouse,
+                // camera follows the character's facing direction.
+                ApplyKeyboardTurnCameraFollow(Time.deltaTime);
             }
 
             _smoothYaw = Mathf.LerpAngle(_smoothYaw, _yaw, Time.deltaTime * _orbitSmoothing);
@@ -211,11 +222,25 @@ namespace ByteWar.Core
             return Mathf.Clamp(pitch, _minPitch, _maxPitch);
         }
 
+        private void ApplyKeyboardTurnCameraFollow(float deltaTime)
+        {
+            if (_target == null)
+                return;
+
+            float speed = Mathf.Max(0f, _keyboardTurnCameraFollowSpeed);
+            if (speed <= 0f)
+                return;
+
+            float desiredYaw = _target.eulerAngles.y;
+            float lerpT = Mathf.Clamp01(deltaTime * speed);
+            _yaw = Mathf.LerpAngle(_yaw, desiredYaw, lerpT);
+        }
+
         private void ReadZoomInput(Mouse mouse)
         {
             if (SuppressZoom) return;
 
-            float scroll = mouse.scroll.ReadValue().y;
+            float scroll = mouse != null ? mouse.scroll.ReadValue().y : 0f;
             if (Mathf.Abs(scroll) > 0.01f)
             {
                 _targetDistance -= scroll * _zoomSpeed;
@@ -263,6 +288,12 @@ namespace ByteWar.Core
 
             _smoothYaw = _yaw;
             _smoothPitch = _pitch;
+        }
+
+        internal void AutoTest_ApplyKeyboardTurnFollowTick(float deltaTime)
+        {
+            ApplyKeyboardTurnCameraFollow(deltaTime);
+            _smoothYaw = _yaw;
         }
 
         internal void AutoTest_ClampPitchOnce()
