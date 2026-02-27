@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "building_material_set_a",
+  "displayName": "Building Material Set A",
+  "category": "Buildings/Materials",
+  "batchId": "B01",
+  "source": {
+    "provider": "FirstParty",
+    "packName": "Unity Generated Prefab Material Pass",
+    "sourceUrl": "local://generatedprefabs/building_material_set_a",
+    "acquiredOn": "2026-02-28",
+    "author": "BytedotGit",
+    "originalFile": "Building_Wall_Material.mat"
+  },
+  "license": {
+    "type": "Internal",
+    "commercialUseAllowed": true,
+    "modificationAllowed": true,
+    "attributionRequired": false,
+    "proofPath": "Assets/Art/LicenseProofs/first_party_internal.txt",
+    "notes": "Material polish pass for wall/floor/roof build pieces."
+  },
+  "styleFit": {
+    "targetStyle": "LowPolyStylizedEnvironment",
+    "matchesPrimaryStyle": true,
+    "referenceNotes": "Higher contrast and readability for build silhouettes at gameplay distance."
+  },
+  "technical": {
+    "mesh": {
+      "format": "MAT",
+      "triangleCountLOD0": 0,
+      "triangleCountLOD1": 0,
+      "triangleCountLOD2": 0,
+      "lodsPresent": false,
+      "materialsCount": 1,
+      "hasColliderMesh": false,
+      "colliderType": "",
+      "hasTriggerMesh": false
+    },
+    "textures": {
+      "albedo": "",
+      "normal": "",
+      "mask": "",
+      "resolution": ""
+    },
+    "rigging": {
+      "isSkinned": false,
+      "skeleton": "",
+      "retargetReady": false
+    }
+  },
+  "gameplay": {
+    "destructionCompatible": false,
+    "destructionClass": "",
+    "damageTypes": [],
+    "dropProfile": ""
+  },
+  "pipeline": {
+    "importPath": "Assets/GeneratedPrefabs",
+    "runtimePrefabPath": "Assets/GeneratedPrefabs/Building_Wall.prefab",
+    "manifestOwner": "Art",
+    "reviewStatus": "Draft",
+    "integrationOwner": "TechArt",
+    "autotestScenario": "BuildingVisuals"
+  },
+  "integration": {
+    "deployableCatalogEntry": "",
+    "requiresCodeChange": false,
+    "expectedRegenStep": "Tools/MCP/Generate All",
+    "verificationCommand": "./Tools/validate-pr.ps1 -ProjectRoot . -RunPlayMode"
+  },
+  "qa": {
+    "visualReviewed": false,
+    "performanceReviewed": false,
+    "networkReviewed": false,
+    "autotestReviewed": false,
+    "notes": "Applies across wall/floor/roof material assets."
+  }
+}

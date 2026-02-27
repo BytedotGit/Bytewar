@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "deployable_hero_prop_a",
+  "displayName": "Deployable Hero Prop A",
+  "category": "Environment/Props",
+  "batchId": "B01",
+  "source": {
+    "provider": "FirstParty",
+    "packName": "BlenderMCP Generated",
+    "sourceUrl": "local://blendermcp/deployable_hero_prop_a",
+    "acquiredOn": "2026-02-28",
+    "author": "BytedotGit",
+    "originalFile": "deployable_hero_prop_a.fbx"
+  },
+  "license": {
+    "type": "Internal",
+    "commercialUseAllowed": true,
+    "modificationAllowed": true,
+    "attributionRequired": false,
+    "proofPath": "Assets/Art/LicenseProofs/first_party_internal.txt",
+    "notes": "Replacement visual set for existing BlenderE2EProp deployable."
+  },
+  "styleFit": {
+    "targetStyle": "LowPolyStylizedEnvironment",
+    "matchesPrimaryStyle": true,
+    "referenceNotes": "Prop silhouette remains readable in radial preview and world placement."
+  },
+  "technical": {
+    "mesh": {
+      "format": "FBX",
+      "triangleCountLOD0": 0,
+      "triangleCountLOD1": 0,
+      "triangleCountLOD2": 0,
+      "lodsPresent": true,
+      "materialsCount": 1,
+      "hasColliderMesh": true,
+      "colliderType": "MeshCollider",
+      "hasTriggerMesh": false
+    },
+    "textures": {
+      "albedo": "",
+      "normal": "",
+      "mask": "",
+      "resolution": ""
+    },
+    "rigging": {
+      "isSkinned": false,
+      "skeleton": "",
+      "retargetReady": false
+    }
+  },
+  "gameplay": {
+    "destructionCompatible": true,
+    "destructionClass": "Prop",
+    "damageTypes": [
+      "Axe",
+      "Fire",
+      "Blunt"
+    ],
+    "dropProfile": "GenericProp_T1"
+  },
+  "pipeline": {
+    "importPath": "Assets/Art/Environment/Props/DeployableHeroPropA",
+    "runtimePrefabPath": "Assets/Resources/Generated/BlenderE2EProp/BlenderE2EProp.prefab",
+    "manifestOwner": "Art",
+    "reviewStatus": "Draft",
+    "integrationOwner": "TechArt",
+    "autotestScenario": "BlenderE2EProp"
+  },
+  "integration": {
+    "deployableCatalogEntry": "BlenderE2EProp",
+    "requiresCodeChange": false,
+    "expectedRegenStep": "Tools/MCP/Generate All",
+    "verificationCommand": "./Tools/validate-pr.ps1 -ProjectRoot . -RunPlayMode"
+  },
+  "qa": {
+    "visualReviewed": false,
+    "performanceReviewed": false,
+    "networkReviewed": false,
+    "autotestReviewed": false,
+    "notes": ""
+  }
+}

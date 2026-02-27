@@ -1,0 +1,8 @@
+BytedotGit Internal Asset License Note
+
+This file certifies that assets marked with license.type = "Internal"
+in manifest files under Assets/Art are first-party assets generated or authored
+by the ByteWar team, and are approved for commercial project use.
+
+Created: 2026-02-28
+Owner: BytedotGit
