@@ -29,10 +29,17 @@
 .PARAMETER UnityExe
     Unity executable path passed to Tools/run-playmode-tests.ps1.
 
+.PARAMETER VerbosePublicFieldWarnings
+    If set, prints every public field finding instead of grouped summaries.
+
+.PARAMETER MaxPublicFieldWarningFiles
+    Maximum number of grouped public-field warning lines to print when not verbose.
+
 .EXAMPLE
     .\validate-pr.ps1
     .\validate-pr.ps1 -Fix
     .\validate-pr.ps1 -RunPlayMode
+    .\validate-pr.ps1 -VerbosePublicFieldWarnings
 #>
 
 [CmdletBinding()]
@@ -42,13 +49,16 @@ param(
     [switch]$RunPlayMode,
     [string]$PlayModeResultsPath = 'Logs/PlayModeTestResults.xml',
     [string]$PlayModeLogPath = 'Logs/playmode_tests_validate_pr.log',
-    [string]$UnityExe = 'C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe'
+    [string]$UnityExe = 'C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe',
+    [switch]$VerbosePublicFieldWarnings,
+    [int]$MaxPublicFieldWarningFiles = 20
 )
 
 if (-not $ProjectRoot) {
     if ($PSScriptRoot) {
         $ProjectRoot = Split-Path -Parent $PSScriptRoot
-    } else {
+    }
+    else {
         $ProjectRoot = Get-Location
     }
 }
@@ -71,6 +81,16 @@ function Resolve-ProjectPath {
     }
 
     return Join-Path $Root $Path
+}
+
+function Get-RelativePath {
+    param(
+        [Parameter(Mandatory = $true)][string]$Root,
+        [Parameter(Mandatory = $true)][string]$Path
+    )
+
+    $rootResolved = (Resolve-Path $Root).Path
+    return [System.IO.Path]::GetRelativePath($rootResolved, $Path)
 }
 
 Write-Host "=== ByteWar PR Validation ===" -ForegroundColor Cyan
@@ -128,10 +148,12 @@ if (Test-Path $changelogPath) {
     $changelog = Get-Content -Path $changelogPath -Raw
     if ($changelog -match '\[Unreleased\]' -or $changelog.Length -gt 100) {
         # Changelog exists and has content — OK
-    } else {
+    }
+    else {
         $warnings += "CHANGELOG.md appears empty or missing release entries"
     }
-} else {
+}
+else {
     $errors += "CHANGELOG.md not found"
 }
 
@@ -139,7 +161,7 @@ if (Test-Path $changelogPath) {
 Write-Host "[4/$totalChecks] Checking file size limits (800 LOC)..." -ForegroundColor Yellow
 
 $csFiles = Get-ChildItem -Path $scriptsRoot -Filter '*.cs' -Recurse -File |
-    Where-Object { $_.FullName -notmatch '\\Tests\\' -and $_.FullName -notmatch '\\Editor\\' }
+Where-Object { $_.FullName -notmatch '\\Tests\\' -and $_.FullName -notmatch '\\Editor\\' }
 
 foreach ($csFile in $csFiles) {
     $lineCount = (Get-Content -Path $csFile.FullName).Count
@@ -152,22 +174,47 @@ foreach ($csFile in $csFiles) {
 # --- Check 5: Public mutable fields in runtime code ---
 Write-Host "[5/$totalChecks] Checking for public mutable fields..." -ForegroundColor Yellow
 
+$publicFieldFindings = @()
+$publicFieldPattern = '(?m)^\s*public\s+(?!(?:const|static|readonly|event|override|abstract|delegate|class|struct|interface|enum|new)\b)[\w<>\[\],\.\s\?]+\s+\w+\s*(?:;|=(?!>))'
+
 foreach ($csFile in $csFiles) {
     $content = Get-Content -Path $csFile.FullName -Raw -ErrorAction SilentlyContinue
     if (-not $content) { continue }
 
-    # Match "public <type> <name>" that isn't a property (no { get), not const/static/readonly/event/override/abstract
-    $publicFieldPattern = '(?m)^\s*public\s+(?!(?:const|static|readonly|event|override|abstract|delegate|class|struct|interface|enum|new)\b)[\w<>\[\],\s\?]+\s+\w+\s*[;=]'
     $fieldMatches = [regex]::Matches($content, $publicFieldPattern)
+    $relativePath = Get-RelativePath -Root $ProjectRoot -Path $csFile.FullName
 
     foreach ($fm in $fieldMatches) {
         $line = $fm.Value.Trim()
-        # Exclude properties (contain { get or =>)
-        if ($line -match '\{' -or $line -match '=>') { continue }
-        # Exclude if preceded by [SerializeField] on previous line (read-only getter pattern)
-        # This is a heuristic — we flag for review
-        $relativePath = $csFile.FullName.Replace($ProjectRoot, '').TrimStart('\')
-        $warnings += "PUBLIC FIELD: $relativePath -> $line"
+        $publicFieldFindings += [PSCustomObject]@{
+            Path = $relativePath
+            Line = $line
+        }
+    }
+}
+
+if ($publicFieldFindings.Count -gt 0) {
+    if ($VerbosePublicFieldWarnings) {
+        foreach ($finding in $publicFieldFindings) {
+            $warnings += "PUBLIC FIELD: $($finding.Path) -> $($finding.Line)"
+        }
+    }
+    else {
+        $groupedFindings = $publicFieldFindings |
+            Group-Object -Property Path |
+            Sort-Object -Property Count -Descending
+
+        $warnings += "PUBLIC FIELD SUMMARY: $($publicFieldFindings.Count) finding(s) across $($groupedFindings.Count) file(s)."
+
+        $limit = [Math]::Max(1, $MaxPublicFieldWarningFiles)
+        $displayGroups = $groupedFindings | Select-Object -First $limit
+        foreach ($group in $displayGroups) {
+            $warnings += "PUBLIC FIELDS ($($group.Count)): $($group.Name)"
+        }
+
+        if ($groupedFindings.Count -gt $displayGroups.Count) {
+            $warnings += "PUBLIC FIELD SUMMARY: $($groupedFindings.Count - $displayGroups.Count) more file(s) omitted. Use -VerbosePublicFieldWarnings for full details."
+        }
     }
 }
 
