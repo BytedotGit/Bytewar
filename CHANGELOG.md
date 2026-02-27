@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Deterministic PlayMode Test Result Artifacts
+
+- Added `Tools/run-playmode-tests.ps1` to run Unity PlayMode tests with deterministic XML artifact output.
+- Wrapper enforces requested result path by copying Unity's fallback root `PlayModeTestResults.xml` when Unity ignores `-testResults` in batchmode.
+- Use `Tools/run-playmode-tests.ps1` in local/CI verification flows to produce stable PlayMode XML output at a caller-specified path.
+
 ### Destruction AutoTester Scenario Coverage
 
 - Added `AutoTestScenarioDestruction` to validate the server-authoritative destructible request path in runtime `-autoTest` flows.
