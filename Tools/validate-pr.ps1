@@ -9,6 +9,7 @@
     3. CHANGELOG.md was updated
     4. No files exceed 800 LOC
     5. No public mutable fields in runtime code
+    6. Optional deterministic PlayMode test validation via Tools/run-playmode-tests.ps1
 
 .PARAMETER ProjectRoot
     Path to the Unity project root.
@@ -16,15 +17,32 @@
 .PARAMETER Fix
     If set, auto-fixes AGENTS.md staleness by regenerating them.
 
+.PARAMETER RunPlayMode
+    If set, executes deterministic PlayMode tests and validates XML totals.
+
+.PARAMETER PlayModeResultsPath
+    XML output path passed to Tools/run-playmode-tests.ps1.
+
+.PARAMETER PlayModeLogPath
+    Log output path passed to Tools/run-playmode-tests.ps1.
+
+.PARAMETER UnityExe
+    Unity executable path passed to Tools/run-playmode-tests.ps1.
+
 .EXAMPLE
     .\validate-pr.ps1
     .\validate-pr.ps1 -Fix
+    .\validate-pr.ps1 -RunPlayMode
 #>
 
 [CmdletBinding()]
 param(
     [string]$ProjectRoot,
-    [switch]$Fix
+    [switch]$Fix,
+    [switch]$RunPlayMode,
+    [string]$PlayModeResultsPath = 'Logs/PlayModeTestResults.xml',
+    [string]$PlayModeLogPath = 'Logs/playmode_tests_validate_pr.log',
+    [string]$UnityExe = 'C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe'
 )
 
 if (-not $ProjectRoot) {
@@ -40,12 +58,26 @@ $ErrorActionPreference = 'Stop'
 
 $errors = @()
 $warnings = @()
+$totalChecks = if ($RunPlayMode) { 6 } else { 5 }
+
+function Resolve-ProjectPath {
+    param(
+        [Parameter(Mandatory = $true)][string]$Root,
+        [Parameter(Mandatory = $true)][string]$Path
+    )
+
+    if ([System.IO.Path]::IsPathRooted($Path)) {
+        return $Path
+    }
+
+    return Join-Path $Root $Path
+}
 
 Write-Host "=== ByteWar PR Validation ===" -ForegroundColor Cyan
 Write-Host "Project root: $ProjectRoot" -ForegroundColor Gray
 
 # --- Check 1: Required governance files exist ---
-Write-Host "`n[1/5] Checking governance files..." -ForegroundColor Yellow
+Write-Host "`n[1/$totalChecks] Checking governance files..." -ForegroundColor Yellow
 
 $requiredFiles = @(
     '.github/ROADMAP.md',
@@ -68,7 +100,7 @@ foreach ($file in $requiredFiles) {
 }
 
 # --- Check 2: AGENTS.md freshness ---
-Write-Host "[2/5] Checking AGENTS.md freshness..." -ForegroundColor Yellow
+Write-Host "[2/$totalChecks] Checking AGENTS.md freshness..." -ForegroundColor Yellow
 
 $scriptsRoot = Join-Path $ProjectRoot "Assets\Scripts"
 $folders = Get-ChildItem -Path $scriptsRoot -Directory | Where-Object { $_.Name -ne 'Tests' }
@@ -89,7 +121,7 @@ if ($Fix) {
 }
 
 # --- Check 3: CHANGELOG updated ---
-Write-Host "[3/5] Checking CHANGELOG.md..." -ForegroundColor Yellow
+Write-Host "[3/$totalChecks] Checking CHANGELOG.md..." -ForegroundColor Yellow
 
 $changelogPath = Join-Path $ProjectRoot "CHANGELOG.md"
 if (Test-Path $changelogPath) {
@@ -104,7 +136,7 @@ if (Test-Path $changelogPath) {
 }
 
 # --- Check 4: 800 LOC limit ---
-Write-Host "[4/5] Checking file size limits (800 LOC)..." -ForegroundColor Yellow
+Write-Host "[4/$totalChecks] Checking file size limits (800 LOC)..." -ForegroundColor Yellow
 
 $csFiles = Get-ChildItem -Path $scriptsRoot -Filter '*.cs' -Recurse -File |
     Where-Object { $_.FullName -notmatch '\\Tests\\' -and $_.FullName -notmatch '\\Editor\\' }
@@ -118,7 +150,7 @@ foreach ($csFile in $csFiles) {
 }
 
 # --- Check 5: Public mutable fields in runtime code ---
-Write-Host "[5/5] Checking for public mutable fields..." -ForegroundColor Yellow
+Write-Host "[5/$totalChecks] Checking for public mutable fields..." -ForegroundColor Yellow
 
 foreach ($csFile in $csFiles) {
     $content = Get-Content -Path $csFile.FullName -Raw -ErrorAction SilentlyContinue
@@ -136,6 +168,61 @@ foreach ($csFile in $csFiles) {
         # This is a heuristic — we flag for review
         $relativePath = $csFile.FullName.Replace($ProjectRoot, '').TrimStart('\')
         $warnings += "PUBLIC FIELD: $relativePath -> $line"
+    }
+}
+
+# --- Check 6: Optional deterministic PlayMode validation ---
+if ($RunPlayMode) {
+    Write-Host "[6/$totalChecks] Running deterministic PlayMode tests..." -ForegroundColor Yellow
+
+    $wrapperPath = Join-Path $ProjectRoot "Tools\run-playmode-tests.ps1"
+    if (-not (Test-Path -LiteralPath $wrapperPath)) {
+        $errors += "MISSING: Tools/run-playmode-tests.ps1"
+    }
+    else {
+        $pwshExe = (Get-Command pwsh -ErrorAction SilentlyContinue).Source
+        if (-not $pwshExe) {
+            $pwshExe = (Get-Command powershell -ErrorAction SilentlyContinue).Source
+        }
+
+        if (-not $pwshExe) {
+            $errors += "Unable to locate PowerShell executable to run PlayMode wrapper."
+        }
+        else {
+            $playModeResultsFullPath = Resolve-ProjectPath -Root $ProjectRoot -Path $PlayModeResultsPath
+            if (Test-Path -LiteralPath $playModeResultsFullPath) {
+                Remove-Item -LiteralPath $playModeResultsFullPath -Force
+            }
+
+            & $pwshExe -NoProfile -ExecutionPolicy Bypass -File $wrapperPath -ProjectRoot $ProjectRoot -UnityExe $UnityExe -ResultsPath $PlayModeResultsPath -LogPath $PlayModeLogPath
+            $runnerExitCode = $LASTEXITCODE
+            if ($runnerExitCode -ne 0) {
+                $errors += "PlayMode wrapper failed with exit code $runnerExitCode."
+            }
+
+            if (-not (Test-Path -LiteralPath $playModeResultsFullPath)) {
+                $errors += "Missing PlayMode result artifact: $playModeResultsFullPath"
+            }
+            else {
+                try {
+                    [xml]$playModeXml = Get-Content -LiteralPath $playModeResultsFullPath -Raw
+                    $testRun = $playModeXml.'test-run'
+                    $failed = [int]$testRun.failed
+                    $total = [int]$testRun.total
+                    $result = [string]$testRun.result
+
+                    if ($failed -gt 0 -or -not [string]::Equals($result, 'Passed', [System.StringComparison]::OrdinalIgnoreCase)) {
+                        $errors += "PlayMode XML indicates failure: result=$result total=$total failed=$failed path=$playModeResultsFullPath"
+                    }
+                    else {
+                        Write-Host "  PlayMode XML verified: total=$total failed=$failed path=$playModeResultsFullPath" -ForegroundColor Gray
+                    }
+                }
+                catch {
+                    $errors += "Unable to parse PlayMode XML '$playModeResultsFullPath': $($_.Exception.Message)"
+                }
+            }
+        }
     }
 }
 

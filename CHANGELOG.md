@@ -9,6 +9,7 @@ All notable changes to this project are documented here.
 - Added `Tools/run-playmode-tests.ps1` to run Unity PlayMode tests with deterministic XML artifact output.
 - Wrapper enforces requested result path by copying Unity's fallback root `PlayModeTestResults.xml` when Unity ignores `-testResults` in batchmode.
 - Use `Tools/run-playmode-tests.ps1` in local/CI verification flows to produce stable PlayMode XML output at a caller-specified path.
+- Integrated an optional `-RunPlayMode` gate into `Tools/validate-pr.ps1` that executes the wrapper and fails validation when PlayMode XML is missing, unparsable, or reports failures.
 
 ### Destruction AutoTester Scenario Coverage
 
