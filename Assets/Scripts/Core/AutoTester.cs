@@ -313,9 +313,11 @@ namespace ByteWar.Core
         private static readonly System.Func<IAutoTestScenario>[] AllScenarioFactories =
         {
             () => new AutoTestScenarioCore(),
+            () => new AutoTestScenarioDestruction(),
             () => new AutoTestScenarioBuildingVisuals(),
             () => new AutoTestScenarioConsole(),
             () => new AutoTestScenarioBlenderE2EProp(),
+            () => new AutoTestScenarioLargeTree(),
             () => new AutoTestScenarioAssetDeployUI(),
         };
 

@@ -4,6 +4,102 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Destruction AutoTester Scenario Coverage
+
+- Added `AutoTestScenarioDestruction` to validate the server-authoritative destructible request path in runtime `-autoTest` flows.
+- Scenario asserts two behaviors with PASS/FAIL markers: in-range request destroys/despawns target, and out-of-range request is rejected with unchanged health.
+- Registered `Destruction` in `AutoTester` scenario factories and added EditMode coverage for `ParseScenarioArgs` and `BuildScenarioList` selection/default behavior.
+
+### Server-Authoritative Destruction Request Path
+
+- Added `DestructibleComponent` as a networked, profile-driven runtime damage receiver (`IDamageable`) with authoritative health/state replication and optional despawn on zero health.
+- Extended `PlayerInteraction` with a server RPC request path for destructible damage, including sender validation, server-side distance checks, and per-target request rate limiting.
+- Added lightweight tool inference in `PlayerInteraction` to map equipped weapon names to `DamageType` and include equipped damage bonus in destructible request damage.
+- Added PlayMode smoke coverage (`DestructionSmokeTests`) for successful lethal request flow and out-of-range request rejection.
+
+### Gear + Destruction Runtime Scaffolding
+
+- Added network-safe equipped loadout ID state (`EquippedLoadoutState`) for deterministic slot-to-item replication without runtime object references.
+- Added `GearVisualProfileRegistry` for deterministic `itemId` to `GearVisualProfile` resolution used by the new hybrid gear visibility pipeline.
+- Added destruction runtime helpers: `DamageResolver`, `DestructibleStateEvaluator`, and `DestructibleRuntimeState` for profile-driven effective damage and state transitions.
+- Added EditMode coverage in `GearAndDestructionRuntimeTests` for loadout slot mapping, profile registry lookup, damage multiplier resolution, and threshold-based destructible state evaluation.
+
+### Repository Hygiene Cleanup
+
+- Removed tracked transient artifacts that should not live in source control: root `PlayModeTestResults.xml`, root `build_log.txt`, Python bytecode under `Tools/BlenderMCP/__pycache__/`, and `DummyProject/bin` build outputs.
+- Added `.gitignore` protections for `__pycache__/`, `PlayModeTestResults*.xml`, and `DummyProject/bin`/`DummyProject/obj` to prevent recurrence.
+
+### Design Direction Lock-In (Art + Destruction)
+
+- Locked production direction to low-poly stylized environments with higher-detail chunky stylized characters, using Valheim + Overwatch as primary visual references.
+- Defined hybrid gear-appearance pipeline (skinned armor replacements + socket attachments) with body masking enabled to reduce clipping.
+- Locked server-authoritative destruction/build placement and structural-integrity destruction scope (collapse + loot) across trees, rocks/ores, and build pieces, with terrain-impact events in scope.
+- Established CC0-first asset sourcing policy with vetted marketplace whitelist and documented path for adding paid assets later.
+- Added explicit hero-asset polish priorities and a concrete 6-week vertical-slice content definition in the GDD.
+
+### Asset Intake + Implementation Spec Scaffolding
+
+- Added an art asset manifest template at `Assets/Art/asset_manifest.template.json` and an initial vetted shortlist at `Assets/Art/asset_shortlist.md` to standardize license/style/technical intake.
+- Added first-pass implementation specs for hybrid gear visibility and server-authoritative destruction under `Assets/Scripts/Docs/`.
+- Updated `Assets/Art/AGENTS.md` and `Assets/Scripts/AGENTS.md` to point contributors to the new intake/spec artifacts.
+
+### Runtime Graphics API Stability
+
+- Updated `BuildScript.BuildWindowsClient` to build Windows players under a scoped Direct3D11-only override, eliminating the `d3d12: failed to query info queue interface (0x80004002)` runtime warning on machines without optional D3D12 debug-layer components.
+- Added EditMode coverage in `ProjectInputHandlingTests` to verify the build-time graphics API override applies `Direct3D11` and restores prior project graphics API settings after the build scope exits.
+
+### LargeTree Growth Stage Migration
+
+- Replaced legacy variation IDs with a single BroadleafClassic-derived growth ladder: `Seedling`, `Sapling`, `Young`, `Mature`, and `Adult` across Blender MCP generation, Unity variation prefab generation, terrain variation profile defaults, deploy catalog expectations, and variation tests.
+- Tuned branch-junction shaping for slimmer branch collars (lower embed depth and reduced fillet/junction radii) so stage variants keep cleaner trunk continuity.
+- Added stage-specific harvest tuning to generated variation prefabs by stamping `ResourceNode` values (`_maxHealth`/`_dropAmount`/wood drop item) with nonlinear progression from early to late growth stages.
+- Added one-pass terrain profile migration for existing projects that still contain legacy variation names, including replacement of old entries with weighted growth-stage defaults.
+- Added server startup conversion of terrain `TreeInstance` data into spawned networked tree prefabs in `WorldPersistence`, with optional terrain-instance clearing to avoid double-rendered trees and to ensure biome trees are choppable at runtime.
+- Fixed `LargeTreeVariationProfile` asset script binding by moving the ScriptableObject type to `LargeTreeVariationProfile.cs`, restoring valid profile serialization and ensuring terrain generation uses all 5 growth-stage prototypes instead of fallback single-prototype placement.
+- Updated `SceneGenerator` to place a visible near-spawn showcase of all five growth-stage prefabs (`Seedling`..`Adult`) so lifecycle differences are obvious immediately on launch.
+- Added explicit growth-stage visual scaling in `LargeTreeVariationPrefabGenerator` (`Seedling` < `Sapling` < `Young` < `Mature` < `Adult`) and runtime/test assertions for monotonic stage height progression to prevent visually-identical stage regressions.
+- Added growth-stage silhouette sculpting in `LargeTreeVariationPrefabGenerator` that morphs trunk/canopy structure per stage (juvenile compact canopy + slim trunk -> adult broad canopy + thicker trunk), with EditMode and AutoTester assertions on LOD0 silhouette aspect and canopy-to-trunk ratio progression so stages evolve in appearance, not just size.
+- Improved Blender `GeometricLowPoly` growth-stage branch/canopy cohesion by strengthening branch-tip connector lobes and adding intermediate bridge lobes between branch tips and side canopies, reducing detached-looking branch endpoints across stage variations.
+- Added a final branch-canopy cohesion pass that anchors lower-canopy sculpting near branch junctions and tightens branch-tip connectivity checks using scale-aware thresholds, preventing visual disconnects that could still pass coarse proximity checks.
+- Relaxed LargeTree runtime growth-stage validation in `AutoTestScenarioLargeTree` to allow minor intermediate silhouette variance while still enforcing valid stage progression and end-state growth, reducing false negatives after regenerated geometry updates.
+
+### LargeTree Broadleaf Geometry Refinement
+
+- Updated Blender `GeometricLowPoly` broadleaf generation to use segmented curved trunks instead of a single straight cone, improving natural trunk silhouette.
+- Added segmented lateral branches with reduced upward pitch and explicit trunk-junction nubs so branches blend into the trunk rather than appearing detached.
+- Reworked broadleaf canopy composition to place distinct lobe clusters around branch tips plus a smaller crown cluster, reducing the previous single-blob canopy look.
+- Added per-variation broadleaf profile tuning (`BroadleafClassic`, `BroadleafWide`, `BroadleafTall`) for lean, sway, branch spread/rise, and canopy lobe scaling.
+- Applied a second silhouette pass to bias broadleaf variations toward wider crowns and flatter lobe stacks (lower branch rise, broader branch spread, and reduced canopy vertical scale).
+- Applied a third `BroadleafClassic` silhouette pass that pushes side canopies farther from branch tips and reduces center pull, preserving the intended main-canopy-plus-two-lobes read at gameplay distance.
+- Added branch-root fillet geometry plus post-fusion wood smoothing in `BroadleafClassic` so curved trunk/branch junctions read as one continuous surface instead of visibly separate pieces.
+- Retuned `BroadleafClassic` against the provided low-poly reference sample profile (single mesh, two materials, ~312 faces), reducing generated runtime triangles to `LOD0=294`, `LOD1=190`, `LOD2=98` for a clearly lower-poly silhouette.
+- Added branch-path lateral bend/twist and increased trunk sway/lean in `BroadleafClassic`, producing a less rigid silhouette while preserving the low-poly faceted style.
+- Re-anchored side canopy lobes closer to branch tips and added branch-tip connector lobes so branch canopies visibly intersect branch endpoints instead of floating; updated runtime triangles are `LOD0=336`, `LOD1=218`, `LOD2=114`.
+- Slimmed branch-to-trunk junction geometry in `BroadleafClassic` (reduced branch-root embed, narrower branch-junction nub, and slimmer fillet radii) to avoid overly bulky branch collars while keeping trunk continuity.
+- Completed windswept refinement by introducing per-side canopy asymmetry and a subtle trunk S-curve bias aligned with the broadleaf sway phase; updated runtime triangles are `LOD0=310`, `LOD1=200`, `LOD2=104`.
+- Redesigned all `LargeTree` variations to follow the same profile-driven shaping family used by the finalized main tree: broadleaf variants now share the triad/fused-junction canopy logic, and pine variants now use curved-trunk profile controls instead of the older straight static-layer path.
+- Regenerated variation exports and runtime prefabs after the redesign. Latest runtime triangle counts are `BroadleafClassic=310/200/104`, `BroadleafWide=1168/770/420`, `BroadleafTall=904/568/306`, `PineA=44/28/16`, and `PineClustered=60/40/24` (LOD0/LOD1/LOD2).
+
+### LargeTree Production Finalization
+
+- Added deterministic production texture generation for `LargeTree` bark and leaves (`Textures/LargeTree_Bark_Albedo.png`, `Textures/LargeTree_Leaves_Albedo.png`).
+- Added deterministic production material assets for `LargeTree` (`Materials/LargeTree_Bark.mat`, `Materials/LargeTree_Leaves.mat`) using the project Standard shader baseline.
+- Added runtime prefab material assignment enforcement in generation, with failure when bark/leaves slots are not both assigned.
+- Updated Blender `generate_large_tree` output to create explicit bark/leaves material slots so Unity assignment is stable and deterministic.
+- Extended EditMode coverage to verify production textures/materials exist and are assigned on LargeTree renderers.
+
+### Asset Creation Policy
+
+- Updated project instructions so asset creation requests default to production-ready final output (materials/textures/prefab assignment/verification), unless the user explicitly requests prototype scope.
+
+### LargeTree Blender-to-Unity Pipeline
+
+- Added deterministic Blender MCP generation for a new broadleaf `LargeTree` asset (LOD0/1/2 + collider mesh + preview render) and export into `Assets/Art/Environment/Vegetation/LargeTree`.
+- Added Unity import/generation flow for `LargeTree` to produce a deployable runtime prefab at `Generated/LargeTree/LargeTree`, including baked collider mesh and preview texture.
+- Integrated `LargeTree` into developer deploy/runtime registration and switched terrain tree sourcing to the generated `LargeTree` prefab.
+- Added/extended EditMode, PlayMode, and AutoTester coverage for `LargeTree` runtime sanity and deployability.
+- Validation results: EditMode `226/226` pass, PlayMode `41/41` pass, Windows build succeeds, targeted `-autoTestScenario LargeTree` passes, full `-autoTest` passes (including AssetDeployUI deployment of `LargeTree`).
+
 ### Developer Asset Deploy Flow
 
 - Restored WoW-style keyboard turning behavior: `A`/`D` now rotate in place (no strafe) when RMB is not held, and the third-person camera yaw follows character turning.
@@ -27,11 +123,30 @@ All notable changes to this project are documented here.
 - Corrected radial up/down visual mapping.
 - Improved top radial header layout to avoid clipping.
 - Normalized radial 3D preview scale across asset sizes.
+- Made generated deployables catalog-complete for UI browsing by ensuring LargeTree variation prefabs and BlenderE2EProp prefab are network-spawn ready (`NetworkObject` on root), then regenerating `DeployableAssetCatalog` after variation generation.
+- Added catalog-driven NetworkConfig registration for generated deployables so assets shown in deploy UI (including LargeTree variations) are spawnable through server-authoritative placement.
 
 ### Blender MCP Server (Tooling)
 
 - Added `Tools/BlenderMCP/` MCP server to drive headless Blender and export FBX assets into `Assets/Art/...`.
 - Added repo guidance for Blender exports alongside the existing Mixamo placeholder pipeline.
+- Updated `generate_large_tree` to default to `GeometricLowPoly` style (faceted, branchless low-poly canopy + straight trunk) while retaining legacy style profiles.
+- Added deterministic LargeTree variation presets: `BroadleafClassic`, `BroadleafWide`, `BroadleafTall`, `PineA`, and `PineClustered`.
+- Extended MCP tool inputs for `blender_generate_large_tree` and `blender_render_large_tree_preview` to accept `styleProfile` and `variation` parameters.
+- Added `blender_generate_large_tree_variations` to run one pass per variation, export per-variation FBX/previews into `Assets/Art/Environment/Vegetation/LargeTree/Variants`, and produce a contact-sheet preview at `LargeTreeVariationsSheet.png`.
+
+### Terrain Tree Variation Mixing
+
+- Added a `LargeTreeVariationProfile` ScriptableObject (`Assets/GeneratedPrefabs/LargeTreeVariationProfile.asset`) that controls weighted terrain tree prototype selection.
+- Updated `TerrainGenerator` to mix available LargeTree variation prefabs/FBXs by profile weights, with deterministic fallback to the single generated LargeTree prefab when no variation assets are present.
+- Added EditMode coverage for weighted terrain prototype selection behavior and edge cases.
+
+### LargeTree Variation Runtime Prefabs
+
+- Added `LargeTreeVariationPrefabGenerator` to build runtime-ready variation prefabs under `Assets/Resources/Generated/LargeTree/Variants/{Variation}` from variation FBX assets.
+- Wired variation-prefab generation into terrain generation (`TerrainGenerator.GenerateTerrain`), MCP full generation (`Tools/MCP/Generate All`), and build pre-generation (`BuildScript.BuildWindowsClient`).
+- Added a dedicated MCP menu command: `Tools/MCP/Generate Large Tree Variation Prefabs`.
+- Extended EditMode tests to validate generated variation prefabs include 3 LODs, a root collider, and copied preview textures when source previews are present.
 
 ### Blender E2E Prop + In-Game Deploy UI
 

@@ -2,34 +2,35 @@
 
 ## Key classes (auto-generated)
 
-| Class | Base | Interfaces | Network | RPCs |
-|-------|------|-----------|---------|------|
-| `AudioManager` | `MonoBehaviour` | - | - | - |
-| `AutoTester` | `MonoBehaviour` | - | - | - |
-| `AutoTestLogFilterHandler` | `` | ILogHandler | - | - |
-| `AutoTesterContext` | `` | - | - | - |
-| `AutoTestScenarioBuildingVisuals` | `` | IAutoTestScenario | - | - |
-| `AutoTestScenarioConsole` | `` | IAutoTestScenario | - | - |
-| `AutoTestScenarioCore` | `` | IAutoTestScenario | - | - |
-| `FootstepController` | `MonoBehaviour` | - | - | - |
-| `GameConstants` | `ScriptableObject` | - | - | - |
-| `GameEvent` | `` | - | - | - |
-| `GameEventBus` | `` | - | - | - |
-| `EnemyDiedEvent` | `` | - | - | - |
-| `EnemyTargetedEvent` | `` | - | - | - |
-| `ItemEvent` | `` | - | - | - |
-| `BuildingPlacedEvent` | `` | - | - | - |
-| `GameStateChangedEvent` | `` | - | - | - |
-| `GameManager` | `NetworkBehaviour` | - | Yes | - |
-| `GameStateMachine` | `` | - | - | - |
-| `PlayerInputHandler` | `MonoBehaviour` | - | - | - |
-| `PlayerInteraction` | `NetworkBehaviour` | - | Yes | AttackEnemyServerRpc, GatherResourceServerRpc, PlayMeleeHitClientRpc |
-| `PlayerRegistry` | `` | - | - | - |
-| `ScreenLogger` | `MonoBehaviour` | - | - | - |
-| `Entry` | `` | - | - | - |
-| `ThirdPersonCamera` | `MonoBehaviour` | - | - | - |
-| `VFXManager` | `NetworkBehaviour` | - | Yes | PlayEffectClientRpc |
-| `VisualGroundingUtility` | `` | - | - | - |
+| Class                             | Base               | Interfaces        | Network | RPCs                                                                                                     |
+| --------------------------------- | ------------------ | ----------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `AudioManager`                    | `MonoBehaviour`    | -                 | -       | -                                                                                                        |
+| `AutoTester`                      | `MonoBehaviour`    | -                 | -       | -                                                                                                        |
+| `AutoTestLogFilterHandler`        | ``                 | ILogHandler       | -       | -                                                                                                        |
+| `AutoTesterContext`               | ``                 | -                 | -       | -                                                                                                        |
+| `AutoTestScenarioBuildingVisuals` | ``                 | IAutoTestScenario | -       | -                                                                                                        |
+| `AutoTestScenarioConsole`         | ``                 | IAutoTestScenario | -       | -                                                                                                        |
+| `AutoTestScenarioCore`            | ``                 | IAutoTestScenario | -       | -                                                                                                        |
+| `AutoTestScenarioDestruction`     | ``                 | IAutoTestScenario | -       | -                                                                                                        |
+| `FootstepController`              | `MonoBehaviour`    | -                 | -       | -                                                                                                        |
+| `GameConstants`                   | `ScriptableObject` | -                 | -       | -                                                                                                        |
+| `GameEvent`                       | ``                 | -                 | -       | -                                                                                                        |
+| `GameEventBus`                    | ``                 | -                 | -       | -                                                                                                        |
+| `EnemyDiedEvent`                  | ``                 | -                 | -       | -                                                                                                        |
+| `EnemyTargetedEvent`              | ``                 | -                 | -       | -                                                                                                        |
+| `ItemEvent`                       | ``                 | -                 | -       | -                                                                                                        |
+| `BuildingPlacedEvent`             | ``                 | -                 | -       | -                                                                                                        |
+| `GameStateChangedEvent`           | ``                 | -                 | -       | -                                                                                                        |
+| `GameManager`                     | `NetworkBehaviour` | -                 | Yes     | -                                                                                                        |
+| `GameStateMachine`                | ``                 | -                 | -       | -                                                                                                        |
+| `PlayerInputHandler`              | `MonoBehaviour`    | -                 | -       | -                                                                                                        |
+| `PlayerInteraction`               | `NetworkBehaviour` | -                 | Yes     | AttackEnemyServerRpc, GatherResourceServerRpc, RequestDestructibleDamageServerRpc, PlayMeleeHitClientRpc |
+| `PlayerRegistry`                  | ``                 | -                 | -       | -                                                                                                        |
+| `ScreenLogger`                    | `MonoBehaviour`    | -                 | -       | -                                                                                                        |
+| `Entry`                           | ``                 | -                 | -       | -                                                                                                        |
+| `ThirdPersonCamera`               | `MonoBehaviour`    | -                 | -       | -                                                                                                        |
+| `VFXManager`                      | `NetworkBehaviour` | -                 | Yes     | PlayEffectClientRpc                                                                                      |
+| `VisualGroundingUtility`          | ``                 | -                 | -       | -                                                                                                        |
 
 ## Invariants
 

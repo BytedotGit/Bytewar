@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using ByteWar.Survival;
@@ -13,14 +14,26 @@ namespace ByteWar.Core
         private PlayerInputHandler _inputHandler;
         private Camera _mainCamera;
         private AbilitySystemComponent _abilitySystem;
+        private EquipmentComponent _equipment;
         private Animator _animator;
+        [SerializeField] private float _destructibleRequestCooldownSeconds = 0.1f;
+        [SerializeField] private float _destructibleServerValidationRangePadding = 1f;
+
+        private readonly Dictionary<ulong, float> _lastDestructibleRequestTimes = new();
 
         private void Awake()
         {
             _inputHandler = GetComponent<PlayerInputHandler>();
             _abilitySystem = GetComponent<AbilitySystemComponent>();
+            _equipment = GetComponent<EquipmentComponent>();
             _animator = GetComponent<Animator>();
             _mainCamera = Camera.main;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            _lastDestructibleRequestTimes.Clear();
+            base.OnNetworkDespawn();
         }
 
         public override void OnNetworkSpawn()
@@ -86,7 +99,6 @@ namespace ByteWar.Core
 
                 // Try IDamageable + ICombatTarget (enemy combat)
                 var combatTarget = hit.collider.GetComponent<ICombatTarget>();
-                var damageable = hit.collider.GetComponent<IDamageable>();
                 if (combatTarget != null && combatTarget.IsAlive)
                 {
                     Debug.Log($"[{nameof(PlayerInteraction)}] Hit combat target: {hit.collider.gameObject.name}. Attacking.");
@@ -97,6 +109,15 @@ namespace ByteWar.Core
                         EnemyTargetTracker.SetTarget(enemyAI);
                         AttackEnemyServerRpc(enemyAI.NetworkObjectId);
                     }
+                    return;
+                }
+
+                var destructible = hit.collider.GetComponentInParent<DestructibleComponent>();
+                if (destructible != null && destructible.IsAlive)
+                {
+                    Debug.Log($"[{nameof(PlayerInteraction)}] Hit destructible '{destructible.gameObject.name}'. Requesting server damage.");
+                    if (_animator != null) _animator.SetTrigger("Gather");
+                    TryDamageDestructible(destructible);
                     return;
                 }
 
@@ -119,6 +140,26 @@ namespace ByteWar.Core
             {
                 Debug.Log($"[{nameof(PlayerInteraction)}] Raycast hit nothing.");
             }
+        }
+
+        public void TryDamageDestructible(DestructibleComponent destructible)
+        {
+            if (!IsSpawned || !IsOwner)
+            {
+                Debug.LogWarning($"[{nameof(PlayerInteraction)}] Rejecting destructible request because caller is not spawned owner.");
+                return;
+            }
+
+            if (destructible == null || !destructible.IsSpawned)
+            {
+                Debug.LogWarning($"[{nameof(PlayerInteraction)}] Cannot damage destructible: target is null or not spawned.");
+                return;
+            }
+
+            DamageType damageType = ResolveCurrentDamageType();
+            float baseDamage = ResolveCurrentToolDamage();
+            Debug.Log($"[{nameof(PlayerInteraction)}] Requesting destructible damage netObj={destructible.NetworkObjectId} type={damageType} baseDamage={baseDamage:0.##}");
+            RequestDestructibleDamageServerRpc(destructible.NetworkObjectId, baseDamage, damageType);
         }
 
         private Vector3 GetMouseWorldPosition()
@@ -177,6 +218,90 @@ namespace ByteWar.Core
             {
                 Debug.LogWarning($"[{nameof(PlayerInteraction)}] Server could not find ResourceNode with NetworkObjectId: {resourceNetworkObjectId}.");
             }
+        }
+
+        [ServerRpc]
+        private void RequestDestructibleDamageServerRpc(ulong destructibleNetworkObjectId, float baseDamage, DamageType damageType, ServerRpcParams rpcParams = default)
+        {
+            ulong senderClientId = rpcParams.Receive.SenderClientId;
+            if (senderClientId != OwnerClientId)
+            {
+                Debug.LogWarning($"[{nameof(PlayerInteraction)}] Rejecting destructible request: sender={senderClientId} owner={OwnerClientId}.");
+                return;
+            }
+
+            if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(destructibleNetworkObjectId, out NetworkObject networkObject))
+            {
+                Debug.LogWarning($"[{nameof(PlayerInteraction)}] Server could not find DestructibleComponent netObj={destructibleNetworkObjectId}.");
+                return;
+            }
+
+            DestructibleComponent destructible = networkObject.GetComponent<DestructibleComponent>();
+            if (destructible == null)
+            {
+                Debug.LogWarning($"[{nameof(PlayerInteraction)}] Rejecting destructible request: target netObj={destructibleNetworkObjectId} has no {nameof(DestructibleComponent)}.");
+                return;
+            }
+
+            if (!ValidateDestructibleRequest(senderClientId, destructibleNetworkObjectId, destructible.transform.position))
+                return;
+
+            destructible.ApplyDamage(baseDamage, damageType, senderClientId);
+        }
+
+        private bool ValidateDestructibleRequest(ulong senderClientId, ulong targetNetworkObjectId, Vector3 targetPosition)
+        {
+            float maxAllowedDistance = GameConstants.GetInteractionRange() + Mathf.Max(0f, _destructibleServerValidationRangePadding);
+            float distance = Vector3.Distance(transform.position, targetPosition);
+            if (distance > maxAllowedDistance)
+            {
+                Debug.LogWarning($"[{nameof(PlayerInteraction)}] Rejecting destructible request from client {senderClientId}: out of range ({distance:0.##} > {maxAllowedDistance:0.##}).");
+                return false;
+            }
+
+            if (_destructibleRequestCooldownSeconds > 0f)
+            {
+                float now = Time.unscaledTime;
+                if (_lastDestructibleRequestTimes.TryGetValue(targetNetworkObjectId, out float lastRequestTime) &&
+                    now - lastRequestTime < _destructibleRequestCooldownSeconds)
+                {
+                    Debug.LogWarning($"[{nameof(PlayerInteraction)}] Rejecting destructible request from client {senderClientId}: rate-limited for target netObj={targetNetworkObjectId}.");
+                    return false;
+                }
+
+                _lastDestructibleRequestTimes[targetNetworkObjectId] = now;
+            }
+
+            return true;
+        }
+
+        private float ResolveCurrentToolDamage()
+        {
+            float baseDamage = GameConstants.GetGatherDamage();
+            if (_equipment == null || _equipment.EquippedWeapon == null)
+                return Mathf.Max(0f, baseDamage);
+
+            return Mathf.Max(0f, baseDamage + Mathf.Max(0f, _equipment.EquippedWeapon.DamageBonus));
+        }
+
+        private DamageType ResolveCurrentDamageType()
+        {
+            if (_equipment == null || _equipment.EquippedWeapon == null)
+                return DamageType.Blunt;
+
+            string itemName = _equipment.EquippedWeapon.ItemName;
+            if (string.IsNullOrWhiteSpace(itemName))
+                return DamageType.Blunt;
+
+            string lowerItemName = itemName.ToLowerInvariant();
+            if (lowerItemName.Contains("axe"))
+                return DamageType.Axe;
+            if (lowerItemName.Contains("pick"))
+                return DamageType.Pick;
+            if (lowerItemName.Contains("fire"))
+                return DamageType.Fire;
+
+            return DamageType.Blunt;
         }
     }
 }

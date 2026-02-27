@@ -3,6 +3,7 @@ using ByteWar.Core;
 using ByteWar.Networking;
 using System.Net;
 using System.Net.Sockets;
+using System.Linq;
 
 namespace ByteWar.Tests.EditMode
 {
@@ -86,6 +87,39 @@ namespace ByteWar.Tests.EditMode
             Assert.AreEqual(0.25f, AutoTester.ComputeHostRetryDelaySeconds(1), 0.0001f);
             Assert.AreEqual(0.50f, AutoTester.ComputeHostRetryDelaySeconds(2), 0.0001f);
             Assert.AreEqual(0.50f, AutoTester.ComputeHostRetryDelaySeconds(999), 0.0001f);
+        }
+
+        [Test]
+        public void AutoTester_ParseScenarioArgs_CollectsRequestedScenarioNames_CaseInsensitive()
+        {
+            string[] args = { "-autoTest", "-autoTestScenario", "Core", "-AUTOTESTSCENARIO", "Destruction" };
+
+            var parsed = AutoTester.ParseScenarioArgs(args);
+
+            Assert.IsTrue(parsed.Contains("core"));
+            Assert.IsTrue(parsed.Contains("DESTRUCTION"));
+            Assert.AreEqual(2, parsed.Count);
+        }
+
+        [Test]
+        public void AutoTester_BuildScenarioList_ReturnsOnlyRequestedDestructionScenario()
+        {
+            string[] args = { "-autoTest", "-autoTestScenario", "Destruction" };
+
+            var scenarios = AutoTester.BuildScenarioList(args);
+
+            Assert.AreEqual(1, scenarios.Length);
+            Assert.AreEqual("Destruction", scenarios[0].Name);
+        }
+
+        [Test]
+        public void AutoTester_BuildScenarioList_DefaultIncludesDestructionScenario()
+        {
+            string[] args = { "-autoTest" };
+
+            var scenarios = AutoTester.BuildScenarioList(args);
+
+            Assert.IsTrue(scenarios.Any(s => s.Name == "Destruction"));
         }
     }
 }
