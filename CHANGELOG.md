@@ -11,6 +11,7 @@ All notable changes to this project are documented here.
 - Use `Tools/run-playmode-tests.ps1` in local/CI verification flows to produce stable PlayMode XML output at a caller-specified path.
 - Integrated an optional `-RunPlayMode` gate into `Tools/validate-pr.ps1` that executes the wrapper and fails validation when PlayMode XML is missing, unparsable, or reports failures.
 - Refined `Tools/validate-pr.ps1` public-field detector to avoid expression-bodied property false positives and emit grouped hotspot summaries by file (use `-VerbosePublicFieldWarnings` for full detail output).
+- Updated `.github/copilot-instructions.md` PlayMode command examples to use the deterministic wrapper (`Tools/run-playmode-tests.ps1`) with logs/artifacts under `Logs/`.
 
 ### Destruction AutoTester Scenario Coverage
 

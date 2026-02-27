@@ -52,6 +52,7 @@ Every change MUST pass ALL of the following before being considered complete:
 8. **Warnings are defects** — compiler warnings and missing references are blocking failures
 9. **Anti-refactor drift** — only touch files required for the current scope. Log unrelated issues to `TECH_DEBT.md`.
 10. **Atomic state sync** — code + docs + tracking updated together
+11. **Asset requests default to production-ready final output** — when asked to create an asset, deliver complete deployable output (geometry, UVs, LODs/colliders as needed, authored materials, authored textures, prefab/runtime assignment, and verification). Only deliver prototype/blockout assets when the user explicitly asks for that scope.
 
 ## Agent Escalation
 
@@ -83,11 +84,10 @@ Every change MUST pass ALL of the following before being considered complete:
   -executeMethod ByteWar.Editor.BatchTestRunner.RunEditModeTests `
   -logFile -
 
-# PlayMode tests
-& "C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe" `
-  -runTests -projectPath . -testPlatform PlayMode `
-  -testResults "PlayModeTestResults.xml" `
-  -batchmode -nographics -logFile "Logs/playmode_tests.log"
+# PlayMode tests (deterministic XML artifact)
+& ".\Tools\run-playmode-tests.ps1" `
+  -ResultsPath "Logs\PlayModeTestResults.xml" `
+  -LogPath "Logs\playmode_tests.log"
 
 # Build client
 & "C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe" `
