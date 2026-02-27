@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Premade-Primary Model Sourcing Policy
+
+- Locked production model sourcing to premade, license-verified assets as the default path.
+- Reclassified Blender-generated models to fallback-only usage when no approved premade option satisfies style/performance/licensing requirements.
+- Updated art guidance (`Assets/Art/AGENTS.md`) and Batch 01 planning artifacts (`Assets/Art/asset_shortlist.md`, `Assets/Art/asset_manifest.template.json`) to encode premade-first workflow and explicit fallback metadata.
+- Updated concrete Batch 01 manifests to premade-primary source entries for Tree Family A and Deployable Hero Prop A, with recorded fallback policy.
+- Added source license-proof stubs for premade providers under `Assets/Art/LicenseProofs/` (`quaternius_cc0.txt`, `kenney_cc0.txt`).
+
 ### Deterministic PlayMode Test Result Artifacts
 
 - Added `Tools/run-playmode-tests.ps1` to run Unity PlayMode tests with deterministic XML artifact output.
