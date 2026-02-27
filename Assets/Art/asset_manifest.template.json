@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "environment_tree_family_a_adult",
+  "displayName": "Tree Family A - Adult",
+  "category": "Environment/Vegetation",
+  "batchId": "B01",
+  "source": {
+    "provider": "FirstParty",
+    "packName": "BlenderMCP Generated",
+    "sourceUrl": "https://example.com/source-url",
+    "acquiredOn": "2026-02-27",
+    "author": "BytedotGit",
+    "originalFile": "large_tree_adult.fbx"
+  },
+  "license": {
+    "type": "Internal",
+    "commercialUseAllowed": true,
+    "modificationAllowed": true,
+    "attributionRequired": false,
+    "proofPath": "Assets/Art/LicenseProofs/first_party_internal.txt",
+    "notes": ""
+  },
+  "styleFit": {
+    "targetStyle": "LowPolyStylizedEnvironment",
+    "matchesPrimaryStyle": true,
+    "referenceNotes": "Valheim readability, chunky silhouette"
+  },
+  "technical": {
+    "mesh": {
+      "format": "FBX",
+      "triangleCountLOD0": 0,
+      "triangleCountLOD1": 0,
+      "triangleCountLOD2": 0,
+      "lodsPresent": true,
+      "materialsCount": 1,
+      "hasColliderMesh": true,
+      "colliderType": "MeshCollider",
+      "hasTriggerMesh": false
+    },
+    "textures": {
+      "albedo": "Assets/Art/Environment/Vegetation/Textures/oak_tree_a_albedo.png",
+      "normal": "",
+      "mask": "",
+      "resolution": "1024x1024"
+    },
+    "rigging": {
+      "isSkinned": false,
+      "skeleton": "",
+      "retargetReady": false
+    }
+  },
+  "gameplay": {
+    "destructionCompatible": true,
+    "destructionClass": "Tree",
+    "damageTypes": [
+      "Axe",
+      "Fire"
+    ],
+    "dropProfile": "Wood_T1"
+  },
+  "pipeline": {
+    "importPath": "Assets/Art/Environment/Vegetation/TreeFamilyA/Adult",
+    "runtimePrefabPath": "Assets/Resources/Generated/LargeTree/LargeTree.prefab",
+    "manifestOwner": "Art",
+    "reviewStatus": "Draft",
+    "integrationOwner": "TechArt",
+    "autotestScenario": "LargeTree"
+  },
+  "integration": {
+    "deployableCatalogEntry": "LargeTree",
+    "requiresCodeChange": false,
+    "expectedRegenStep": "Tools/MCP/Generate All",
+    "verificationCommand": "./Tools/validate-pr.ps1 -ProjectRoot . -RunPlayMode"
+  },
+  "qa": {
+    "visualReviewed": false,
+    "performanceReviewed": false,
+    "networkReviewed": false,
+    "autotestReviewed": false,
+    "notes": ""
+  }
+}
