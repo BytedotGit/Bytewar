@@ -1,0 +1,8 @@
+Kenney License Note
+
+This file records that assets sourced from Kenney for Batch01 manifests
+are approved under the project's license verification workflow.
+
+Source: https://kenney.nl
+Captured: 2026-02-28
+Owner: BytedotGit

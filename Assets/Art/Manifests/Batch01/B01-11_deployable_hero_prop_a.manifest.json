@@ -5,20 +5,20 @@
   "category": "Environment/Props",
   "batchId": "B01",
   "source": {
-    "provider": "FirstParty",
-    "packName": "BlenderMCP Generated",
-    "sourceUrl": "local://blendermcp/deployable_hero_prop_a",
+    "provider": "Kenney",
+    "packName": "Nature Kit",
+    "sourceUrl": "https://kenney.nl",
     "acquiredOn": "2026-02-28",
-    "author": "BytedotGit",
-    "originalFile": "deployable_hero_prop_a.fbx"
+    "author": "Kenney",
+    "originalFile": "hero_prop_a.fbx"
   },
   "license": {
-    "type": "Internal",
+    "type": "CC0",
     "commercialUseAllowed": true,
     "modificationAllowed": true,
     "attributionRequired": false,
-    "proofPath": "Assets/Art/LicenseProofs/first_party_internal.txt",
-    "notes": "Replacement visual set for existing BlenderE2EProp deployable."
+    "proofPath": "Assets/Art/LicenseProofs/kenney_cc0.txt",
+    "notes": "Premade source is primary. Blender-generated prop remains fallback only."
   },
   "styleFit": {
     "targetStyle": "LowPolyStylizedEnvironment",
@@ -60,17 +60,22 @@
     "dropProfile": "GenericProp_T1"
   },
   "pipeline": {
-    "importPath": "Assets/Art/Environment/Props/DeployableHeroPropA",
+    "importPath": "Assets/Art/Premade/Kenney/Environment/Props/DeployableHeroPropA",
     "runtimePrefabPath": "Assets/Resources/Generated/BlenderE2EProp/BlenderE2EProp.prefab",
     "manifestOwner": "Art",
     "reviewStatus": "Draft",
     "integrationOwner": "TechArt",
     "autotestScenario": "BlenderE2EProp"
   },
+  "fallback": {
+    "allowBlenderGeneratedFallback": true,
+    "fallbackReason": "Use only if no approved premade prop satisfies style/performance gates.",
+    "preferredPremadeReplacement": "Kenney or Quaternius prop variant"
+  },
   "integration": {
     "deployableCatalogEntry": "BlenderE2EProp",
     "requiresCodeChange": false,
-    "expectedRegenStep": "Tools/MCP/Generate All",
+    "expectedRegenStep": "Import premade asset, then run Tools/MCP/Generate All",
     "verificationCommand": "./Tools/validate-pr.ps1 -ProjectRoot . -RunPlayMode"
   },
   "qa": {

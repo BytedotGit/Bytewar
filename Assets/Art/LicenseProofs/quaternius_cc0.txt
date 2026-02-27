@@ -1,0 +1,9 @@
+Quaternius CC0 License Note
+
+This file records that assets sourced from Quaternius for Batch01 manifests
+are treated as CC0 and approved for commercial use under the project's
+license verification workflow.
+
+Source: https://quaternius.com
+Captured: 2026-02-28
+Owner: BytedotGit

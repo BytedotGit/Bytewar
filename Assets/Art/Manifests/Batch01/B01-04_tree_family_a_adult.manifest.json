@@ -5,20 +5,20 @@
   "category": "Environment/Vegetation",
   "batchId": "B01",
   "source": {
-    "provider": "FirstParty",
-    "packName": "BlenderMCP Generated",
-    "sourceUrl": "local://blendermcp/tree_family_a",
+    "provider": "Quaternius",
+    "packName": "Nature Pack",
+    "sourceUrl": "https://quaternius.com",
     "acquiredOn": "2026-02-28",
-    "author": "BytedotGit",
-    "originalFile": "large_tree_adult.fbx"
+    "author": "Quaternius",
+    "originalFile": "tree_family_a_adult.fbx"
   },
   "license": {
-    "type": "Internal",
+    "type": "CC0",
     "commercialUseAllowed": true,
     "modificationAllowed": true,
     "attributionRequired": false,
-    "proofPath": "Assets/Art/LicenseProofs/first_party_internal.txt",
-    "notes": "First-party generated tree variant for production art pass."
+    "proofPath": "Assets/Art/LicenseProofs/quaternius_cc0.txt",
+    "notes": "Premade source is primary. Blender-generated tree remains fallback only."
   },
   "styleFit": {
     "targetStyle": "LowPolyStylizedEnvironment",
@@ -59,17 +59,22 @@
     "dropProfile": "Wood_T1"
   },
   "pipeline": {
-    "importPath": "Assets/Art/Environment/Vegetation/TreeFamilyA/Adult",
+    "importPath": "Assets/Art/Premade/Quaternius/Environment/Vegetation/TreeFamilyA/Adult",
     "runtimePrefabPath": "Assets/Resources/Generated/LargeTree/LargeTree.prefab",
     "manifestOwner": "Art",
     "reviewStatus": "Draft",
     "integrationOwner": "TechArt",
     "autotestScenario": "LargeTree"
   },
+  "fallback": {
+    "allowBlenderGeneratedFallback": true,
+    "fallbackReason": "Use only if no approved premade asset satisfies style/performance gates.",
+    "preferredPremadeReplacement": "Quaternius tree-family variant"
+  },
   "integration": {
     "deployableCatalogEntry": "LargeTree",
     "requiresCodeChange": false,
-    "expectedRegenStep": "Tools/MCP/Generate All",
+    "expectedRegenStep": "Import premade asset, then run Tools/MCP/Generate All",
     "verificationCommand": "./Tools/validate-pr.ps1 -ProjectRoot . -RunPlayMode"
   },
   "qa": {

@@ -5,20 +5,20 @@
   "category": "Environment/Vegetation",
   "batchId": "B01",
   "source": {
-    "provider": "FirstParty",
-    "packName": "BlenderMCP Generated",
+    "provider": "Quaternius",
+    "packName": "Nature Pack",
     "sourceUrl": "https://example.com/source-url",
     "acquiredOn": "2026-02-27",
-    "author": "BytedotGit",
-    "originalFile": "large_tree_adult.fbx"
+    "author": "Quaternius",
+    "originalFile": "tree_family_a_adult.fbx"
   },
   "license": {
-    "type": "Internal",
+    "type": "CC0",
     "commercialUseAllowed": true,
     "modificationAllowed": true,
     "attributionRequired": false,
-    "proofPath": "Assets/Art/LicenseProofs/first_party_internal.txt",
-    "notes": ""
+    "proofPath": "Assets/Art/LicenseProofs/quaternius_cc0.txt",
+    "notes": "Use premade asset as primary source."
   },
   "styleFit": {
     "targetStyle": "LowPolyStylizedEnvironment",
@@ -65,6 +65,11 @@
     "reviewStatus": "Draft",
     "integrationOwner": "TechArt",
     "autotestScenario": "LargeTree"
+  },
+  "fallback": {
+    "allowBlenderGeneratedFallback": true,
+    "fallbackReason": "",
+    "preferredPremadeReplacement": ""
   },
   "integration": {
     "deployableCatalogEntry": "LargeTree",
