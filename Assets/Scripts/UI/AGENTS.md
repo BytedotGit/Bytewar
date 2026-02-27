@@ -19,6 +19,7 @@
 
 - Prefer event-driven UI updates over per-frame polling.
 - UI must not spam logs per frame.
+- Keep `AssetDeployUI` split across partial files by responsibility. `AssetDeployUI.RadialNode.cs` should only contain radial tree data structure behavior.
 
 ## Tests
 
