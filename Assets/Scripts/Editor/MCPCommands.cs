@@ -7,10 +7,42 @@ namespace ByteWar.Editor
 {
     public static class MCPCommands
     {
+        [MenuItem("Tools/MCP/Reimport Quaternius FBX")]
+        public static void ReimportQuaterniusFbx()
+        {
+            string[] roots =
+            {
+                "Assets/Art/Premade/Quaternius/UltimateNature/FBX",
+                "Assets/Art/Premade/Quaternius/UltimateCrops/FBX",
+                "Assets/Art/Premade/Quaternius/Environment/Vegetation",
+            };
+            int count = 0;
+            foreach (string root in roots)
+            {
+                if (!AssetDatabase.IsValidFolder(root))
+                    continue;
+                string[] guids = AssetDatabase.FindAssets("t:GameObject", new[] { root });
+                foreach (string guid in guids)
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(guid);
+                    if (path.EndsWith(".fbx", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                        count++;
+                    }
+                }
+            }
+            Debug.Log($"[MCP] Force-reimported {count} Quaternius FBX assets.");
+        }
+
         [MenuItem("Tools/MCP/Generate All")]
         public static void GenerateAll()
         {
             Debug.Log("[MCP] Starting full generation pipeline...");
+
+            // 0. Reimport Quaternius FBX to apply latest postprocessor settings
+            Debug.Log("[MCP] Step 0 — Reimporting Quaternius FBX assets...");
+            ReimportQuaterniusFbx();
 
             // 1. Terrain assets (heightmap, layers, textures, tree prefab)
             Debug.Log("[MCP] Step 1/7 — Generating terrain assets...");
@@ -48,13 +80,21 @@ namespace ByteWar.Editor
             Debug.Log("[MCP] Step 5/7 — Generating scriptable assets...");
             AssetGenerator.GenerateAssets();
 
-            // 6. Runtime prefabs (NetworkPlayer, EnemyAI, NetworkManager, etc.)
-            Debug.Log("[MCP] Step 6/7 — Generating runtime prefabs...");
-            PrefabGenerator.GeneratePrefabs();
-
-            // 6b. Blender E2E prop prefab (optional, safe no-op if FBX missing)
-            Debug.Log("[MCP] Step 6b/7 — Generating Blender E2E prop prefab...");
+            // 6. Blender-generated deployable prefabs (optional, safe no-op if FBX missing)
+            Debug.Log("[MCP] Step 6/7 — Generating Blender deployable prefabs...");
             BlenderE2EPropPrefabGenerator.Generate();
+            LargeTreePrefabGenerator.Generate();
+            LargeTreeVariationPrefabGenerator.GenerateAll();
+
+            // Keep deployable catalog synchronized before NetworkManager prefab registration.
+            if (DeployableAssetCatalogBuilder.TryRegenerate(out string catalogMessage))
+                Debug.Log($"[MCP] Deployable catalog regeneration succeeded. {catalogMessage}");
+            else
+                Debug.LogWarning($"[MCP] Deployable catalog regeneration failed. {catalogMessage}");
+
+            // 6b. Runtime prefabs (NetworkPlayer, EnemyAI, NetworkManager, etc.)
+            Debug.Log("[MCP] Step 6b/7 — Generating runtime prefabs...");
+            PrefabGenerator.GeneratePrefabs();
 
             // 7. Scene (terrain + env objects + lighting + all prefabs)
             Debug.Log("[MCP] Step 7/7 — Generating test scene...");
@@ -69,6 +109,36 @@ namespace ByteWar.Editor
             Debug.Log("[MCP] Generating Blender E2E prop prefab...");
             bool ok = BlenderE2EPropPrefabGenerator.Generate();
             Debug.Log("[MCP] Blender E2E prop prefab generation complete.");
+
+            if (Application.isBatchMode)
+            {
+                int exitCode = ok ? 0 : 1;
+                Debug.Log($"[MCP] Exiting editor with code {exitCode} (batchmode). ok={ok}");
+                EditorApplication.Exit(exitCode);
+            }
+        }
+
+        [MenuItem("Tools/MCP/Generate Large Tree Prefab")]
+        public static void GenerateLargeTreePrefab()
+        {
+            Debug.Log("[MCP] Generating LargeTree prefab...");
+            bool ok = LargeTreePrefabGenerator.Generate();
+            Debug.Log("[MCP] LargeTree prefab generation complete.");
+
+            if (Application.isBatchMode)
+            {
+                int exitCode = ok ? 0 : 1;
+                Debug.Log($"[MCP] Exiting editor with code {exitCode} (batchmode). ok={ok}");
+                EditorApplication.Exit(exitCode);
+            }
+        }
+
+        [MenuItem("Tools/MCP/Generate Large Tree Variation Prefabs")]
+        public static void GenerateLargeTreeVariationPrefabs()
+        {
+            Debug.Log("[MCP] Generating LargeTree variation prefabs...");
+            bool ok = LargeTreeVariationPrefabGenerator.GenerateAll();
+            Debug.Log($"[MCP] LargeTree variation prefab generation complete. success={ok}");
 
             if (Application.isBatchMode)
             {

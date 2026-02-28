@@ -11,6 +11,14 @@ const BRIDGE_URL = `http://127.0.0.1:${BRIDGE_PORT}`;
 const WORKSPACE_ROOT = process.cwd();
 
 const E2E_ASSET_NAME = "BlenderE2EProp";
+const LARGE_TREE_ASSET_NAME = "LargeTree";
+const LARGE_TREE_VARIATIONS = [
+  "Seedling",
+  "Sapling",
+  "Young",
+  "Mature",
+  "Adult",
+];
 
 function getE2EOutputPaths() {
   const artRoot = path.join(WORKSPACE_ROOT, "Assets", "Art");
@@ -24,6 +32,185 @@ function getE2EOutputPaths() {
     fbxPathRel: path.relative(WORKSPACE_ROOT, `${outDir}.fbx`),
     previewPathRel: path.relative(WORKSPACE_ROOT, path.join(assetFolder, "Preview.png")),
   };
+}
+
+function getLargeTreeOutputPaths() {
+  const artRoot = path.join(WORKSPACE_ROOT, "Assets", "Art");
+  const outDir = path.join(artRoot, "Environment", "Vegetation", LARGE_TREE_ASSET_NAME, LARGE_TREE_ASSET_NAME);
+  // Folder: Assets/Art/Environment/Vegetation/LargeTree/LargeTree.*
+  const assetFolder = path.dirname(outDir);
+  return {
+    assetFolder,
+    fbxPathAbs: `${outDir}.fbx`,
+    previewPathAbs: path.join(assetFolder, "Preview.png"),
+    fbxPathRel: path.relative(WORKSPACE_ROOT, `${outDir}.fbx`),
+    previewPathRel: path.relative(WORKSPACE_ROOT, path.join(assetFolder, "Preview.png")),
+  };
+}
+
+function getLargeTreeVariationOutputPaths(variationName) {
+  const safeVariation = String(variationName).replaceAll(/[^a-zA-Z0-9_-]/g, "_");
+  const assetName = `${LARGE_TREE_ASSET_NAME}_${safeVariation}`;
+  const artRoot = path.join(WORKSPACE_ROOT, "Assets", "Art");
+  const assetFolder = path.join(
+    artRoot,
+    "Environment",
+    "Vegetation",
+    LARGE_TREE_ASSET_NAME,
+    "Variants",
+    safeVariation,
+  );
+
+  return {
+    variation: safeVariation,
+    assetName,
+    assetFolder,
+    fbxPathAbs: path.join(assetFolder, `${assetName}.fbx`),
+    previewPathAbs: path.join(assetFolder, "Preview.png"),
+    fbxPathRel: path.relative(WORKSPACE_ROOT, path.join(assetFolder, `${assetName}.fbx`)),
+    previewPathRel: path.relative(WORKSPACE_ROOT, path.join(assetFolder, "Preview.png")),
+  };
+}
+
+function getLargeTreeVariationSheetPaths() {
+  const assetFolder = path.join(
+    WORKSPACE_ROOT,
+    "Assets",
+    "Art",
+    "Environment",
+    "Vegetation",
+    LARGE_TREE_ASSET_NAME,
+    "Variants",
+  );
+
+  const sheetPathAbs = path.join(assetFolder, "LargeTreeVariationsSheet.png");
+  return {
+    assetFolder,
+    sheetPathAbs,
+    sheetPathRel: path.relative(WORKSPACE_ROOT, sheetPathAbs),
+  };
+}
+
+function resolveLargeTreeVariationList(rawVariations) {
+  if (!Array.isArray(rawVariations) || rawVariations.length === 0) {
+    return [...LARGE_TREE_VARIATIONS];
+  }
+
+  const filtered = rawVariations
+    .map((v) => String(v).trim())
+    .filter((v) => LARGE_TREE_VARIATIONS.includes(v));
+
+  return filtered.length > 0 ? [...new Set(filtered)] : [...LARGE_TREE_VARIATIONS];
+}
+
+async function tryHandleLargeTreeVariationBatchTool(name, args) {
+  if (name !== "blender_generate_large_tree_variations") {
+    return null;
+  }
+
+  const styleProfile = args.styleProfile;
+  const variations = resolveLargeTreeVariationList(args.variations);
+  const perVariation = [];
+
+  for (const variation of variations) {
+    const paths = getLargeTreeVariationOutputPaths(variation);
+    fs.mkdirSync(paths.assetFolder, { recursive: true });
+
+    const generation = await executeBridgeCommand("generate_large_tree", {
+      assetName: paths.assetName,
+      styleProfile,
+      variation,
+    });
+
+    const exportResult = await executeBridgeCommand("export_fbx", {
+      filePath: paths.fbxPathAbs,
+      selectedOnly: true,
+    });
+
+    const previewResult = await executeBridgeCommand("render_preview", {
+      assetName: paths.assetName,
+      styleProfile,
+      variation,
+      filePath: paths.previewPathAbs,
+      width: 512,
+      height: 512,
+    });
+
+    perVariation.push({
+      variation,
+      assetName: paths.assetName,
+      generation,
+      export: { ...exportResult, unityRelativePath: paths.fbxPathRel },
+      preview: { ...previewResult, unityRelativePath: paths.previewPathRel },
+    });
+  }
+
+  const sheetPaths = getLargeTreeVariationSheetPaths();
+  fs.mkdirSync(sheetPaths.assetFolder, { recursive: true });
+  const sheet = await executeBridgeCommand("render_large_tree_variation_sheet", {
+    filePath: sheetPaths.sheetPathAbs,
+    styleProfile,
+    variations,
+    width: args.sheetWidth,
+    height: args.sheetHeight,
+    columns: args.sheetColumns,
+  });
+
+  return toolResponseJson({
+    status: "ok",
+    styleProfile: styleProfile ?? "GeometricLowPoly",
+    availableVariations: LARGE_TREE_VARIATIONS,
+    generatedVariations: variations,
+    outputs: perVariation,
+    sheet: {
+      ...sheet,
+      unityRelativePath: sheetPaths.sheetPathRel,
+    },
+  });
+}
+
+async function tryHandleLargeTreeCoreTools(name, args) {
+  if (name === "blender_generate_large_tree") {
+    const paths = getLargeTreeOutputPaths();
+    fs.mkdirSync(paths.assetFolder, { recursive: true });
+
+    const gen = await executeBridgeCommand("generate_large_tree", {
+      assetName: LARGE_TREE_ASSET_NAME,
+      styleProfile: args.styleProfile,
+      variation: args.variation,
+    });
+    const exp = await executeBridgeCommand("export_fbx", {
+      filePath: paths.fbxPathAbs,
+      selectedOnly: true,
+    });
+
+    return toolResponseJson({
+      ...gen,
+      export: exp,
+      unityRelativePath: paths.fbxPathRel,
+    });
+  }
+
+  if (name === "blender_render_large_tree_preview") {
+    const paths = getLargeTreeOutputPaths();
+    fs.mkdirSync(paths.assetFolder, { recursive: true });
+
+    const res = await executeBridgeCommand("render_preview", {
+      assetName: LARGE_TREE_ASSET_NAME,
+      styleProfile: args.styleProfile,
+      variation: args.variation,
+      filePath: paths.previewPathAbs,
+      width: 512,
+      height: 512,
+    });
+
+    return toolResponseJson({
+      ...res,
+      unityRelativePath: paths.previewPathRel,
+    });
+  }
+
+  return null;
 }
 
 let blenderProcess = null;
@@ -45,31 +232,34 @@ function fileExists(p) {
   }
 }
 
+function getWindowsBlenderExecutableCandidates() {
+  if (!looksLikeWindows()) {
+    return [];
+  }
+
+  const base = String.raw`C:\Program Files\Blender Foundation`;
+  if (!fileExists(base)) {
+    return [];
+  }
+
+  try {
+    return fs
+      .readdirSync(base, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => path.join(base, entry.name, "blender.exe"))
+      .filter((exePath) => fileExists(exePath));
+  } catch {
+    return [];
+  }
+}
+
 function findBlenderExecutable() {
-  if (process.env.BLENDER_PATH && fileExists(process.env.BLENDER_PATH)) {
-    return process.env.BLENDER_PATH;
+  const explicitBlenderPath = process.env.BLENDER_PATH;
+  if (explicitBlenderPath && fileExists(explicitBlenderPath)) {
+    return explicitBlenderPath;
   }
 
-  // If Blender is on PATH, letting spawn resolve it is best.
-  // We'll return "blender" as a candidate.
-  const candidates = ["blender"];
-
-  if (looksLikeWindows()) {
-    const base = "C:\\Program Files\\Blender Foundation";
-    if (fileExists(base)) {
-      try {
-        const entries = fs.readdirSync(base, { withFileTypes: true });
-        for (const entry of entries) {
-          if (!entry.isDirectory()) continue;
-          const exe = path.join(base, entry.name, "blender.exe");
-          if (fileExists(exe)) candidates.unshift(exe);
-        }
-      } catch {
-        // ignore
-      }
-    }
-  }
-
+  const candidates = [...getWindowsBlenderExecutableCandidates(), "blender"];
   return candidates[0];
 }
 
@@ -124,7 +314,7 @@ async function ensureBlenderBridgeRunning() {
     throw new Error("BLENDER_MCP_NO_LAUNCH=1 is set; refusing to start Blender.");
   }
 
-  if (blenderProcess && blenderProcess.exitCode === null) {
+  if (blenderProcess?.exitCode === null) {
     return;
   }
 
@@ -336,6 +526,79 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Renders a headless PNG preview of BlenderE2EProp to Assets/Art/Environment/Props/BlenderE2EProp/Preview.png.",
         inputSchema: { type: "object", properties: {} },
       },
+      {
+        name: "blender_generate_large_tree",
+        description:
+          "Generates a deterministic LargeTree using style/variation presets (default styleProfile=GeometricLowPoly) with UV unwrap, LOD0/1/2, and collider mesh; then exports it to Assets/Art/Environment/Vegetation/LargeTree/LargeTree.fbx.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            styleProfile: {
+              type: "string",
+              description:
+                "Tree style profile. Use GeometricLowPoly (default) for faceted low-poly trees, or LegacyBroadleaf/StylizedLowPolyForestV2_CleanCanopy for the older branch-heavy style.",
+            },
+            variation: {
+              type: "string",
+              description:
+                "Variation preset name. GeometricLowPoly options: Seedling, Sapling, Young, Mature, Adult.",
+            },
+          },
+        },
+      },
+      {
+        name: "blender_render_large_tree_preview",
+        description:
+          "Renders a headless PNG preview of LargeTree to Assets/Art/Environment/Vegetation/LargeTree/Preview.png.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            styleProfile: {
+              type: "string",
+              description:
+                "Tree style profile to use if generation is needed before preview (default GeometricLowPoly).",
+            },
+            variation: {
+              type: "string",
+              description:
+                "Variation preset to use if generation is needed before preview.",
+            },
+          },
+        },
+      },
+      {
+        name: "blender_generate_large_tree_variations",
+        description:
+          "Runs one deterministic generation+export pass for each requested LargeTree variation into Assets/Art/Environment/Vegetation/LargeTree/Variants/<Variation>/, renders per-variation previews, and creates a single contact-sheet preview image.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            styleProfile: {
+              type: "string",
+              description:
+                "Tree style profile to use for all generated variations. Defaults to GeometricLowPoly.",
+            },
+            variations: {
+              type: "array",
+              items: { type: "string" },
+              description:
+                "Optional subset of variation names to generate. Defaults to all GeometricLowPoly variations.",
+            },
+            sheetWidth: {
+              type: "number",
+              description: "Contact-sheet width in pixels (default 2048).",
+            },
+            sheetHeight: {
+              type: "number",
+              description: "Contact-sheet height in pixels (default 1024).",
+            },
+            sheetColumns: {
+              type: "number",
+              description: "Contact-sheet column count (default 3).",
+            },
+          },
+        },
+      },
     ],
   };
 });
@@ -392,7 +655,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     if (name === "blender_export_fbx_to_unity") {
       const { category, assetName, selectedOnly } = args;
-      const safeAssetName = String(assetName).replace(/[^a-zA-Z0-9_\-]/g, "_");
+      const safeAssetName = String(assetName).replaceAll(/[^a-zA-Z0-9_-]/g, "_");
       const artRoot = path.join(WORKSPACE_ROOT, "Assets", "Art");
       const outDir = path.join(artRoot, ...String(category).split("/"), safeAssetName);
       fs.mkdirSync(outDir, { recursive: true });
@@ -443,6 +706,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       });
     }
 
+    const largeTreeCoreResponse = await tryHandleLargeTreeCoreTools(name, args);
+    if (largeTreeCoreResponse) {
+      return largeTreeCoreResponse;
+    }
+
+    const batchLargeTreeResponse = await tryHandleLargeTreeVariationBatchTool(name, args);
+    if (batchLargeTreeResponse) {
+      return batchLargeTreeResponse;
+    }
+
     throw new Error("Tool not found");
   } catch (e) {
     return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
@@ -451,7 +724,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 function shutdown() {
   try {
-    if (blenderProcess && blenderProcess.exitCode === null) {
+    if (blenderProcess?.exitCode === null) {
       blenderProcess.kill();
     }
   } catch {
@@ -464,4 +737,9 @@ process.on("SIGTERM", shutdown);
 process.on("exit", shutdown);
 
 const transport = new StdioServerTransport();
-server.connect(transport).catch(console.error);
+try {
+  await server.connect(transport);
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+}

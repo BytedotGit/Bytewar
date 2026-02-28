@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using ByteWar.Building;
 using ByteWar.Networking;
 using UnityEngine;
@@ -13,6 +14,14 @@ namespace ByteWar.Core
     /// </summary>
     public class AutoTestScenarioCore : IAutoTestScenario
     {
+        private const int MaxLegacyEnvironmentProps = 0;
+        private const int MinQuaterniusDecorTrees = 200;
+        private const int MinQuaterniusDecorVegetation = 300;
+        private const int MinQuaterniusDecorRocks = 180;
+        private const int MinQuaterniusShowcaseTrees = 1;
+        private const int MinQuaterniusShowcaseVegetation = 1;
+        private const int MinQuaterniusShowcaseRocks = 1;
+
         public string Name => "Core";
 
         public IEnumerator Run(AutoTesterContext ctx)
@@ -22,6 +31,14 @@ namespace ByteWar.Core
             var mainCam = ctx.MainCamera;
             var tpc = ctx.ThirdPersonCamera;
             var animator = ctx.Animator;
+
+            if (!TryValidateWorldPopulation(out string worldSummary, out string worldFailure))
+            {
+                Debug.LogError($"[AutoTester] FAIL: Core - World population sanity failed. reason='{worldFailure}' summary='{worldSummary}'");
+                Application.Quit(43);
+                yield break;
+            }
+            Debug.Log($"[AutoTester] PASS: World population sanity. {worldSummary}");
 
             // --- Player visual sanity ---
             var stamp = localPlayer.GeneratedVisualModeStamp;
@@ -322,8 +339,321 @@ namespace ByteWar.Core
             Debug.Log("[AutoTester] PASS: Core scenario complete.");
         }
 
+        internal static bool TryValidateWorldPopulation(out string summary, out string failureReason)
+        {
+            int rockClusters = 0;
+            int boulders = 0;
+            int fallenLogs = 0;
+            int biomeTrees = 0;
+            int showcaseTrees = 0;
+            int quaterniusDecorTrees = 0;
+            int quaterniusDecorVegetation = 0;
+            int quaterniusDecorRocks = 0;
+            int quaterniusShowcaseTrees = 0;
+            int quaterniusShowcaseVegetation = 0;
+            int quaterniusShowcaseRocks = 0;
+            bool hasGreybox = false;
+
+            var transforms = UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                Transform t = transforms[i];
+                if (t == null)
+                    continue;
+
+                string name = t.name;
+                if (name.StartsWith("RockCluster", StringComparison.Ordinal))
+                    rockClusters++;
+                else if (name.StartsWith("Boulder", StringComparison.Ordinal))
+                    boulders++;
+                else if (name.StartsWith("FallenLog", StringComparison.Ordinal))
+                    fallenLogs++;
+                else if (name.StartsWith("Placed_BiomeTree_", StringComparison.Ordinal))
+                    biomeTrees++;
+                else if (name.StartsWith("Placed_LargeTree_", StringComparison.Ordinal))
+                    showcaseTrees++;
+                else if (name.StartsWith("Placed_QuaterniusTree_", StringComparison.Ordinal))
+                {
+                    quaterniusDecorTrees++;
+                }
+                else if (name.StartsWith("Placed_QuaterniusVegetation_", StringComparison.Ordinal))
+                {
+                    quaterniusDecorVegetation++;
+                }
+                else if (name.StartsWith("Placed_QuaterniusRock_", StringComparison.Ordinal))
+                {
+                    quaterniusDecorRocks++;
+                }
+                else if (name.StartsWith("Showcase_QuaterniusTree_", StringComparison.Ordinal))
+                {
+                    quaterniusShowcaseTrees++;
+                }
+                else if (name.StartsWith("Showcase_QuaterniusVegetation_", StringComparison.Ordinal))
+                {
+                    quaterniusShowcaseVegetation++;
+                }
+                else if (name.StartsWith("Showcase_QuaterniusRock_", StringComparison.Ordinal))
+                {
+                    quaterniusShowcaseRocks++;
+                }
+
+                if (!hasGreybox && name.StartsWith("Greybox", StringComparison.Ordinal))
+                    hasGreybox = true;
+            }
+
+            int legacyEnvironmentProps = rockClusters + boulders + fallenLogs;
+            bool hasTerrain = Terrain.activeTerrain != null;
+
+            summary = $"terrain={hasTerrain} legacyProps={legacyEnvironmentProps} (rocks={rockClusters}, boulders={boulders}, logs={fallenLogs}) biomeTrees={biomeTrees} showcaseTrees={showcaseTrees} quaterniusTrees={quaterniusDecorTrees} quaterniusVegetation={quaterniusDecorVegetation} quaterniusRocks={quaterniusDecorRocks} quaterniusShowcaseTrees={quaterniusShowcaseTrees} quaterniusShowcaseVegetation={quaterniusShowcaseVegetation} quaterniusShowcaseRocks={quaterniusShowcaseRocks} greybox={hasGreybox}";
+
+            if (!hasTerrain)
+            {
+                failureReason = "No active terrain present.";
+                return false;
+            }
+
+            if (hasGreybox)
+            {
+                failureReason = "Greybox fallback objects detected in scene.";
+                return false;
+            }
+
+            if (legacyEnvironmentProps > MaxLegacyEnvironmentProps)
+            {
+                failureReason = $"Legacy placeholder props detected ({legacyEnvironmentProps} > {MaxLegacyEnvironmentProps}).";
+                return false;
+            }
+
+            if (quaterniusDecorTrees < MinQuaterniusDecorTrees)
+            {
+                failureReason = $"Quaternius decorative tree scatter below minimum ({quaterniusDecorTrees} < {MinQuaterniusDecorTrees}).";
+                return false;
+            }
+
+            if (quaterniusDecorVegetation < MinQuaterniusDecorVegetation)
+            {
+                failureReason = $"Quaternius decorative vegetation scatter below minimum ({quaterniusDecorVegetation} < {MinQuaterniusDecorVegetation}).";
+                return false;
+            }
+
+            if (quaterniusDecorRocks < MinQuaterniusDecorRocks)
+            {
+                failureReason = $"Quaternius decorative rock scatter below minimum ({quaterniusDecorRocks} < {MinQuaterniusDecorRocks}).";
+                return false;
+            }
+
+            if (quaterniusShowcaseTrees < MinQuaterniusShowcaseTrees)
+            {
+                failureReason = $"Grouped Quaternius tree showcase below minimum ({quaterniusShowcaseTrees} < {MinQuaterniusShowcaseTrees}).";
+                return false;
+            }
+
+            if (quaterniusShowcaseVegetation < MinQuaterniusShowcaseVegetation)
+            {
+                failureReason = $"Grouped Quaternius vegetation showcase below minimum ({quaterniusShowcaseVegetation} < {MinQuaterniusShowcaseVegetation}).";
+                return false;
+            }
+
+            if (quaterniusShowcaseRocks < MinQuaterniusShowcaseRocks)
+            {
+                failureReason = $"Grouped Quaternius rock showcase below minimum ({quaterniusShowcaseRocks} < {MinQuaterniusShowcaseRocks}).";
+                return false;
+            }
+
+            // Validate a sample of placed objects are upright (not sideways).
+            // Trees must be taller than wide; vegetation allows naturally squat plants (bushes, crops).
+            int sidewaysCount = ValidateUprightSample(transforms, "Placed_QuaterniusTree_", 20, 0.5f);
+            if (sidewaysCount > 0)
+            {
+                failureReason = $"Found {sidewaysCount} sideways Quaternius trees (height < 50% of horizontal extent). FBX axis import is broken.";
+                return false;
+            }
+
+            int sidewaysVeg = ValidateUprightSample(transforms, "Placed_QuaterniusVegetation_", 20, 0.33f);
+            if (sidewaysVeg > 0)
+            {
+                failureReason = $"Found {sidewaysVeg} sideways Quaternius vegetation (height < 33% of horizontal extent). FBX axis import is broken.";
+                return false;
+            }
+
+            int sidewaysRocks = ValidateTransformUpAlignmentSample(transforms, "Placed_QuaterniusRock_", 24, 0.65f);
+            if (sidewaysRocks > 0)
+            {
+                failureReason = $"Found {sidewaysRocks} sideways Quaternius rocks (transform up misaligned). FBX axis import is broken.";
+                return false;
+            }
+
+            int sidewaysShowcaseTrees = ValidateUprightSample(transforms, "Showcase_QuaterniusTree_", 20, 0.5f);
+            if (sidewaysShowcaseTrees > 0)
+            {
+                failureReason = $"Found {sidewaysShowcaseTrees} sideways Quaternius showcase trees (height < 50% of horizontal extent). FBX axis import is broken.";
+                return false;
+            }
+
+            int sidewaysShowcaseVegetation = ValidateUprightSample(transforms, "Showcase_QuaterniusVegetation_", 20, 0.33f);
+            if (sidewaysShowcaseVegetation > 0)
+            {
+                failureReason = $"Found {sidewaysShowcaseVegetation} sideways Quaternius showcase vegetation (height < 33% of horizontal extent). FBX axis import is broken.";
+                return false;
+            }
+
+            int sidewaysShowcaseRocks = ValidateTransformUpAlignmentSample(transforms, "Showcase_QuaterniusRock_", 16, 0.65f);
+            if (sidewaysShowcaseRocks > 0)
+            {
+                failureReason = $"Found {sidewaysShowcaseRocks} sideways Quaternius showcase rocks (transform up misaligned). FBX axis import is broken.";
+                return false;
+            }
+
+            failureReason = string.Empty;
+            return true;
+        }
+
+        private static bool TryGetRenderableBounds(GameObject root, out Bounds bounds)
+        {
+            bounds = default;
+            if (root == null)
+                return false;
+
+            bool hasBounds = false;
+            var renderers = root.GetComponentsInChildren<Renderer>(includeInactive: true);
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                var renderer = renderers[i];
+                if (renderer == null || renderer.bounds.size.sqrMagnitude <= 0.000001f)
+                    continue;
+
+                if (!hasBounds)
+                {
+                    bounds = renderer.bounds;
+                    hasBounds = true;
+                    continue;
+                }
+
+                bounds.Encapsulate(renderer.bounds);
+            }
+
+            return hasBounds;
+        }
+
         private static bool IsFinite(Vector3 v) => IsFinite(v.x) && IsFinite(v.y) && IsFinite(v.z);
         private static bool IsFinite(Quaternion q) => IsFinite(q.x) && IsFinite(q.y) && IsFinite(q.z) && IsFinite(q.w);
         private static bool IsFinite(float f) => !float.IsNaN(f) && !float.IsInfinity(f);
+
+        /// <summary>
+        /// Samples placed objects and checks if they are upright using
+        /// MeshFilter.sharedMesh.bounds transformed to world space.
+        /// Renderer.bounds is unreliable in -nographics batchmode.
+        /// Returns the count of sideways objects found.
+        /// </summary>
+        private static int ValidateUprightSample(Transform[] transforms, string namePrefix, int maxSamples, float minHeightRatio = 0.5f)
+        {
+            int sideways = 0;
+            int checked_ = 0;
+
+            for (int i = 0; i < transforms.Length && checked_ < maxSamples; i++)
+            {
+                Transform t = transforms[i];
+                if (t == null || !t.name.StartsWith(namePrefix, System.StringComparison.Ordinal))
+                    continue;
+
+                Vector3 size = ComputeMeshBoundsWorldSize(t.gameObject);
+                if (size.sqrMagnitude <= 0.0001f)
+                    continue;
+
+                checked_++;
+                float height = size.y;
+                float horizontalMax = Mathf.Max(size.x, size.z);
+
+                if (height < horizontalMax * minHeightRatio)
+                {
+                    sideways++;
+                    Debug.LogWarning($"[AutoTester] Sideways object: '{t.name}' meshBounds=({size.x:0.00}, {size.y:0.00}, {size.z:0.00}) threshold={minHeightRatio:0.00}");
+                }
+            }
+
+            return sideways;
+        }
+
+        private static int ValidateTransformUpAlignmentSample(Transform[] transforms, string namePrefix, int maxSamples, float minUpDot)
+        {
+            if (transforms == null || maxSamples <= 0)
+                return 0;
+
+            int sideways = 0;
+            int checkedCount = 0;
+
+            for (int i = 0; i < transforms.Length && checkedCount < maxSamples; i++)
+            {
+                Transform t = transforms[i];
+                if (t == null || !t.name.StartsWith(namePrefix, StringComparison.Ordinal))
+                    continue;
+
+                checkedCount++;
+                float upDot = Mathf.Abs(Vector3.Dot(t.up.normalized, Vector3.up));
+                if (upDot < minUpDot)
+                {
+                    sideways++;
+                    Debug.LogWarning($"[AutoTester] Sideways transform: '{t.name}' upDot={upDot:0.00} threshold={minUpDot:0.00}");
+                }
+            }
+
+            return sideways;
+        }
+
+        /// <summary>
+        /// Computes world-space AABB size using MeshFilter.sharedMesh.bounds.
+        /// Works in both -nographics batchmode and runtime (unlike Renderer.bounds).
+        /// </summary>
+        private static Vector3 ComputeMeshBoundsWorldSize(GameObject root)
+        {
+            if (root == null)
+                return Vector3.zero;
+
+            var meshFilters = root.GetComponentsInChildren<MeshFilter>(includeInactive: true);
+            if (meshFilters == null || meshFilters.Length == 0)
+                return Vector3.zero;
+
+            Bounds combined = default;
+            bool hasBounds = false;
+
+            for (int fi = 0; fi < meshFilters.Length; fi++)
+            {
+                var mf = meshFilters[fi];
+                if (mf == null || mf.sharedMesh == null)
+                    continue;
+
+                Bounds mb = mf.sharedMesh.bounds;
+                if (mb.size.sqrMagnitude <= 0.0001f)
+                    continue;
+
+                Matrix4x4 m = mf.transform.localToWorldMatrix;
+                Vector3 center = mb.center;
+                Vector3 ext = mb.extents;
+
+                for (int cx = -1; cx <= 1; cx += 2)
+                {
+                    for (int cy = -1; cy <= 1; cy += 2)
+                    {
+                        for (int cz = -1; cz <= 1; cz += 2)
+                        {
+                            Vector3 corner = m.MultiplyPoint3x4(
+                                center + new Vector3(ext.x * cx, ext.y * cy, ext.z * cz));
+
+                            if (!hasBounds)
+                            {
+                                combined = new Bounds(corner, Vector3.zero);
+                                hasBounds = true;
+                            }
+                            else
+                            {
+                                combined.Encapsulate(corner);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return hasBounds ? combined.size : Vector3.zero;
+        }
     }
 }

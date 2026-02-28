@@ -25,18 +25,18 @@ Policy note:
 
 ## Batch 01 - Ten Asset Targets
 
-| ID     | Category               | Target                                          | Source                         | License         | Priority | Owner       | Status      |
-| ------ | ---------------------- | ----------------------------------------------- | ------------------------------ | --------------- | -------- | ----------- | ----------- |
-| B01-01 | Characters/Player      | Player base body refresh                        | Unity Asset Store / Synty      | EULA/Commercial | P0       | Art         | Planned     |
-| B01-02 | Characters/Gear        | Starter armor set (chest/legs/helm)             | Unity Asset Store / Synty      | EULA/Commercial | P0       | Art         | Planned     |
-| B01-03 | Weapons/Melee          | Starter weapon set (axe/sword)                  | Kenney / Unity Asset Store     | CC0/EULA        | P0       | Art         | Planned     |
-| B01-04 | Environment/Vegetation | Tree family A (seedling->adult)                 | Quaternius                     | CC0             | P0       | Art         | In progress |
-| B01-05 | Environment/Rocks      | Rock/ore family A                               | Quaternius                     | CC0             | P0       | Art         | Planned     |
-| B01-06 | Buildings              | Main build set materials pass (wall/floor/roof) | First-party                    | Internal        | P0       | Art         | Planned     |
-| B01-07 | Environment/Props      | Biome prop kit (logs, stumps, foliage clutter)  | Kenney/Quaternius              | CC0             | P1       | Art         | Planned     |
-| B01-08 | Environment/Landmark   | Signature biome landmark                        | Quaternius / Unity Asset Store | CC0/EULA        | P1       | Art         | Planned     |
-| B01-09 | VFX support mesh       | Spell/gathering impact helper meshes            | First-party                    | Internal        | P1       | Tech Art    | Planned     |
-| B01-10 | UI/Preview             | Deploy radial preview stand-ins                 | First-party                    | Internal        | P1       | UI/Tech Art | Planned     |
+| ID     | Category               | Target                                          | Source                         | License         | Priority | Owner       | Status     |
+| ------ | ---------------------- | ----------------------------------------------- | ------------------------------ | --------------- | -------- | ----------- | ---------- |
+| B01-01 | Characters/Player      | Player base body refresh                        | Unity Asset Store / Synty      | EULA/Commercial | P0       | Art         | Planned    |
+| B01-02 | Characters/Gear        | Starter armor set (chest/legs/helm)             | Unity Asset Store / Synty      | EULA/Commercial | P0       | Art         | Planned    |
+| B01-03 | Weapons/Melee          | Starter weapon set (axe/sword)                  | Kenney / Unity Asset Store     | CC0/EULA        | P0       | Art         | Planned    |
+| B01-04 | Environment/Vegetation | Tree family A (seedling->adult)                 | Quaternius                     | CC0             | P0       | Art         | Integrated |
+| B01-05 | Environment/Rocks      | Rock/ore family A                               | Quaternius                     | CC0             | P0       | Art         | Planned    |
+| B01-06 | Buildings              | Main build set materials pass (wall/floor/roof) | First-party                    | Internal        | P0       | Art         | Planned    |
+| B01-07 | Environment/Props      | Biome prop kit (logs, stumps, foliage clutter)  | Kenney/Quaternius              | CC0             | P1       | Art         | Planned    |
+| B01-08 | Environment/Landmark   | Signature biome landmark                        | Quaternius / Unity Asset Store | CC0/EULA        | P1       | Art         | Planned    |
+| B01-09 | VFX support mesh       | Spell/gathering impact helper meshes            | First-party                    | Internal        | P1       | Tech Art    | Planned    |
+| B01-10 | UI/Preview             | Deploy radial preview stand-ins                 | First-party                    | Internal        | P1       | UI/Tech Art | Planned    |
 
 ## First Three Integration Targets (Execute Next)
 
@@ -68,17 +68,18 @@ Use this checklist exactly as written when dropping premade assets into the repo
 
 ### B01-04 Tree Family A (Premade Primary)
 
-| Item | Required Value |
-| --- | --- |
-| Manifest | `Assets/Art/Manifests/Batch01/B01-04_tree_family_a_adult.manifest.json` |
-| Source provider | Quaternius |
-| Destination folder | `Assets/Art/Premade/Quaternius/Environment/Vegetation/TreeFamilyA/Adult/` |
-| Required mesh filename | `tree_family_a_adult.fbx` |
-| Optional preview filename | `Preview.png` |
-| Optional collider mesh suffix | `_COL` |
-| Runtime target | `Assets/Resources/Generated/LargeTree/LargeTree.prefab` |
+| Item                          | Required Value                                                            |
+| ----------------------------- | ------------------------------------------------------------------------- |
+| Manifest                      | `Assets/Art/Manifests/Batch01/B01-04_tree_family_a_adult.manifest.json`   |
+| Source provider               | Quaternius                                                                |
+| Destination folder            | `Assets/Art/Premade/Quaternius/Environment/Vegetation/TreeFamilyA/Adult/` |
+| Required mesh filename        | `tree_family_a_adult.fbx`                                                 |
+| Optional preview filename     | `Preview.png`                                                             |
+| Optional collider mesh suffix | `_COL`                                                                    |
+| Runtime target                | `Assets/Resources/Generated/LargeTree/LargeTree.prefab`                   |
 
 Execution steps:
+
 1. Place `tree_family_a_adult.fbx` in `Assets/Art/Premade/Quaternius/Environment/Vegetation/TreeFamilyA/Adult/`.
 2. If provided, place `Preview.png` in the same folder.
 3. Run Unity batch generation: `ByteWar.Editor.MCPCommands.GenerateLargeTreeVariationPrefabs`.
@@ -87,17 +88,18 @@ Execution steps:
 
 ### B01-11 Deployable Hero Prop A (Premade Primary)
 
-| Item | Required Value |
-| --- | --- |
-| Manifest | `Assets/Art/Manifests/Batch01/B01-11_deployable_hero_prop_a.manifest.json` |
-| Source provider | Kenney |
-| Destination folder | `Assets/Art/Premade/Kenney/Environment/Props/DeployableHeroPropA/` |
-| Required mesh filename | `hero_prop_a.fbx` |
-| Optional preview filename | `Preview.png` |
-| Optional collider mesh suffix | `_COL` |
-| Runtime target | `Assets/Resources/Generated/BlenderE2EProp/BlenderE2EProp.prefab` |
+| Item                          | Required Value                                                             |
+| ----------------------------- | -------------------------------------------------------------------------- |
+| Manifest                      | `Assets/Art/Manifests/Batch01/B01-11_deployable_hero_prop_a.manifest.json` |
+| Source provider               | Kenney                                                                     |
+| Destination folder            | `Assets/Art/Premade/Kenney/Environment/Props/DeployableHeroPropA/`         |
+| Required mesh filename        | `hero_prop_a.fbx`                                                          |
+| Optional preview filename     | `Preview.png`                                                              |
+| Optional collider mesh suffix | `_COL`                                                                     |
+| Runtime target                | `Assets/Resources/Generated/BlenderE2EProp/BlenderE2EProp.prefab`          |
 
 Execution steps:
+
 1. Place `hero_prop_a.fbx` in `Assets/Art/Premade/Kenney/Environment/Props/DeployableHeroPropA/`.
 2. If provided, place `Preview.png` in the same folder.
 3. Run Unity batch generation: `ByteWar.Editor.MCPCommands.GenerateBlenderE2EProp`.
@@ -110,3 +112,25 @@ Execution steps:
 2. Manifest has real triangle counts and reviewed flags updated.
 3. Generation command exits with code `0`.
 4. `validate-pr` returns `Errors: 0`.
+
+## Execution Record (2026-02-28)
+
+Completed integrations:
+
+1. B01-04 Tree Family A
+   - Source: Quaternius `Ultimate Stylized Nature Pack` (`NormalTree_2.fbx`)
+   - Staged file: `Assets/Art/Premade/Quaternius/Environment/Vegetation/TreeFamilyA/Adult/tree_family_a_adult.fbx`
+   - Bridged generator input: `Assets/Art/Environment/Vegetation/LargeTree/LargeTree.fbx`
+   - Runtime output regenerated: `Assets/Resources/Generated/LargeTree/LargeTree.prefab`
+
+2. B01-11 Deployable Hero Prop A
+   - Source: Kenney `Nature Kit` (`campfire_logs.fbx`)
+   - Staged file: `Assets/Art/Premade/Kenney/Environment/Props/DeployableHeroPropA/hero_prop_a.fbx`
+   - Bridged generator input: `Assets/Art/Environment/Props/BlenderE2EProp/BlenderE2EProp.fbx`
+   - Runtime output regenerated: `Assets/Resources/Generated/BlenderE2EProp/BlenderE2EProp.prefab`
+
+Verification summary:
+
+- `Tools/validate-pr.ps1 -ProjectRoot . -RunPlayMode` -> `Errors: 0, Warnings: 19`
+- PlayMode totals -> `total=43 passed=43 failed=0 skipped=0`
+- Focused EditMode fixture `ByteWar.Tests.EditMode.BlenderE2EPropImportTests` -> `3/3` passed

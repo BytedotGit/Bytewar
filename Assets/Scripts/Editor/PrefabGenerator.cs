@@ -22,6 +22,11 @@ namespace ByteWar.Editor
         {
             Debug.Log($"{BuildGenPrefix} PrefabGenerator: start");
 
+            if (!DeployableAssetCatalogBuilder.TryRegenerate(out string catalogMessage))
+                Debug.LogWarning($"{BuildGenPrefix} PrefabGenerator: deployable catalog regeneration failed before prefab generation. {catalogMessage}");
+            else
+                Debug.Log($"{BuildGenPrefix} PrefabGenerator: deployable catalog ready. {catalogMessage}");
+
             string basePath = "Assets/GeneratedPrefabs";
             if (!AssetDatabase.IsValidFolder(basePath))
             {
@@ -290,6 +295,11 @@ namespace ByteWar.Editor
             networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = doorFramePrefab });
             networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = windowPrefab });
             networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = halfWallPrefab });
+
+            // Optional generated deployable assets (Resources/Generated) that can be spawned by developer placement.
+            TryAddOptionalGeneratedDeployablePrefab(networkManager, BlenderE2EPropPrefabGenerator.PrefabPath, "BlenderE2EProp");
+            TryAddOptionalGeneratedDeployablePrefab(networkManager, LargeTreePrefabGenerator.PrefabPath, "LargeTree");
+            TryAddCatalogGeneratedDeployablePrefabs(networkManager);
 
             // Wire WorldPersistence onto NetworkManager
             var worldPersistence = networkManagerObj.AddComponent<WorldPersistence>();
@@ -828,6 +838,88 @@ namespace ByteWar.Editor
             part.transform.localPosition = localPos;
             part.GetComponent<Renderer>().sharedMaterial = mat;
             Object.DestroyImmediate(part.GetComponent<Collider>());
+        }
+
+        private static void TryAddOptionalGeneratedDeployablePrefab(NetworkManager networkManager, string prefabPath, string label)
+        {
+            if (networkManager == null || networkManager.NetworkConfig == null || networkManager.NetworkConfig.Prefabs == null)
+                return;
+
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null)
+            {
+                Debug.Log($"{BuildGenPrefix} PrefabGenerator: optional deployable '{label}' missing at '{prefabPath}' (skipping registration).");
+                return;
+            }
+
+            if (prefab.GetComponent<NetworkObject>() == null)
+            {
+                Debug.LogWarning($"{BuildGenPrefix} PrefabGenerator: optional deployable '{label}' has no NetworkObject at root; cannot register for NGO spawn.");
+                return;
+            }
+
+            var prefabs = networkManager.NetworkConfig.Prefabs.Prefabs;
+            for (int i = 0; i < prefabs.Count; i++)
+            {
+                var existing = prefabs[i];
+                if (existing.Prefab == prefab)
+                {
+                    Debug.Log($"{BuildGenPrefix} PrefabGenerator: optional deployable '{label}' already registered.");
+                    return;
+                }
+            }
+
+            networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = prefab });
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: registered optional deployable '{label}' in NetworkConfig.");
+        }
+
+        private static void TryAddCatalogGeneratedDeployablePrefabs(NetworkManager networkManager)
+        {
+            if (networkManager == null || networkManager.NetworkConfig == null || networkManager.NetworkConfig.Prefabs == null)
+                return;
+
+            var catalog = AssetDatabase.LoadAssetAtPath<DeployableAssetCatalog>(DeployableAssetCatalogBuilder.CatalogAssetPath);
+            if (catalog == null || catalog.Entries == null || catalog.Entries.Count == 0)
+            {
+                Debug.Log($"{BuildGenPrefix} PrefabGenerator: deployable catalog missing or empty; skipping catalog-driven network prefab registration.");
+                return;
+            }
+
+            int attempted = 0;
+            for (int i = 0; i < catalog.Entries.Count; i++)
+            {
+                var entry = catalog.Entries[i];
+                if (entry == null || string.IsNullOrWhiteSpace(entry.ResourcePath))
+                    continue;
+
+                string resourcePath = NormalizeResourcePath(entry.ResourcePath);
+                if (string.IsNullOrEmpty(resourcePath))
+                    continue;
+
+                string prefabPath = $"Assets/Resources/{resourcePath}.prefab";
+                string label = string.IsNullOrWhiteSpace(entry.DisplayName) ? resourcePath : entry.DisplayName;
+                TryAddOptionalGeneratedDeployablePrefab(networkManager, prefabPath, label);
+                attempted++;
+            }
+
+            Debug.Log($"{BuildGenPrefix} PrefabGenerator: attempted catalog-driven deployable registration for {attempted} entry(s).");
+        }
+
+        private static string NormalizeResourcePath(string resourcePath)
+        {
+            if (string.IsNullOrWhiteSpace(resourcePath))
+                return string.Empty;
+
+            string normalized = resourcePath.Trim().Replace('\\', '/');
+            while (normalized.Contains("//", System.StringComparison.Ordinal))
+                normalized = normalized.Replace("//", "/", System.StringComparison.Ordinal);
+
+            int slash = normalized.LastIndexOf('/');
+            int dot = normalized.LastIndexOf('.');
+            if (dot > slash)
+                normalized = normalized.Substring(0, dot);
+
+            return normalized.Trim('/');
         }
     }
 }

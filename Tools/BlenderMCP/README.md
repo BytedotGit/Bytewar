@@ -39,6 +39,34 @@ The first Blender tool call will launch a background Blender process and start a
 - `blender_export_fbx`
 - `blender_export_fbx_to_unity`
 - `blender_execute_script`
+- `blender_generate_large_tree` (default `styleProfile=GeometricLowPoly`)
+- `blender_render_large_tree_preview`
+- `blender_generate_large_tree_variations`
+
+### LargeTree style/variation presets
+
+`blender_generate_large_tree` supports optional parameters:
+
+- `styleProfile`:
+  - `GeometricLowPoly` (default, faceted blocky low-poly style)
+  - `LegacyBroadleaf` / `StylizedLowPolyForestV2_CleanCanopy` (legacy branch-heavy style)
+- `variation` (used by `GeometricLowPoly`):
+  - `Seedling`
+  - `Sapling`
+  - `Young`
+  - `Mature`
+  - `Adult`
+
+### Batch variation generation
+
+`blender_generate_large_tree_variations` runs one deterministic generation/export pass per variation and writes outputs to:
+
+- `Assets/Art/Environment/Vegetation/LargeTree/Variants/<Variation>/LargeTree_<Variation>.fbx`
+- `Assets/Art/Environment/Vegetation/LargeTree/Variants/<Variation>/Preview.png`
+
+It also renders a contact-sheet preview for the generated set:
+
+- `Assets/Art/Environment/Vegetation/LargeTree/Variants/LargeTreeVariationsSheet.png`
 
 ## Notes for ByteWar
 

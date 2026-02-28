@@ -46,6 +46,9 @@ Export into these folders (created as needed):
 
 These rules exist so generated assets behave correctly when deployed in-game (collision, placement, shading, LODs), and so agents can follow a strict checklist.
 
+- Asset creation requests are treated as final-production requests by default unless the user explicitly asks for prototype/blockout output.
+- "Done" means deployable in the shipped game, not just generated geometry.
+
 ### Transforms
 
 - Apply **all** transforms before export: Location/Rotation/Scale.
@@ -72,6 +75,19 @@ Collision is convention-driven so Unity generators can be deterministic:
 
 - This project uses the Built-in Render Pipeline **Standard** shader baseline. Avoid URP/HDRP-specific materials.
 - Prefer fewer materials per asset; one material per prop is ideal for batching and performance.
+
+### Final-asset checklist (required)
+
+For assets requested as creations (default behavior), agents must deliver all of the following:
+
+- Geometry + UVs + required LODs + required collider mesh naming.
+- Production material set under the asset folder (for example `Materials/`).
+- Production texture set under the asset folder (for example `Textures/`), with deterministic generation or first-party authored sources.
+- Unity prefab wiring that actually assigns those materials/textures on renderers used in-game.
+- Preview image generation and runtime/deploy registration where applicable.
+- Automated validation (tests/autotest assertions) that fail if textures/materials are missing or unassigned.
+
+A flat color-only mesh without authored/assigned material+texture assets is not considered production-ready.
 
 ## LOD policy
 

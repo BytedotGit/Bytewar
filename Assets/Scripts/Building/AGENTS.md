@@ -1,25 +1,23 @@
-﻿# Building - Agent Guidance
+# Building - Agent Guidance
 
 ## Key classes (auto-generated)
 
-| Class                 | Base               | Interfaces                | Network | RPCs                                                                                                  |
-| --------------------- | ------------------ | ------------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
-| `BuildingController`  | `NetworkBehaviour` | -                         | Yes     | PlaceBuildingServerRpc, RemoveBuildingServerRpc, RepairBuildingServerRpc, PlayBuildingEffectClientRpc |
-| `BuildingPiece`       | `NetworkBehaviour` | IDamageable, IPersistable | Yes     | -                                                                                                     |
-| `BuildingPreview`     | ``                 | -                         | -       | -                                                                                                     |
-| `BuildingRecipe`      | `ScriptableObject` | -                         | -       | -                                                                                                     |
-| `BuildingSnap`        | ``                 | -                         | -       | -                                                                                                     |
-| `RecipeIngredient`    | ``                 | -                         | -       | -                                                                                                     |
-| `CraftingRecipe`      | `ScriptableObject` | -                         | -       | -                                                                                                     |
-| `CraftingStation`     | `NetworkBehaviour` | -                         | Yes     | -                                                                                                     |
-| `SnapPointMarker`     | `MonoBehaviour`    | -                         | -       | -                                                                                                     |
-| `StructuralIntegrity` | `MonoBehaviour`    | -                         | -       | -                                                                                                     |
-| `StructuralMaterial`  | (enum)             | -                         | -       | -                                                                                                     |
-| `ComfortSystem`       | `MonoBehaviour`    | -                         | -       | -                                                                                                     |
-| `ComfortGroup`        | (enum)             | -                         | -       | -                                                                                                     |
-| `BuildingSaveEntry`   | ``                 | -                         | -       | -                                                                                                     |
-| `WorldSaveData`       | ``                 | -                         | -       | -                                                                                                     |
-| `WorldPersistence`    | `NetworkBehaviour` | IPersistable              | Yes     | -                                                                                                     |
+| Class | Base | Interfaces | Network | RPCs |
+|-------|------|-----------|---------|------|
+| `BuildingController` | `NetworkBehaviour` | - | Yes | PlaceBuildingServerRpc, PlaceDeveloperAssetServerRpc, RemoveBuildingServerRpc, RepairBuildingServerRpc, PlayBuildingEffectClientRpc |
+| `BuildingPiece` | `NetworkBehaviour` | IDamageable, IPersistable | Yes | - |
+| `BuildingPreview` | `` | - | - | - |
+| `BuildingRecipe` | `ScriptableObject` | - | - | - |
+| `BuildingSnap` | `` | - | - | - |
+| `ComfortSystem` | `MonoBehaviour` | - | - | - |
+| `RecipeIngredient` | `` | - | - | - |
+| `CraftingRecipe` | `ScriptableObject` | - | - | - |
+| `CraftingStation` | `NetworkBehaviour` | - | Yes | - |
+| `SnapPointMarker` | `MonoBehaviour` | - | - | - |
+| `StructuralIntegrity` | `MonoBehaviour` | - | - | - |
+| `BuildingSaveEntry` | `` | - | - | - |
+| `WorldSaveData` | `` | - | - | - |
+| `WorldPersistence` | `NetworkBehaviour` | IPersistable | Yes | - |
 
 ## Invariants
 

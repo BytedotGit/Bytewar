@@ -4,6 +4,7 @@ using ByteWar.Networking;
 using System.Net;
 using System.Net.Sockets;
 using System.Linq;
+using UnityEngine;
 
 namespace ByteWar.Tests.EditMode
 {
@@ -120,6 +121,138 @@ namespace ByteWar.Tests.EditMode
             var scenarios = AutoTester.BuildScenarioList(args);
 
             Assert.IsTrue(scenarios.Any(s => s.Name == "Destruction"));
+        }
+
+        [Test]
+        public void BlenderPropLodProgression_AcceptsStrictDecreasing()
+        {
+            bool accepted = AutoTestScenarioBlenderE2EProp.IsBlenderPropLodTriangleProgressionAcceptable(180, 96, 40, out bool strict);
+
+            Assert.IsTrue(accepted);
+            Assert.IsTrue(strict);
+        }
+
+        [Test]
+        public void BlenderPropLodProgression_AcceptsFlatFallback()
+        {
+            bool accepted = AutoTestScenarioBlenderE2EProp.IsBlenderPropLodTriangleProgressionAcceptable(112, 112, 112, out bool strict);
+
+            Assert.IsTrue(accepted);
+            Assert.IsFalse(strict);
+        }
+
+        [Test]
+        public void BlenderPropLodProgression_RejectsMixedNonDecreasing()
+        {
+            bool accepted = AutoTestScenarioBlenderE2EProp.IsBlenderPropLodTriangleProgressionAcceptable(140, 140, 120, out bool strict);
+
+            Assert.IsFalse(accepted);
+            Assert.IsFalse(strict);
+        }
+
+        [Test]
+        public void GenericLodProgression_RejectsFlatFallback_WhenDisabled()
+        {
+            bool accepted = AutoTestScenarioBlenderE2EProp.IsLodTriangleProgressionAcceptable(112, 112, 112, allowFlatFallback: false, out bool strict);
+
+            Assert.IsFalse(accepted);
+            Assert.IsFalse(strict);
+        }
+
+        [Test]
+        public void GenericLodProgression_AcceptsFlatFallback_WhenEnabled()
+        {
+            bool accepted = AutoTestScenarioBlenderE2EProp.IsLodTriangleProgressionAcceptable(112, 112, 112, allowFlatFallback: true, out bool strict);
+
+            Assert.IsTrue(accepted);
+            Assert.IsFalse(strict);
+        }
+
+        [Test]
+        public void LargeTreeShowcaseMetrics_AcceptsAllRendererFallback_WhenLod0RendererArrayIsInvalid()
+        {
+            var root = new GameObject("Placed_LargeTree_Seedling");
+            Mesh mesh = null;
+            try
+            {
+                var lodGroup = root.AddComponent<LODGroup>();
+                var meshChild = new GameObject("Visual");
+                meshChild.transform.SetParent(root.transform, worldPositionStays: false);
+
+                mesh = CreateSimpleBoundsMesh(new Vector3(2f, 4f, 2f));
+                meshChild.AddComponent<MeshFilter>().sharedMesh = mesh;
+                var renderer = meshChild.AddComponent<MeshRenderer>();
+
+                lodGroup.SetLODs(new[]
+                {
+                    new LOD(0.7f, new Renderer[] { null }),
+                    new LOD(0.4f, new[] { renderer }),
+                    new LOD(0.1f, new[] { renderer }),
+                });
+                lodGroup.RecalculateBounds();
+
+                bool ok = AutoTestScenarioLargeTree.TryGetLod0SilhouetteMetricsForTests(root, out float aspect, out float canopyFootprint);
+                Assert.IsTrue(ok);
+                Assert.Greater(aspect, 0.01f);
+                Assert.Greater(canopyFootprint, 0.01f);
+            }
+            finally
+            {
+                if (mesh != null)
+                    Object.DestroyImmediate(mesh);
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
+        public void LargeTreeShowcaseMetrics_AcceptsMeshFallback_WhenNoRenderersExist()
+        {
+            var root = new GameObject("Placed_LargeTree_Seedling");
+            Mesh mesh = null;
+            try
+            {
+                var lodGroup = root.AddComponent<LODGroup>();
+                var meshChild = new GameObject("VisualMeshOnly");
+                meshChild.transform.SetParent(root.transform, worldPositionStays: false);
+
+                mesh = CreateSimpleBoundsMesh(new Vector3(1.5f, 3f, 1.5f));
+                meshChild.AddComponent<MeshFilter>().sharedMesh = mesh;
+
+                lodGroup.SetLODs(new[]
+                {
+                    new LOD(0.7f, System.Array.Empty<Renderer>()),
+                    new LOD(0.4f, System.Array.Empty<Renderer>()),
+                    new LOD(0.1f, System.Array.Empty<Renderer>()),
+                });
+                lodGroup.RecalculateBounds();
+
+                bool ok = AutoTestScenarioLargeTree.TryGetLod0SilhouetteMetricsForTests(root, out float aspect, out float canopyFootprint);
+                Assert.IsTrue(ok);
+                Assert.Greater(aspect, 0.01f);
+                Assert.Greater(canopyFootprint, 0.01f);
+            }
+            finally
+            {
+                if (mesh != null)
+                    Object.DestroyImmediate(mesh);
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        private static Mesh CreateSimpleBoundsMesh(Vector3 size)
+        {
+            var mesh = new Mesh();
+            float hx = size.x * 0.5f;
+            float hz = size.z * 0.5f;
+            mesh.vertices = new[]
+            {
+                new Vector3(-hx, 0f, -hz),
+                new Vector3(hx, 0f, -hz),
+                new Vector3(0f, size.y, hz),
+            };
+            mesh.triangles = new[] { 0, 1, 2 };
+            mesh.RecalculateBounds();
+            return mesh;
         }
     }
 }

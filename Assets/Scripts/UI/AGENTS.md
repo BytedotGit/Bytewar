@@ -2,18 +2,18 @@
 
 ## Key classes (auto-generated)
 
-| Class | Base | Interfaces | Network | RPCs |
-|-------|------|-----------|---------|------|
-| `ActionBarUI` | `MonoBehaviour` | - | - | - |
-| `ActionSlot` | `` | - | - | - |
-| `CraftingUI` | `MonoBehaviour` | - | - | - |
-| `DevConsole` | `MonoBehaviour` | - | - | - |
-| `ConsoleLine` | `` | - | - | - |
-| `EnemyHealthUI` | `MonoBehaviour` | - | - | - |
-| `EnemyTargetTracker` | `` | - | - | - |
-| `InventoryUI` | `MonoBehaviour` | - | - | - |
-| `KeybindingHUD` | `MonoBehaviour` | - | - | - |
-| `PlayerVitalsUI` | `MonoBehaviour` | - | - | - |
+| Class                | Base            | Interfaces | Network | RPCs |
+| -------------------- | --------------- | ---------- | ------- | ---- |
+| `ActionBarUI`        | `MonoBehaviour` | -          | -       | -    |
+| `ActionSlot`         | ``              | -          | -       | -    |
+| `CraftingUI`         | `MonoBehaviour` | -          | -       | -    |
+| `DevConsole`         | `MonoBehaviour` | -          | -       | -    |
+| `ConsoleLine`        | ``              | -          | -       | -    |
+| `EnemyHealthUI`      | `MonoBehaviour` | -          | -       | -    |
+| `EnemyTargetTracker` | ``              | -          | -       | -    |
+| `InventoryUI`        | `MonoBehaviour` | -          | -       | -    |
+| `KeybindingHUD`      | `MonoBehaviour` | -          | -       | -    |
+| `PlayerVitalsUI`     | `MonoBehaviour` | -          | -       | -    |
 
 ## Invariants
 

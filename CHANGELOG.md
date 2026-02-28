@@ -4,6 +4,136 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Dense Environment + Pathway Visual Pass
+
+- Locked Quaternius tree candidate sourcing to the three approved pack roots:
+  - `Ultimate Nature`
+  - `Ultimate Crops`
+  - `Stylized Nature MegaKit` (staged under `Assets/Art/Premade/Quaternius/Environment/Vegetation`)
+- Added deterministic grouped showcase placement in `EnvironmentGenerator` so Quaternius assets are visible in organized clusters near spawn:
+  - `Showcase_QuaterniusTree_*`
+  - `Showcase_QuaterniusVegetation_*`
+  - `Showcase_QuaterniusRock_*`
+- Extended Quaternius import/reimport coverage so the postprocessor and MCP reimport pass also include staged Stylized Nature MegaKit tree assets.
+- Expanded Quaternius world scatter density and composition:
+  - Trees increased to 620 placements.
+  - Vegetation increased to 1,600 placements.
+  - Added dedicated Quaternius rock scatter (`Placed_QuaterniusRock_*`) with 420 placements.
+- Added deterministic biome-aware scatter filtering in `EnvironmentGenerator` so trees, vegetation, and rocks distribute into distinct meadow/woodland/highland zones instead of uniform noise.
+- Added deterministic pathway preservation in `EnvironmentGenerator` (scatter avoids generated path corridors) to keep traversal lanes readable.
+- Upgraded `TerrainGenerator` splatmap logic to produce grass-dominant terrain with procedural dirt pathways and stronger regional variation.
+- Added terrain detail-grass generation (`DetailPrototype` + density map) so ground coverage reads as consistently grassy in playable builds.
+- Extended runtime and EditMode guards:
+  - `AutoTestScenarioCore` now validates minimum Quaternius rock population and rock orientation alignment.
+  - `GeneratorTests` now validates terrain grass/path blending, detail-grass density, Quaternius rock counts, and rock orientation.
+
+### Full Quaternius Asset Population
+
+- Expanded `EnvironmentGenerator` to use all 106 downloaded Quaternius FBX assets (34 trees + 72 vegetation) with broadened token filters and inclusion of `UltimateCrops` root.
+- Increased scatter counts: trees 400, vegetation 650 (total 1,050 placed objects).
+- Enabled `bakeAxisConversion = true` in `QuaterniusFbxPostprocessor` so all models import upright without runtime rotation corrections.
+- Set `autoUprightFromBounds: false` in scatter calls since orientation is now fixed at import time.
+- Added `ReimportQuaterniusFbx` to `MCPCommands` (called at start of `GenerateAll`) to force-apply postprocessor settings.
+- Updated test thresholds in `AutoTestScenarioCore` and `GeneratorTests` (min 200 trees, min 300 vegetation).
+- All 7 AutoTester scenarios pass; world population: 0 legacy props, 260 Quaternius trees, 420 Quaternius vegetation.
+
+### Quaternius Orientation + Legacy Pack Cleanup
+
+- Removed legacy placeholder environment prop generation/scatter from `EnvironmentGenerator` (`RockCluster`, `Boulder`, `FallenLog`) and added startup cleanup so old placed instances are purged before rescatters.
+- Removed `StylizedTree` from active Quaternius candidate roots and tightened token filtering to avoid dead/harvested/fallen/half variants that were producing flat or sideways placements.
+- Added bounds-based upright correction for Quaternius tree placement in `EnvironmentGenerator` to auto-correct sideways FBX orientations at spawn time.
+- Added `QuaterniusFbxPostprocessor` to enforce deterministic premade import settings (`bakeAxisConversion`, material import/search, no animation/avatar) for `UltimateNature` and `UltimateCrops` FBX assets.
+- Extended runtime/EditMode gates to enforce the cleanup:
+  - `AutoTestScenarioCore` now fails if legacy placeholder props are present.
+  - `GeneratorTests.SceneGenerator_CreatesTestScene` now asserts legacy placeholder props are absent.
+- Enhanced `Tools/download_quaternius_fbx.ps1` to download texture image assets alongside FBX files for `UltimateNature`/`UltimateCrops` so premade material lookups can resolve authored color maps.
+
+### Quaternius Premade Environment Scatter Integration
+
+- `EnvironmentGenerator` now performs deterministic full-map premade scatter passes using imported Quaternius FBX assets:
+  - `Placed_QuaterniusTree_*` from `StylizedTree` + `UltimateNature` candidates.
+  - `Placed_QuaterniusVegetation_*` from `UltimateCrops` + nature vegetation candidates.
+- Added premade-candidate discovery and filtering in `EnvironmentGenerator` with deterministic ordering and robust fallbacks when specific premade folders are unavailable.
+- Kept existing rock/boulder/log and resource-tree scatter paths active so gameplay-critical world interactions remain stable while visual density is upgraded.
+- Extended runtime and EditMode regression gates:
+  - `AutoTestScenarioCore` now validates minimum Quaternius decorative tree/vegetation counts.
+  - `GeneratorTests.SceneGenerator_CreatesTestScene` now asserts Quaternius scatter presence and grounding tolerances.
+
+### Full-Area Environment Population + Tree Visibility Fix
+
+- Fixed world vegetation visibility by normalizing generated `LargeTree` variation prefabs to target real-world heights (`Seedling`..`Adult` now scales to approximately `1.4m`..`7.1m` instead of sub-0.1m micro trees).
+- Expanded `EnvironmentGenerator` full-map scatter to populate the entire terrain, not just sparse outskirts:
+  - `RockCluster` increased to 220 placements
+  - `Boulder` increased to 100 placements
+  - `FallenLog` increased to 120 placements
+  - Added deterministic global `Placed_WorldTree_*` scatter pass with 220 tree instances across terrain.
+- Reduced spawn clear-zone radius during scatter from ±30m to ±14m so the world feels populated immediately while preserving a playable spawn area.
+- Extended runtime and EditMode safeguards to enforce full-area density:
+  - `AutoTestScenarioCore` now requires minimum global world-tree count and reports it in the world population summary.
+  - `GeneratorTests.SceneGenerator_CreatesTestScene` now asserts minimum dense world-tree scatter in generated scenes.
+
+### Grounding Stability Fix (No Floating / Buried Assets)
+
+- Fixed scene placement grounding in `SceneGenerator` to prioritize terrain-height sampling over generic collider raycasts, preventing trees/props from snapping onto other colliders in mid-air.
+- Added renderer-bounds bottom alignment for spawned showcase/biome objects so their visual bases sit on terrain consistently.
+- Fixed `EnvironmentGenerator` scatter placement to:
+  - sample terrain in terrain-local world bounds (instead of hardcoded extents),
+  - include terrain transform Y offset,
+  - align each spawned instance bottom to terrain using renderer/collider bounds.
+- Added EditMode regression checks in `GeneratorTests` to validate sampled world trees and environment props are not significantly floating or buried.
+- Extended `AutoTestScenarioCore` world sanity to fail when sampled world trees exceed grounding tolerance versus terrain height.
+
+### Barren Scene Hardening (Build + Runtime Guards)
+
+- Updated `BuildScript.BuildWindowsClient` to regenerate `Assets/Scenes/TestScene.unity` during pre-build generation, preventing stale barren scene snapshots from being packaged into Windows builds.
+- Added `BuildScript.EnsureGeneratedTestSceneForBuild()` with explicit validation that generated build scenes include active terrain and do not contain greybox fallback objects.
+- Hardened `SceneGenerator.TryGenerateAndPlaceTerrain()` with an emergency deterministic terrain-data path when the standard terrain asset is missing, reducing silent fallback to flat greybox scenes.
+- Extended `AutoTestScenarioCore` with world-population sanity checks (terrain present, no greybox objects, minimum environment prop density, biome tree ring, and growth-stage showcase) and a dedicated failure exit code.
+- Added EditMode regression coverage in `ProjectInputHandlingTests.BuildScript_EnsureGeneratedTestSceneForBuild_GeneratesPopulatedTerrainScene` to enforce pre-build scene population guarantees.
+
+### Terrain-First World Population Fix
+
+- Fixed `SceneGenerator.GenerateTestScene` to generate and place the procedural terrain by default (instead of always building a flat greybox ground), with deterministic fallback to greybox only if terrain data is unavailable.
+- Fixed world population flow to run `EnvironmentGenerator.GenerateEnvironment()` during scene generation when terrain is present, restoring dense rock/boulder/log scatter.
+- Fixed scene placement heights for resource nodes and enemy spawner by sampling world ground height instead of hardcoded `y=0`, preventing buried or floating gameplay objects on varied terrain.
+- Added EditMode regression coverage in `GeneratorTests.SceneGenerator_CreatesTestScene` to enforce active terrain presence, non-flat spawn-area height, populated environment prop counts, and required resource node count.
+
+### LargeTree Growth-Stage Sculpting & Placement Fixes
+
+- Fixed `ApplyGrowthStageSculpt` to preserve the mesh Z axis (world height after rotation) from radial/width scaling. Z-up meshes now have their height controlled solely by uniform scale, producing correct monotonic height progression (Seedling < Sapling < Young < Mature < Adult).
+- Clamped `CanopyYOffset` for Z-up meshes to prevent extreme mesh Y expansion that distorted world-space bounds and triggered false upright corrections.
+- Removed redundant scene-level `TryAutoUprightTreeInstance` calls from `TryPlaceLargeTreeGrowthShowcaseNearSpawn` and `TryPlaceLargeTreeBiomeRingNearSpawn` — variation prefabs already have upright correction baked in during generation.
+- Fixed silhouette evolution test to use orientation-independent aspect ratio (`max(Y,Z)` as height) for Z-up meshes.
+- Fixed branch-canopy proximity test to skip early stages (e.g. Seedling) with insufficient bark/canopy vertex separation instead of failing.
+- All 259 EditMode tests pass, Windows build succeeds, AutoTester reports all PASS markers.
+
+### TestScene Biome Density + Runtime Tree Uprightness
+
+- Expanded `SceneGenerator` near-spawn vegetation from a minimal showcase into a deterministic biome ring (32 placed `LargeTree` variants) so manual EXE launches no longer appear barren.
+- Added placement-time upright correction in `SceneGenerator` using aggregate renderer bounds (`TryAutoUprightTreeInstance` + `ResolveSceneTreeUprightRotation`) to normalize sideways premade tree orientations at scene-instantiation time.
+- Added EditMode coverage for scene-level upright resolver behavior and biome density expectations in `GeneratorTests`.
+
+### LargeTree Premade Orientation Correction
+
+- Added automatic upright correction in `LargeTreeVariationPrefabGenerator` and `LargeTreePrefabGenerator` so premade tree meshes imported with horizontal forward axes are rotated to Y-up during prefab generation.
+- Kept correction heuristic bounds-based and deterministic, with no-op behavior for already-upright meshes.
+- Added EditMode coverage in `GeneratorTests` for both resolver paths:
+  - `TreeUprightResolvers_RotateSidewaysTreesToYUp`
+  - `TreeUprightResolvers_KeepAlreadyUprightBoundsUnchanged`
+- Regenerated environment assets and rebuilt Windows client to package the corrected orientations.
+
+### Batch01 Premade Asset Integration (Tree + Deployable Prop)
+
+- Imported and staged premade CC0 assets for Batch01 targets:
+  - Tree Family A from Quaternius `Ultimate Stylized Nature Pack` (`NormalTree_2.fbx` -> `tree_family_a_adult.fbx`).
+  - Deployable Hero Prop A from Kenney `Nature Kit` (`campfire_logs.fbx` -> `hero_prop_a.fbx`).
+- Bridged staged premade assets into current generator input paths and regenerated runtime prefabs:
+  - `Assets/Resources/Generated/LargeTree/LargeTree.prefab`
+  - `Assets/Resources/Generated/BlenderE2EProp/BlenderE2EProp.prefab`
+- Hardened import generators (`BlenderE2EPropPrefabGenerator`, `LargeTreePrefabGenerator`) with fallback `LODGroup` creation when premade meshes do not include authored `_LOD0/_LOD1/_LOD2` child naming.
+- Updated EditMode import assertions to accept fallback-Lod setups (equal triangle counts across LOD levels) while still enforcing non-empty geometry.
+- Validation: `validate-pr -RunPlayMode` passed (`43/43` PlayMode), and focused EditMode fixture `BlenderE2EPropImportTests` passed (`3/3`).
+
 ### Premade-Primary Model Sourcing Policy
 
 - Locked production model sourcing to premade, license-verified assets as the default path.

@@ -1,4 +1,4 @@
-﻿# Abilities - Agent Guidance
+# Abilities - Agent Guidance
 
 ## Key classes (auto-generated)
 

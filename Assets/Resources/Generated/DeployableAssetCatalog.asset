@@ -12,4 +12,343 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f8918caf607c444c87892db32e448b4, type: 3}
   m_Name: DeployableAssetCatalog
   m_EditorClassIdentifier: ByteWar::ByteWar.UI.DeployableAssetCatalog
-  _entries: []
+  _entries:
+  - _displayName: BlenderE2EProp
+    _resourcePath: Generated/BlenderE2EProp/BlenderE2EProp
+    _previewResourcePath: Generated/BlenderE2EProp/Preview
+  - _displayName: LargeTree
+    _resourcePath: Generated/LargeTree/LargeTree
+    _previewResourcePath: Generated/LargeTree/Preview
+  - _displayName: LargeTree_Adult
+    _resourcePath: Generated/LargeTree/Variants/Adult/LargeTree_Adult
+    _previewResourcePath: Generated/LargeTree/Variants/Adult/Preview
+  - _displayName: LargeTree_Mature
+    _resourcePath: Generated/LargeTree/Variants/Mature/LargeTree_Mature
+    _previewResourcePath: Generated/LargeTree/Variants/Mature/Preview
+  - _displayName: LargeTree_Sapling
+    _resourcePath: Generated/LargeTree/Variants/Sapling/LargeTree_Sapling
+    _previewResourcePath: Generated/LargeTree/Variants/Sapling/Preview
+  - _displayName: LargeTree_Seedling
+    _resourcePath: Generated/LargeTree/Variants/Seedling/LargeTree_Seedling
+    _previewResourcePath: Generated/LargeTree/Variants/Seedling/Preview
+  - _displayName: LargeTree_Young
+    _resourcePath: Generated/LargeTree/Variants/Young/LargeTree_Young
+    _previewResourcePath: Generated/LargeTree/Variants/Young/Preview
+  - _displayName: Apple_1
+    _resourcePath: Generated/Quaternius/UltimateCrops/Apple_1
+    _previewResourcePath: 
+  - _displayName: Apple_2
+    _resourcePath: Generated/Quaternius/UltimateCrops/Apple_2
+    _previewResourcePath: 
+  - _displayName: Apple_3
+    _resourcePath: Generated/Quaternius/UltimateCrops/Apple_3
+    _previewResourcePath: 
+  - _displayName: Apple_4
+    _resourcePath: Generated/Quaternius/UltimateCrops/Apple_4
+    _previewResourcePath: 
+  - _displayName: Apple_Crop
+    _resourcePath: Generated/Quaternius/UltimateCrops/Apple_Crop
+    _previewResourcePath: 
+  - _displayName: Apple_Harvested
+    _resourcePath: Generated/Quaternius/UltimateCrops/Apple_Harvested
+    _previewResourcePath: 
+  - _displayName: Bamboo_1
+    _resourcePath: Generated/Quaternius/UltimateCrops/Bamboo_1
+    _previewResourcePath: 
+  - _displayName: Bamboo_2
+    _resourcePath: Generated/Quaternius/UltimateCrops/Bamboo_2
+    _previewResourcePath: 
+  - _displayName: Bamboo_3
+    _resourcePath: Generated/Quaternius/UltimateCrops/Bamboo_3
+    _previewResourcePath: 
+  - _displayName: Bamboo_4
+    _resourcePath: Generated/Quaternius/UltimateCrops/Bamboo_4
+    _previewResourcePath: 
+  - _displayName: Bamboo_Crop
+    _resourcePath: Generated/Quaternius/UltimateCrops/Bamboo_Crop
+    _previewResourcePath: 
+  - _displayName: Beet_1
+    _resourcePath: Generated/Quaternius/UltimateCrops/Beet_1
+    _previewResourcePath: 
+  - _displayName: Beet_2
+    _resourcePath: Generated/Quaternius/UltimateCrops/Beet_2
+    _previewResourcePath: 
+  - _displayName: Beet_3
+    _resourcePath: Generated/Quaternius/UltimateCrops/Beet_3
+    _previewResourcePath: 
+  - _displayName: Beet_4
+    _resourcePath: Generated/Quaternius/UltimateCrops/Beet_4
+    _previewResourcePath: 
+  - _displayName: Beet_Crop
+    _resourcePath: Generated/Quaternius/UltimateCrops/Beet_Crop
+    _previewResourcePath: 
+  - _displayName: BushBerries_1
+    _resourcePath: Generated/Quaternius/UltimateCrops/BushBerries_1
+    _previewResourcePath: 
+  - _displayName: BushBerries_2
+    _resourcePath: Generated/Quaternius/UltimateCrops/BushBerries_2
+    _previewResourcePath: 
+  - _displayName: BushBerries_3
+    _resourcePath: Generated/Quaternius/UltimateCrops/BushBerries_3
+    _previewResourcePath: 
+  - _displayName: BushBerries_4
+    _resourcePath: Generated/Quaternius/UltimateCrops/BushBerries_4
+    _previewResourcePath: 
+  - _displayName: BushBerries_Crop
+    _resourcePath: Generated/Quaternius/UltimateCrops/BushBerries_Crop
+    _previewResourcePath: 
+  - _displayName: BushBerries_Harvested
+    _resourcePath: Generated/Quaternius/UltimateCrops/BushBerries_Harvested
+    _previewResourcePath: 
+  - _displayName: Cactus_1
+    _resourcePath: Generated/Quaternius/UltimateCrops/Cactus_1
+    _previewResourcePath: 
+  - _displayName: Cactus_2
+    _resourcePath: Generated/Quaternius/UltimateCrops/Cactus_2
+    _previewResourcePath: 
+  - _displayName: Cactus_3
+    _resourcePath: Generated/Quaternius/UltimateCrops/Cactus_3
+    _previewResourcePath: 
+  - _displayName: Cactus_4
+    _resourcePath: Generated/Quaternius/UltimateCrops/Cactus_4
+    _previewResourcePath: 
+  - _displayName: Cactus_Crop
+    _resourcePath: Generated/Quaternius/UltimateCrops/Cactus_Crop
+    _previewResourcePath: 
+  - _displayName: Cactus_Harvested
+    _resourcePath: Generated/Quaternius/UltimateCrops/Cactus_Harvested
+    _previewResourcePath: 
+  - _displayName: Carrot_1
+    _resourcePath: Generated/Quaternius/UltimateCrops/Carrot_1
+    _previewResourcePath: 
+  - _displayName: Carrot_2
+    _resourcePath: Generated/Quaternius/UltimateCrops/Carrot_2
+    _previewResourcePath: 
+  - _displayName: Carrot_3
+    _resourcePath: Generated/Quaternius/UltimateCrops/Carrot_3
+    _previewResourcePath: 
+  - _displayName: Carrot_4
+    _resourcePath: Generated/Quaternius/UltimateCrops/Carrot_4
+    _previewResourcePath: 
+  - _displayName: Carrot_Crop
+    _resourcePath: Generated/Quaternius/UltimateCrops/Carrot_Crop
+    _previewResourcePath: 
+  - _displayName: Coconut_Half
+    _resourcePath: Generated/Quaternius/UltimateCrops/Coconut_Half
+    _previewResourcePath: 
+  - _displayName: Corn_1
+    _resourcePath: Generated/Quaternius/UltimateCrops/Corn_1
+    _previewResourcePath: 
+  - _displayName: Corn_2
+    _resourcePath: Generated/Quaternius/UltimateCrops/Corn_2
+    _previewResourcePath: 
+  - _displayName: Corn_3
+    _resourcePath: Generated/Quaternius/UltimateCrops/Corn_3
+    _previewResourcePath: 
+  - _displayName: Corn_4
+    _resourcePath: Generated/Quaternius/UltimateCrops/Corn_4
+    _previewResourcePath: 
+  - _displayName: Corn_Crop
+    _resourcePath: Generated/Quaternius/UltimateCrops/Corn_Crop
+    _previewResourcePath: 
+  - _displayName: Corn_Harvested
+    _resourcePath: Generated/Quaternius/UltimateCrops/Corn_Harvested
+    _previewResourcePath: 
+  - _displayName: Flower_1
+    _resourcePath: Generated/Quaternius/UltimateCrops/Flower_1
+    _previewResourcePath: 
+  - _displayName: Flower_2
+    _resourcePath: Generated/Quaternius/UltimateCrops/Flower_2
+    _previewResourcePath: 
+  - _displayName: Flower_3
+    _resourcePath: Generated/Quaternius/UltimateCrops/Flower_3
+    _previewResourcePath: 
+  - _displayName: Flower_4
+    _resourcePath: Generated/Quaternius/UltimateCrops/Flower_4
+    _previewResourcePath: 
+  - _displayName: Flowers_Crop
+    _resourcePath: Generated/Quaternius/UltimateCrops/Flowers_Crop
+    _previewResourcePath: 
+  - _displayName: Flowers_Harvested
+    _resourcePath: Generated/Quaternius/UltimateCrops/Flowers_Harvested
+    _previewResourcePath: 
+  - _displayName: Grass_1
+    _resourcePath: Generated/Quaternius/UltimateCrops/Grass_1
+    _previewResourcePath: 
+  - _displayName: Grass_2
+    _resourcePath: Generated/Quaternius/UltimateCrops/Grass_2
+    _previewResourcePath: 
+  - _displayName: Grass_3
+    _resourcePath: Generated/Quaternius/UltimateCrops/Grass_3
+    _previewResourcePath: 
+  - _displayName: Grass_4
+    _resourcePath: Generated/Quaternius/UltimateCrops/Grass_4
+    _previewResourcePath: 
+  - _displayName: BirchTree_1
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_1
+    _previewResourcePath: 
+  - _displayName: BirchTree_2
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_2
+    _previewResourcePath: 
+  - _displayName: BirchTree_3
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_3
+    _previewResourcePath: 
+  - _displayName: BirchTree_4
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_4
+    _previewResourcePath: 
+  - _displayName: BirchTree_5
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_5
+    _previewResourcePath: 
+  - _displayName: BirchTree_Autumn_1
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Autumn_1
+    _previewResourcePath: 
+  - _displayName: BirchTree_Autumn_2
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Autumn_2
+    _previewResourcePath: 
+  - _displayName: BirchTree_Autumn_3
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Autumn_3
+    _previewResourcePath: 
+  - _displayName: BirchTree_Autumn_4
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Autumn_4
+    _previewResourcePath: 
+  - _displayName: BirchTree_Autumn_5
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Autumn_5
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_1
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_1
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_2
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_2
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_3
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_3
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_4
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_4
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_5
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_5
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_Snow_1
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_Snow_1
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_Snow_2
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_Snow_2
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_Snow_3
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_Snow_3
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_Snow_4
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_Snow_4
+    _previewResourcePath: 
+  - _displayName: BirchTree_Dead_Snow_5
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Dead_Snow_5
+    _previewResourcePath: 
+  - _displayName: BirchTree_Snow_1
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Snow_1
+    _previewResourcePath: 
+  - _displayName: BirchTree_Snow_2
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Snow_2
+    _previewResourcePath: 
+  - _displayName: BirchTree_Snow_3
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Snow_3
+    _previewResourcePath: 
+  - _displayName: BirchTree_Snow_4
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Snow_4
+    _previewResourcePath: 
+  - _displayName: BirchTree_Snow_5
+    _resourcePath: Generated/Quaternius/UltimateNature/BirchTree_Snow_5
+    _previewResourcePath: 
+  - _displayName: BushBerries_1
+    _resourcePath: Generated/Quaternius/UltimateNature/BushBerries_1
+    _previewResourcePath: 
+  - _displayName: BushBerries_2
+    _resourcePath: Generated/Quaternius/UltimateNature/BushBerries_2
+    _previewResourcePath: 
+  - _displayName: BushBerries_3
+    _resourcePath: Generated/Quaternius/UltimateNature/BushBerries_3
+    _previewResourcePath: 
+  - _displayName: BushBerries_4
+    _resourcePath: Generated/Quaternius/UltimateNature/BushBerries_4
+    _previewResourcePath: 
+  - _displayName: BushBerries_Crop
+    _resourcePath: Generated/Quaternius/UltimateNature/BushBerries_Crop
+    _previewResourcePath: 
+  - _displayName: BushBerries_Harvested
+    _resourcePath: Generated/Quaternius/UltimateNature/BushBerries_Harvested
+    _previewResourcePath: 
+  - _displayName: Bush_1
+    _resourcePath: Generated/Quaternius/UltimateNature/Bush_1
+    _previewResourcePath: 
+  - _displayName: Bush_2
+    _resourcePath: Generated/Quaternius/UltimateNature/Bush_2
+    _previewResourcePath: 
+  - _displayName: Bush_Snow_1
+    _resourcePath: Generated/Quaternius/UltimateNature/Bush_Snow_1
+    _previewResourcePath: 
+  - _displayName: Bush_Snow_2
+    _resourcePath: Generated/Quaternius/UltimateNature/Bush_Snow_2
+    _previewResourcePath: 
+  - _displayName: CactusFlower_1
+    _resourcePath: Generated/Quaternius/UltimateNature/CactusFlower_1
+    _previewResourcePath: 
+  - _displayName: CactusFlowers_2
+    _resourcePath: Generated/Quaternius/UltimateNature/CactusFlowers_2
+    _previewResourcePath: 
+  - _displayName: CactusFlowers_3
+    _resourcePath: Generated/Quaternius/UltimateNature/CactusFlowers_3
+    _previewResourcePath: 
+  - _displayName: CactusFlowers_4
+    _resourcePath: Generated/Quaternius/UltimateNature/CactusFlowers_4
+    _previewResourcePath: 
+  - _displayName: CactusFlowers_5
+    _resourcePath: Generated/Quaternius/UltimateNature/CactusFlowers_5
+    _previewResourcePath: 
+  - _displayName: Cactus_1
+    _resourcePath: Generated/Quaternius/UltimateNature/Cactus_1
+    _previewResourcePath: 
+  - _displayName: Cactus_2
+    _resourcePath: Generated/Quaternius/UltimateNature/Cactus_2
+    _previewResourcePath: 
+  - _displayName: Cactus_3
+    _resourcePath: Generated/Quaternius/UltimateNature/Cactus_3
+    _previewResourcePath: 
+  - _displayName: Cactus_4
+    _resourcePath: Generated/Quaternius/UltimateNature/Cactus_4
+    _previewResourcePath: 
+  - _displayName: Cactus_5
+    _resourcePath: Generated/Quaternius/UltimateNature/Cactus_5
+    _previewResourcePath: 
+  - _displayName: Cactus_Crop
+    _resourcePath: Generated/Quaternius/UltimateNature/Cactus_Crop
+    _previewResourcePath: 
+  - _displayName: Cactus_Harvested
+    _resourcePath: Generated/Quaternius/UltimateNature/Cactus_Harvested
+    _previewResourcePath: 
+  - _displayName: CommonTree_1
+    _resourcePath: Generated/Quaternius/UltimateNature/CommonTree_1
+    _previewResourcePath: 
+  - _displayName: CommonTree_2
+    _resourcePath: Generated/Quaternius/UltimateNature/CommonTree_2
+    _previewResourcePath: 
+  - _displayName: CommonTree_3
+    _resourcePath: Generated/Quaternius/UltimateNature/CommonTree_3
+    _previewResourcePath: 
+  - _displayName: CommonTree_4
+    _resourcePath: Generated/Quaternius/UltimateNature/CommonTree_4
+    _previewResourcePath: 
+  - _displayName: CommonTree_5
+    _resourcePath: Generated/Quaternius/UltimateNature/CommonTree_5
+    _previewResourcePath: 
+  - _displayName: CommonTree_Autumn_1
+    _resourcePath: Generated/Quaternius/UltimateNature/CommonTree_Autumn_1
+    _previewResourcePath: 
+  - _displayName: CommonTree_Autumn_2
+    _resourcePath: Generated/Quaternius/UltimateNature/CommonTree_Autumn_2
+    _previewResourcePath: 
+  - _displayName: CommonTree_Autumn_3
+    _resourcePath: Generated/Quaternius/UltimateNature/CommonTree_Autumn_3
+    _previewResourcePath: 
+  - _displayName: CommonTree_Autumn_4
+    _resourcePath: Generated/Quaternius/UltimateNature/CommonTree_Autumn_4
+    _previewResourcePath: 

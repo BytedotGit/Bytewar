@@ -201,8 +201,8 @@ if ($publicFieldFindings.Count -gt 0) {
     }
     else {
         $groupedFindings = $publicFieldFindings |
-            Group-Object -Property Path |
-            Sort-Object -Property Count -Descending
+        Group-Object -Property Path |
+        Sort-Object -Property Count -Descending
 
         $warnings += "PUBLIC FIELD SUMMARY: $($publicFieldFindings.Count) finding(s) across $($groupedFindings.Count) file(s)."
 

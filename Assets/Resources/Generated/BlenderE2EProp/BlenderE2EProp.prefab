@@ -41,8 +41,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1484773391366000507}
-  - component: {fileID: 2798415686172778000}
-  - component: {fileID: 3395851179496376175}
+  - component: {fileID: 3809540186027791919}
+  - component: {fileID: 8089246393054793377}
+  - component: {fileID: 7208348015624272240}
+  - component: {fileID: 4876950934166130739}
   m_Layer: 0
   m_Name: BlenderE2EProp
   m_TagString: Untagged
@@ -66,7 +68,78 @@ Transform:
   - {fileID: 4181691554426904577}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!205 &2798415686172778000
+--- !u!114 &3809540186027791919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6283276787546792111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &8089246393054793377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6283276787546792111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkTransform
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AutoOwnerAuthorityTickOffset: 1
+  PositionInterpolationType: 0
+  RotationInterpolationType: 0
+  ScaleInterpolationType: 0
+  PositionLerpSmoothing: 1
+  PositionMaxInterpolationTime: 0.1
+  RotationLerpSmoothing: 1
+  RotationMaxInterpolationTime: 0.1
+  ScaleLerpSmoothing: 1
+  ScaleMaxInterpolationTime: 0.1
+  AuthorityMode: 0
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!205 &7208348015624272240
 LODGroup:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -74,8 +147,8 @@ LODGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6283276787546792111}
   serializedVersion: 2
-  m_LocalReferencePoint: {x: 0.009882629, y: 0.58610547, z: -0.016582936}
-  m_Size: 1.1118424
+  m_LocalReferencePoint: {x: 0, y: 0.031299915, z: 0}
+  m_Size: 0.29185238
   m_FadeMode: 0
   m_AnimateCrossFading: 0
   m_LastLODIsBillboard: 0
@@ -83,18 +156,18 @@ LODGroup:
   - screenRelativeHeight: 0.6
     fadeTransitionWidth: 0
     renderers:
-    - renderer: {fileID: 7993737406262742047}
+    - renderer: {fileID: 2059957080127424658}
   - screenRelativeHeight: 0.2
     fadeTransitionWidth: 0
     renderers:
-    - renderer: {fileID: 6038971793093332371}
+    - renderer: {fileID: 2059957080127424658}
   - screenRelativeHeight: 0.05
     fadeTransitionWidth: 0
     renderers:
-    - renderer: {fileID: 1333121374437670050}
+    - renderer: {fileID: 2059957080127424658}
   m_Enabled: 1
---- !u!64 &3395851179496376175
-MeshCollider:
+--- !u!65 &4876950934166130739
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -111,10 +184,9 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300000, guid: 4ed8222100067cb4e90ba5c0ea2171a9, type: 2}
+  serializedVersion: 3
+  m_Size: {x: 0.29185238, y: 0.06259983, z: 0.29185238}
+  m_Center: {x: 0, y: 0.031299915, z: 0}
 --- !u!1001 &817374388837504022
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -163,10 +235,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -1823908802153824242, guid: 007dc02e28c2e7e459de9ddcf4b94a52, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 007dc02e28c2e7e459de9ddcf4b94a52, type: 3}
       propertyPath: m_Name
       value: BlenderE2EProp
@@ -181,18 +249,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 007dc02e28c2e7e459de9ddcf4b94a52, type: 3}
   m_PrefabInstance: {fileID: 817374388837504022}
   m_PrefabAsset: {fileID: 0}
---- !u!23 &1333121374437670050 stripped
+--- !u!23 &2059957080127424658 stripped
 MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -7361178127013304140, guid: 007dc02e28c2e7e459de9ddcf4b94a52, type: 3}
-  m_PrefabInstance: {fileID: 817374388837504022}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &6038971793093332371 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 6384232304088701317, guid: 007dc02e28c2e7e459de9ddcf4b94a52, type: 3}
-  m_PrefabInstance: {fileID: 817374388837504022}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &7993737406262742047 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7329767258197219337, guid: 007dc02e28c2e7e459de9ddcf4b94a52, type: 3}
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 007dc02e28c2e7e459de9ddcf4b94a52, type: 3}
   m_PrefabInstance: {fileID: 817374388837504022}
   m_PrefabAsset: {fileID: 0}

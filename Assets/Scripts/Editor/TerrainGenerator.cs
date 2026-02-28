@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System;
+using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 namespace ByteWar.Editor
 {
@@ -14,6 +17,48 @@ namespace ByteWar.Editor
         private const string BasePath = "Assets/GeneratedPrefabs";
         private const string TdPath = "Assets/GeneratedPrefabs/GeneratedTerrainData.asset";
         private const string TreePrefabPath = "Assets/GeneratedPrefabs/TreePrefab.prefab";
+        private const string LargeTreeGeneratedPrefabPath = "Assets/Resources/Generated/LargeTree/LargeTree.prefab";
+        private const string LargeTreeVariationProfilePath = "Assets/GeneratedPrefabs/LargeTreeVariationProfile.asset";
+        private const string LargeTreeVariationArtRoot = "Assets/Art/Environment/Vegetation/LargeTree/Variants";
+        private const string LargeTreeVariationGeneratedRoot = "Assets/Resources/Generated/LargeTree/Variants";
+        private const string DetailGrassTexturePath = "Assets/GeneratedPrefabs/DetailGrassTex.png";
+        private const float MainPathHalfWidthNormalized = 0.020f;
+        private const float BranchPathHalfWidthNormalized = 0.016f;
+        private static readonly Vector2[] MainPathPointsNormalized =
+        {
+            new Vector2(0.325f, 0.375f),
+            new Vector2(0.440f, 0.460f),
+            new Vector2(0.550f, 0.525f),
+            new Vector2(0.660f, 0.600f),
+        };
+        private static readonly Vector2[] BranchPathPointsNormalizedA =
+        {
+            new Vector2(0.440f, 0.460f),
+            new Vector2(0.485f, 0.610f),
+            new Vector2(0.610f, 0.690f),
+        };
+        private static readonly Vector2[] BranchPathPointsNormalizedB =
+        {
+            new Vector2(0.440f, 0.460f),
+            new Vector2(0.360f, 0.590f),
+        };
+        private static readonly string[] LargeTreeVariationNames =
+        {
+            "Seedling",
+            "Sapling",
+            "Young",
+            "Mature",
+            "Adult",
+        };
+
+        private static readonly string[] LegacyLargeTreeVariationNames =
+        {
+            "BroadleafClassic",
+            "BroadleafWide",
+            "BroadleafTall",
+            "PineA",
+            "PineClustered",
+        };
 
         [MenuItem("ByteWar/Generate Terrain")]
         public static void GenerateTerrain()
@@ -21,9 +66,12 @@ namespace ByteWar.Editor
             Debug.Log("[TerrainGenerator] Starting high-quality terrain generation...");
             EnsureFolder(BasePath);
 
-            // ── Step 1: Tree prefab (must exist before TerrainData references it) ──────
-            GameObject treePrefab = GenerateTreePrefab();
-            Debug.Log("[TerrainGenerator] Tree prefab ready.");
+            // Attempt to materialize runtime-ready variation prefabs before building terrain prototypes.
+            LargeTreeVariationPrefabGenerator.GenerateAll();
+
+            // ── Step 1: Terrain tree prototypes are intentionally disabled ───────────
+            // Quaternius world scatter now drives environment visuals and Building UI parity.
+            Debug.Log("[TerrainGenerator] Terrain tree prototypes disabled; scene uses Quaternius world scatter instead.");
 
             // ── Step 2: Terrain Layers (4 biomes) saved as assets ────────────────────
             TerrainLayer[] layers = new TerrainLayer[]
@@ -77,10 +125,22 @@ namespace ByteWar.Editor
                     float h = td.GetInterpolatedHeight(nx, nz) / td.size.y;   // 0-1
                     float sl = td.GetSteepness(nx, nz) / 90f;                   // 0-1
 
-                    float grass = Mathf.Clamp01(1f - sl * 3.5f - Mathf.Max(0, h - 0.55f) * 5f);
-                    float dirt = Mathf.Clamp01(0.4f - sl * 1.5f - Mathf.Abs(h - 0.25f) * 4f);
-                    float rock = Mathf.Clamp01(sl * 2.8f + Mathf.Max(0, h - 0.60f) * 4f);
-                    float snow = Mathf.Clamp01(Mathf.Max(0, h - 0.70f) * 10f);
+                    float cx = (nx - 0.5f) * 2f;
+                    float cz = (nz - 0.5f) * 2f;
+                    float radial = Mathf.Clamp01(Mathf.Sqrt((cx * cx) + (cz * cz)));
+                    float terrainNoise = Mathf.PerlinNoise(nx * 3.8f + 17.4f, nz * 3.8f + 41.8f);
+                    float pathMask = EvaluatePathMaskNormalized(nx, nz);
+
+                    float meadow = Mathf.Clamp01((1f - radial) * 0.90f + (0.42f - h) * 1.45f + (terrainNoise - 0.5f) * 0.30f);
+                    float highland = Mathf.Clamp01((cz + 0.25f) * 0.90f + (h - 0.42f) * 1.85f + (terrainNoise - 0.5f) * 0.38f);
+                    float woodland = Mathf.Clamp01(0.48f + (1f - Mathf.Abs(cx)) * 0.32f + (terrainNoise - 0.5f) * 0.42f - highland * 0.20f);
+
+                    float grass = Mathf.Clamp01(0.62f + meadow * 0.45f + woodland * 0.25f - sl * 0.55f - highland * 0.24f - pathMask * 0.22f);
+                    float dirt = Mathf.Clamp01(0.09f + pathMask * 1.55f + meadow * 0.14f + Mathf.Clamp01(0.25f - h) * 0.20f);
+                    float rock = Mathf.Clamp01(0.10f + sl * 1.45f + highland * 0.66f + Mathf.Clamp01(h - 0.58f) * 0.85f - meadow * 0.15f - pathMask * 0.35f);
+                    float snow = Mathf.Clamp01((h - 0.78f) * 5.0f + highland * 0.25f - pathMask * 0.45f);
+
+                    grass = Mathf.Max(grass, 0.06f);
 
                     float total = grass + dirt + rock + snow + 0.0001f;
                     splatmap[z, x, 0] = grass / total;
@@ -90,43 +150,13 @@ namespace ByteWar.Editor
                 }
             }
             td.SetAlphamaps(0, 0, splatmap);
-            Debug.Log("[TerrainGenerator] Splatmap computed.");
+            SetupDetailGrass(td, splatmap);
+            Debug.Log("[TerrainGenerator] Splatmap and grass details computed.");
 
-            // ── Step 5: Trees ─────────────────────────────────────────────────────────
-            td.treePrototypes = new TreePrototype[]
-            {
-                new TreePrototype { prefab = treePrefab, bendFactor = 0.25f }
-            };
-
-            var trees = new System.Collections.Generic.List<TreeInstance>();
-            var rng = new System.Random(12345);
-            int attempts = 0;
-            while (trees.Count < 400 && attempts < 5000)
-            {
-                attempts++;
-                float tx = (float)rng.NextDouble();
-                float tz = (float)rng.NextDouble();
-                float h = td.GetInterpolatedHeight(tx, tz) / td.size.y;
-                float sl = td.GetSteepness(tx, tz);
-
-                // Avoid spawn area and extreme heights / steep slopes
-                float dx = tx - 0.5f, dz = tz - 0.5f;
-                if (Mathf.Sqrt(dx * dx + dz * dz) < 0.12f) continue;
-                if (h < 0.04f || h > 0.52f || sl > 28f) continue;
-
-                float scale = 0.75f + (float)rng.NextDouble() * 0.55f;
-                trees.Add(new TreeInstance
-                {
-                    position = new Vector3(tx, 0, tz),
-                    widthScale = scale,
-                    heightScale = scale * (0.9f + (float)rng.NextDouble() * 0.3f),
-                    prototypeIndex = 0,
-                    color = new Color(0.8f + (float)rng.NextDouble() * 0.2f, 1f, 0.8f),
-                    lightmapColor = Color.white
-                });
-            }
-            td.treeInstances = trees.ToArray();
-            Debug.Log($"[TerrainGenerator] Placed {trees.Count} trees.");
+            // ── Step 5: Trees (disabled) ─────────────────────────────────────────────
+            td.treePrototypes = Array.Empty<TreePrototype>();
+            td.treeInstances = Array.Empty<TreeInstance>();
+            Debug.Log("[TerrainGenerator] Cleared terrain tree instances.");
 
             // ── Step 6: Save TerrainData ──────────────────────────────────────────────
             DeleteAsset(TdPath);
@@ -174,7 +204,6 @@ namespace ByteWar.Editor
             Object.DestroyImmediate(tex);
             AssetDatabase.ImportAsset(texPath);
 
-            var ti = new TextureImporter();
             Texture2D imported = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
 
             string layPath = $"{BasePath}/{name}.terrainlayer";
@@ -188,6 +217,150 @@ namespace ByteWar.Editor
             };
             AssetDatabase.CreateAsset(layer, layPath);
             return AssetDatabase.LoadAssetAtPath<TerrainLayer>(layPath);
+        }
+
+        private static void SetupDetailGrass(TerrainData td, float[,,] splatmap)
+        {
+            if (td == null || splatmap == null)
+                return;
+
+            Texture2D detailTexture = CreateOrLoadDetailGrassTexture();
+            if (detailTexture == null)
+            {
+                Debug.LogWarning("[TerrainGenerator] Grass detail texture unavailable, skipping detail grass generation.");
+                return;
+            }
+
+            td.SetDetailResolution(1024, 16);
+            td.detailPrototypes = new[]
+            {
+                new DetailPrototype
+                {
+                    prototypeTexture = detailTexture,
+                    renderMode = DetailRenderMode.GrassBillboard,
+                    healthyColor = new Color(0.30f, 0.62f, 0.24f, 1f),
+                    dryColor = new Color(0.43f, 0.56f, 0.28f, 1f),
+                    minWidth = 0.55f,
+                    maxWidth = 1.30f,
+                    minHeight = 0.60f,
+                    maxHeight = 1.45f,
+                    noiseSpread = 0.20f,
+                    usePrototypeMesh = false,
+                },
+            };
+
+            int width = td.detailWidth;
+            int height = td.detailHeight;
+            int[,] density = new int[height, width];
+
+            for (int y = 0; y < height; y++)
+            {
+                float nz = y / (float)Mathf.Max(1, height - 1);
+                for (int x = 0; x < width; x++)
+                {
+                    float nx = x / (float)Mathf.Max(1, width - 1);
+                    float grassWeight = SampleSplatWeight(splatmap, td.alphamapWidth, td.alphamapHeight, nx, nz, 0);
+                    float steepness = td.GetSteepness(nx, nz) / 90f;
+                    float pathMask = EvaluatePathMaskNormalized(nx, nz);
+
+                    float detailNoise = Mathf.PerlinNoise(nx * 24f + 1.7f, nz * 24f + 7.9f);
+                    float densityFloat = (grassWeight * 24f) + ((1f - pathMask) * 10f) + ((detailNoise - 0.5f) * 4f);
+                    densityFloat -= steepness * 16f;
+
+                    if (pathMask > 0.35f)
+                        densityFloat *= 0.22f;
+                    if (steepness > 0.45f)
+                        densityFloat *= 0.35f;
+
+                    density[y, x] = Mathf.Clamp(Mathf.RoundToInt(densityFloat), 0, 36);
+                }
+            }
+
+            td.SetDetailLayer(0, 0, 0, density);
+        }
+
+        private static Texture2D CreateOrLoadDetailGrassTexture()
+        {
+            DeleteAsset(DetailGrassTexturePath);
+
+            const int size = 64;
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            tex.wrapMode = TextureWrapMode.Clamp;
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float nx = x / (float)(size - 1);
+                    float ny = y / (float)(size - 1);
+                    float centerDist = Vector2.Distance(new Vector2(nx, ny), Vector2.one * 0.5f);
+                    float feather = Mathf.Clamp01(1f - (centerDist * 2.05f));
+                    float noise = Mathf.PerlinNoise(nx * 6.2f + 0.9f, ny * 6.2f + 4.1f);
+                    float alpha = Mathf.Clamp01((feather * 0.88f) + (noise * 0.22f));
+                    tex.SetPixel(x, y, new Color(0.33f, 0.66f, 0.30f, alpha));
+                }
+            }
+
+            tex.Apply();
+            File.WriteAllBytes(DetailGrassTexturePath, tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset(DetailGrassTexturePath, ImportAssetOptions.ForceUpdate);
+
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(DetailGrassTexturePath);
+        }
+
+        private static float SampleSplatWeight(float[,,] splatmap, int alphaWidth, int alphaHeight, float nx, float nz, int channel)
+        {
+            if (splatmap == null)
+                return 0f;
+
+            int x = Mathf.Clamp(Mathf.RoundToInt(nx * Mathf.Max(1, alphaWidth - 1)), 0, Mathf.Max(0, alphaWidth - 1));
+            int z = Mathf.Clamp(Mathf.RoundToInt(nz * Mathf.Max(1, alphaHeight - 1)), 0, Mathf.Max(0, alphaHeight - 1));
+            return splatmap[z, x, channel];
+        }
+
+        private static float EvaluatePathMaskNormalized(float nx, float nz)
+        {
+            Vector2 point = new Vector2(nx, nz);
+
+            float distanceMain = DistanceToPathChainNormalized(point, MainPathPointsNormalized);
+            float distanceBranchA = DistanceToPathChainNormalized(point, BranchPathPointsNormalizedA);
+            float distanceBranchB = DistanceToPathChainNormalized(point, BranchPathPointsNormalizedB);
+
+            float pathDistance = Mathf.Min(distanceMain, Mathf.Min(distanceBranchA, distanceBranchB));
+            float baseWidth = pathDistance == distanceMain ? MainPathHalfWidthNormalized : BranchPathHalfWidthNormalized;
+
+            float widthNoise = Mathf.PerlinNoise(nx * 13.5f + 2.2f, nz * 13.5f + 6.4f);
+            float effectiveWidth = baseWidth * Mathf.Lerp(0.80f, 1.30f, widthNoise);
+            return Mathf.Clamp01(1f - (pathDistance / Mathf.Max(0.0001f, effectiveWidth)));
+        }
+
+        private static float DistanceToPathChainNormalized(Vector2 point, Vector2[] points)
+        {
+            if (points == null || points.Length < 2)
+                return float.MaxValue;
+
+            float minDistance = float.MaxValue;
+            for (int i = 1; i < points.Length; i++)
+            {
+                float distance = DistancePointToSegment(point, points[i - 1], points[i]);
+                if (distance < minDistance)
+                    minDistance = distance;
+            }
+
+            return minDistance;
+        }
+
+        private static float DistancePointToSegment(Vector2 point, Vector2 segmentA, Vector2 segmentB)
+        {
+            Vector2 ab = segmentB - segmentA;
+            float abSqr = ab.sqrMagnitude;
+            if (abSqr <= 0.00001f)
+                return Vector2.Distance(point, segmentA);
+
+            float t = Mathf.Clamp01(Vector2.Dot(point - segmentA, ab) / abSqr);
+            Vector2 closest = segmentA + (ab * t);
+            return Vector2.Distance(point, closest);
         }
 
         private static GameObject GenerateTreePrefab()
@@ -237,6 +410,171 @@ namespace ByteWar.Editor
             return prefab;
         }
 
+        public static int SelectWeightedPrototypeIndex(System.Random rng, IReadOnlyList<float> weights)
+        {
+            if (rng == null)
+                throw new ArgumentNullException(nameof(rng));
+
+            if (weights == null || weights.Count == 0)
+                return 0;
+
+            float totalWeight = 0f;
+            for (int i = 0; i < weights.Count; i++)
+                totalWeight += Mathf.Max(0f, weights[i]);
+
+            if (totalWeight <= 0f)
+                return 0;
+
+            float roll = (float)rng.NextDouble() * totalWeight;
+            float cumulative = 0f;
+            for (int i = 0; i < weights.Count; i++)
+            {
+                cumulative += Mathf.Max(0f, weights[i]);
+                if (roll <= cumulative)
+                    return i;
+            }
+
+            return weights.Count - 1;
+        }
+
+        private static TerrainTreePrototypeSet ResolveTerrainTreePrototypeSet()
+        {
+            var prototypes = new List<TreePrototype>();
+            var weights = new List<float>();
+
+            var profile = LoadOrCreateLargeTreeVariationProfile();
+            if (profile != null)
+            {
+                foreach (var entry in profile.Entries)
+                {
+                    if (entry == null || entry.Weight <= 0f)
+                        continue;
+
+                    GameObject prefab = entry.Prefab;
+                    if (prefab == null)
+                        prefab = TryLoadLargeTreeVariationPrefab(entry.VariationName);
+                    if (prefab == null)
+                        continue;
+
+                    prototypes.Add(new TreePrototype { prefab = prefab, bendFactor = 0.25f });
+                    weights.Add(entry.Weight);
+                }
+            }
+
+            if (prototypes.Count > 0)
+                return new TerrainTreePrototypeSet(prototypes.ToArray(), weights.ToArray());
+
+            var fallbackPrefab = ResolveTerrainTreeFallbackPrefab();
+            return new TerrainTreePrototypeSet(
+                new[] { new TreePrototype { prefab = fallbackPrefab, bendFactor = 0.25f } },
+                new[] { 1f });
+        }
+
+        private static LargeTreeVariationProfile LoadOrCreateLargeTreeVariationProfile()
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<LargeTreeVariationProfile>(LargeTreeVariationProfilePath);
+            if (profile != null)
+            {
+                if (NeedsGrowthStageProfileMigration(profile.Entries))
+                {
+                    profile.SetEntries(BuildDefaultLargeTreeVariationEntries());
+                    EditorUtility.SetDirty(profile);
+                    AssetDatabase.SaveAssets();
+                    Debug.Log($"[TerrainGenerator] Migrated LargeTree variation profile to growth stages at '{LargeTreeVariationProfilePath}'.");
+                }
+
+                return profile;
+            }
+
+            EnsureFolder(BasePath);
+
+            profile = ScriptableObject.CreateInstance<LargeTreeVariationProfile>();
+            profile.SetEntries(BuildDefaultLargeTreeVariationEntries());
+
+            AssetDatabase.CreateAsset(profile, LargeTreeVariationProfilePath);
+            AssetDatabase.ImportAsset(LargeTreeVariationProfilePath, ImportAssetOptions.ForceUpdate);
+            AssetDatabase.SaveAssets();
+
+            Debug.Log($"[TerrainGenerator] Created LargeTree variation profile at '{LargeTreeVariationProfilePath}'.");
+            return profile;
+        }
+
+        private static List<LargeTreeVariationProfileEntry> BuildDefaultLargeTreeVariationEntries()
+        {
+            return new List<LargeTreeVariationProfileEntry>
+            {
+                new LargeTreeVariationProfileEntry("Seedling", TryLoadLargeTreeVariationPrefab("Seedling"), 0.16f),
+                new LargeTreeVariationProfileEntry("Sapling", TryLoadLargeTreeVariationPrefab("Sapling"), 0.24f),
+                new LargeTreeVariationProfileEntry("Young", TryLoadLargeTreeVariationPrefab("Young"), 0.28f),
+                new LargeTreeVariationProfileEntry("Mature", TryLoadLargeTreeVariationPrefab("Mature"), 0.20f),
+                new LargeTreeVariationProfileEntry("Adult", TryLoadLargeTreeVariationPrefab("Adult"), 0.12f),
+            };
+        }
+
+        private static bool NeedsGrowthStageProfileMigration(IReadOnlyList<LargeTreeVariationProfileEntry> entries)
+        {
+            if (entries == null || entries.Count == 0)
+                return true;
+
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < entries.Count; i++)
+            {
+                var entry = entries[i];
+                if (entry == null)
+                    continue;
+
+                string name = entry.VariationName?.Trim();
+                if (string.IsNullOrEmpty(name))
+                    continue;
+
+                if (string.Equals(name, "LargeTreeBase", StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                for (int legacyIndex = 0; legacyIndex < LegacyLargeTreeVariationNames.Length; legacyIndex++)
+                {
+                    if (string.Equals(name, LegacyLargeTreeVariationNames[legacyIndex], StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+
+                seen.Add(name);
+            }
+
+            for (int i = 0; i < LargeTreeVariationNames.Length; i++)
+            {
+                if (!seen.Contains(LargeTreeVariationNames[i]))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static GameObject TryLoadLargeTreeVariationPrefab(string variationName)
+        {
+            if (string.IsNullOrWhiteSpace(variationName) || variationName.Equals("LargeTreeBase", StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            string generatedPath = $"{LargeTreeVariationGeneratedRoot}/{variationName}/LargeTree_{variationName}.prefab";
+            var generatedPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(generatedPath);
+            if (generatedPrefab != null)
+                return generatedPrefab;
+
+            string artPath = $"{LargeTreeVariationArtRoot}/{variationName}/LargeTree_{variationName}.fbx";
+            return AssetDatabase.LoadAssetAtPath<GameObject>(artPath);
+        }
+
+        private static GameObject ResolveTerrainTreeFallbackPrefab()
+        {
+            var generatedLargeTree = AssetDatabase.LoadAssetAtPath<GameObject>(LargeTreeGeneratedPrefabPath);
+            if (generatedLargeTree != null)
+            {
+                Debug.Log($"[TerrainGenerator] Using generated LargeTree prefab at '{LargeTreeGeneratedPrefabPath}' for terrain prototypes.");
+                return generatedLargeTree;
+            }
+
+            Debug.LogWarning($"[TerrainGenerator] Generated LargeTree prefab not found at '{LargeTreeGeneratedPrefabPath}'. Falling back to procedural TreePrefab.");
+            return GenerateTreePrefab();
+        }
+
         private static void EnsureFolder(string path)
         {
             if (AssetDatabase.IsValidFolder(path)) return;
@@ -251,5 +589,18 @@ namespace ByteWar.Editor
             if (AssetDatabase.LoadAssetAtPath<Object>(path) != null)
                 AssetDatabase.DeleteAsset(path);
         }
+
+        private readonly struct TerrainTreePrototypeSet
+        {
+            public readonly TreePrototype[] Prototypes;
+            public readonly float[] Weights;
+
+            public TerrainTreePrototypeSet(TreePrototype[] prototypes, float[] weights)
+            {
+                Prototypes = prototypes;
+                Weights = weights;
+            }
+        }
     }
+
 }

@@ -9,10 +9,12 @@ namespace ByteWar.Editor
     {
         internal const string E2EAssetName = "BlenderE2EProp";
         internal const string E2EFbxPath = "Assets/Art/Environment/Props/BlenderE2EProp/BlenderE2EProp.fbx";
+        internal const string LargeTreeAssetName = "LargeTree";
+        internal const string LargeTreeFbxPath = "Assets/Art/Environment/Vegetation/LargeTree/LargeTree.fbx";
 
         private void OnPreprocessModel()
         {
-            if (!IsTargetE2EAsset(assetPath))
+            if (!IsTargetBlenderAsset(assetPath))
                 return;
 
             var importer = (ModelImporter)assetImporter;
@@ -42,7 +44,7 @@ namespace ByteWar.Editor
 
         private void OnPostprocessModel(GameObject root)
         {
-            if (!IsTargetE2EAsset(assetPath))
+            if (!IsTargetBlenderAsset(assetPath))
                 return;
 
             if (root == null)
@@ -66,9 +68,10 @@ namespace ByteWar.Editor
             }
         }
 
-        private static bool IsTargetE2EAsset(string p)
+        private static bool IsTargetBlenderAsset(string p)
         {
-            return string.Equals(p, E2EFbxPath, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(p, E2EFbxPath, StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(p, LargeTreeFbxPath, StringComparison.OrdinalIgnoreCase);
         }
 
         internal static bool TryBuildLodGroup(GameObject root, out string message)

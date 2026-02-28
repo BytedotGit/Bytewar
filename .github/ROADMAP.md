@@ -13,7 +13,7 @@ All AI agents must consult this roadmap AND the MASTER_PLAN to understand projec
 
 **Infrastructure**: MASTER_PLAN Phase 2 (Core Abstractions & Interfaces) — interfaces defined, classes extracted; encapsulation + tests remaining. Phases 6/7/8 partially complete (spec files, validation tools, agent definitions created).
 
-**Gameplay**: Phase 15 (Visuals & Audio Polish) — not started.
+**Gameplay**: Phase 15 (Visuals & Audio Polish) — in progress (environment density, terrain grass/path pass underway).
 
 **Tooling**: Blender MCP server for headless asset export into `Assets/Art/` (in progress).
 

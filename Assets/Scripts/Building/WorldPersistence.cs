@@ -36,6 +36,9 @@ namespace ByteWar.Building
     {
         [Header("Configuration")]
         [SerializeField] private string _saveFileName = "world_save.json";
+        [SerializeField] private bool _spawnTerrainTreesOnServerStart = true;
+        [SerializeField] private bool _clearTerrainTreeInstancesAfterSpawn = true;
+        [SerializeField] private float _terrainTreeSpawnYOffset = 0f;
 
         [Header("Building Prefab Registry")]
         [SerializeField] private GameObject _foundationPrefab;
@@ -51,6 +54,8 @@ namespace ByteWar.Building
         [SerializeField] private GameObject _windowPrefab;
         [SerializeField] private GameObject _halfWallPrefab;
 
+        private bool _hasSpawnedTerrainTrees;
+
         /// <summary>Full path to the save file (platform-specific).</summary>
         public string SaveFilePath => Path.Combine(Application.persistentDataPath, _saveFileName);
 
@@ -59,6 +64,14 @@ namespace ByteWar.Building
 
         /// <summary>Raised after a successful save. Parameter = number of buildings saved.</summary>
         public event Action<int> OnWorldSaved;
+
+        public override void OnNetworkSpawn()
+        {
+            if (!IsServer)
+                return;
+
+            TrySpawnTerrainTreesFromActiveTerrain();
+        }
 
         // ── IPersistable ──────────────────────────────────────────────────────
 
@@ -262,6 +275,116 @@ namespace ByteWar.Building
             _doorFramePrefab = doorFrame;
             _windowPrefab = window;
             _halfWallPrefab = halfWall;
+        }
+
+        private void TrySpawnTerrainTreesFromActiveTerrain()
+        {
+            if (_hasSpawnedTerrainTrees)
+            {
+                Debug.Log("[WorldPersistence] Terrain tree startup spawn already completed; skipping duplicate invocation.");
+                return;
+            }
+
+            if (!_spawnTerrainTreesOnServerStart)
+            {
+                Debug.Log("[WorldPersistence] Terrain tree startup spawn disabled.");
+                return;
+            }
+
+            Terrain terrain = Terrain.activeTerrain;
+            TerrainData terrainData = terrain != null ? terrain.terrainData : null;
+            if (terrain == null || terrainData == null)
+            {
+                Debug.Log("[WorldPersistence] No active terrain found for startup biome tree spawning.");
+                return;
+            }
+
+            TreePrototype[] prototypes = terrainData.treePrototypes;
+            TreeInstance[] instances = terrainData.treeInstances;
+            if (prototypes == null || prototypes.Length == 0 || instances == null || instances.Length == 0)
+            {
+                Debug.Log("[WorldPersistence] Active terrain has no tree prototypes/instances to convert.");
+                return;
+            }
+
+            int spawned = 0;
+            int skipped = 0;
+
+            for (int i = 0; i < instances.Length; i++)
+            {
+                TreeInstance treeInstance = instances[i];
+                if (treeInstance.prototypeIndex < 0 || treeInstance.prototypeIndex >= prototypes.Length)
+                {
+                    skipped++;
+                    continue;
+                }
+
+                GameObject prototypePrefab = prototypes[treeInstance.prototypeIndex].prefab;
+                GameObject spawnPrefab = ResolveSpawnableTreePrefab(prototypePrefab);
+                if (spawnPrefab == null)
+                {
+                    skipped++;
+                    continue;
+                }
+
+                var networkObject = spawnPrefab.GetComponent<NetworkObject>();
+                if (networkObject == null)
+                {
+                    skipped++;
+                    Debug.LogWarning($"[WorldPersistence] Startup biome tree skipped: prefab '{spawnPrefab.name}' has no NetworkObject.");
+                    continue;
+                }
+
+                Vector3 worldPosition = new Vector3(
+                    treeInstance.position.x * terrainData.size.x,
+                    treeInstance.position.y * terrainData.size.y,
+                    treeInstance.position.z * terrainData.size.z) + terrain.transform.position;
+
+                worldPosition.y += _terrainTreeSpawnYOffset;
+
+                Quaternion rotation = Quaternion.Euler(0f, treeInstance.rotation * Mathf.Rad2Deg, 0f);
+                GameObject spawnedTree = Instantiate(spawnPrefab, worldPosition, rotation);
+
+                Vector3 localScale = spawnedTree.transform.localScale;
+                spawnedTree.transform.localScale = new Vector3(
+                    localScale.x * treeInstance.widthScale,
+                    localScale.y * treeInstance.heightScale,
+                    localScale.z * treeInstance.widthScale);
+
+                var spawnedNetworkObject = spawnedTree.GetComponent<NetworkObject>();
+                spawnedNetworkObject.Spawn();
+                spawned++;
+            }
+
+            if (_clearTerrainTreeInstancesAfterSpawn && spawned > 0)
+            {
+                terrainData.treeInstances = Array.Empty<TreeInstance>();
+                terrain.Flush();
+            }
+
+            _hasSpawnedTerrainTrees = true;
+            Debug.Log($"[WorldPersistence] Startup biome tree spawn complete: spawned={spawned} skipped={skipped} clearTerrain={_clearTerrainTreeInstancesAfterSpawn}.");
+        }
+
+        private static GameObject ResolveSpawnableTreePrefab(GameObject prototypePrefab)
+        {
+            if (prototypePrefab == null)
+                return null;
+
+            if (prototypePrefab.GetComponent<NetworkObject>() != null)
+                return prototypePrefab;
+
+            string name = prototypePrefab.name?.Trim() ?? string.Empty;
+            if (name.StartsWith("LargeTree_", StringComparison.OrdinalIgnoreCase))
+            {
+                string variationName = name.Substring("LargeTree_".Length);
+                return Resources.Load<GameObject>($"Generated/LargeTree/Variants/{variationName}/LargeTree_{variationName}");
+            }
+
+            if (string.Equals(name, "LargeTree", StringComparison.OrdinalIgnoreCase))
+                return Resources.Load<GameObject>("Generated/LargeTree/LargeTree");
+
+            return null;
         }
     }
 }

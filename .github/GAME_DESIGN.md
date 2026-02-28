@@ -10,12 +10,55 @@
 - **Core Philosophy**: High-stakes open-world risk, deep player autonomy in base building, and bracketed competitive arenas.
 - **Visual Aesthetic**: Custom high-poly, detailed player models (developed via Blender) set against stylized, low-poly environments. The contrast between detailed characters and stylized worlds is key to visual readability.
 
-### Art Direction Bible (WIP, agent-enforced)
+### Art Direction Bible (Locked, agent-enforced)
 
-- **Primary references**: Valheim + Enshrouded blend.
+- **Primary references**: Valheim (environment readability) + Overwatch (character polish/silhouette discipline).
+- **Art Style**: Low-poly stylized world + higher-detail playable character/gear stack.
+  - **Characters**: Chunky stylized silhouettes with high readability at mid camera distance, using cleaner deformation and detail density than the environment.
+  - **Environments**: Flat-shaded or low-frequency stylized forms; readable silhouettes over micro-detail; modular destructible pieces for trees, rocks, and building structures.
+- **Camera framing target**: WoW-style zoomable third-person camera from near over-the-shoulder to far tactical framing.
 - **Environment detail rule**: Hero props can carry richer surface detail; background props stay simpler for performance and readability.
 - **The Wilds mood**: Moodier/foggier atmosphere is preferred over bright daylight.
 - **Wear level**: Wear/dirt is per-asset and must be explicitly specified (clean / light wear / heavy wear) to avoid inconsistent styling.
+
+### Locked Production Choices (2026-02-27)
+
+- **Gear appearance pipeline**: Hybrid.
+  - **Skinned replacements** for armor regions (helmet/chest/legs/gloves/boots).
+  - **Socket attachments** for weapons, shields, and carried props.
+- **Body masking**: Enabled by default to avoid clipping under equipped armor.
+- **Networking model for world interaction**: Server-authoritative placement and destruction from day one.
+- **Destruction depth**: Structural integrity + collapse + loot.
+- **Initial destructible scope**: Trees, rocks/ores, build pieces, and terrain impact events.
+- **Damage model**: Material-aware damage types (axe/pick/fire/blunt) are part of core progression.
+
+### Asset Sourcing Policy
+
+- **Default**: CC0-first sourcing for production and prototyping.
+- **Expansion path**: Paid assets are allowed later once visual direction is proven and licensing is reviewed.
+- **Allowed sources (license-checked)**: Quaternius, Kenney, Poly Haven, Unity Asset Store, Synty Store, Sketchfab, OpenGameArt, and equivalent vetted sources.
+- **Consistency rule**: One primary asset family should cover most environment content; secondary packs must be style-matched to avoid visual drift.
+
+### Hero Asset Priority
+
+- Polish order for first content passes:
+  1. Player base body.
+  2. Starter armor set.
+  3. Starter weapon set.
+  4. Core tree family.
+  5. Core rock/ore family.
+  6. Main build set (wall/floor/roof).
+  7. Signature biome landmark.
+
+### Vertical Slice Definition (6-week target)
+
+- Must include all of the following:
+  1. One biome with a complete exploration loop.
+  2. Harvestable trees and rocks with drop tables.
+  3. Basic shelter construction with structural collapse behavior.
+  4. Gear equip flow with visible appearance changes.
+  5. One enemy archetype with basic combat loop.
+  6. Stable multiplayer host/join session.
 
 ---
 

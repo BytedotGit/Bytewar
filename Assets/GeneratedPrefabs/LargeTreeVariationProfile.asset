@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 484a7737406b2bc48b1e7f7eaca2a255, type: 3}
+  m_Name: LargeTreeVariationProfile
+  m_EditorClassIdentifier: ByteWar.Editor::ByteWar.Editor.LargeTreeVariationProfile
+  _entries:
+  - _variationName: Seedling
+    _prefab: {fileID: 1900015266480454994, guid: d8d2c0a9855a6994891a47c9fb3bbf20, type: 3}
+    _weight: 0.16
+  - _variationName: Sapling
+    _prefab: {fileID: 4712844027744626804, guid: ed11f7078bece3a4291176e84aa77865, type: 3}
+    _weight: 0.24
+  - _variationName: Young
+    _prefab: {fileID: 7604170786256736643, guid: c609b16fe20792943ac08fb188531ffa, type: 3}
+    _weight: 0.28
+  - _variationName: Mature
+    _prefab: {fileID: 8414712956866553322, guid: a1c576c87f3b5dc4696d7bc8b9b37815, type: 3}
+    _weight: 0.2
+  - _variationName: Adult
+    _prefab: {fileID: 7905753829448942419, guid: 6ca80570775728a43addc7c7d4e237f9, type: 3}
+    _weight: 0.12

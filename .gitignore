@@ -52,3 +52,21 @@ UserSettings/
 # Local one-off artifacts
 dotnet_build.txt
 SyncVS.log
+
+# Python bytecode caches
+__pycache__/
+
+# Local Python virtual environments
+.venv/
+.venv-*/
+venv/
+
+# Local Node vendor folders
+**/node_modules/
+
+# Local test result snapshots
+PlayModeTestResults*.xml
+
+# Dummy local build outputs
+DummyProject/bin/
+DummyProject/obj/

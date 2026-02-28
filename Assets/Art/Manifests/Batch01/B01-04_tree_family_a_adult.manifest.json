@@ -6,11 +6,11 @@
   "batchId": "B01",
   "source": {
     "provider": "Quaternius",
-    "packName": "Nature Pack",
-    "sourceUrl": "https://quaternius.com",
+    "packName": "Ultimate Stylized Nature Pack",
+    "sourceUrl": "https://quaternius.com/packs/ultimatestylizednature.html",
     "acquiredOn": "2026-02-28",
     "author": "Quaternius",
-    "originalFile": "tree_family_a_adult.fbx"
+    "originalFile": "NormalTree_2.fbx"
   },
   "license": {
     "type": "CC0",
@@ -31,10 +31,10 @@
       "triangleCountLOD0": 0,
       "triangleCountLOD1": 0,
       "triangleCountLOD2": 0,
-      "lodsPresent": true,
+      "lodsPresent": false,
       "materialsCount": 1,
-      "hasColliderMesh": true,
-      "colliderType": "MeshCollider",
+      "hasColliderMesh": false,
+      "colliderType": "BoxCollider",
       "hasTriggerMesh": false
     },
     "textures": {
@@ -62,7 +62,7 @@
     "importPath": "Assets/Art/Premade/Quaternius/Environment/Vegetation/TreeFamilyA/Adult",
     "runtimePrefabPath": "Assets/Resources/Generated/LargeTree/LargeTree.prefab",
     "manifestOwner": "Art",
-    "reviewStatus": "Draft",
+    "reviewStatus": "Integrated",
     "integrationOwner": "TechArt",
     "autotestScenario": "LargeTree"
   },
@@ -80,8 +80,8 @@
   "qa": {
     "visualReviewed": false,
     "performanceReviewed": false,
-    "networkReviewed": false,
-    "autotestReviewed": false,
-    "notes": ""
+    "networkReviewed": true,
+    "autotestReviewed": true,
+    "notes": "Imported from Quaternius source file NormalTree_2.fbx and renamed to tree_family_a_adult.fbx. validate-pr -RunPlayMode passed (43/43). Runtime generator used fallback LODGroup due missing authored _LOD suffix nodes."
   }
 }
